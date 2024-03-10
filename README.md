@@ -6,8 +6,9 @@ This repository is home of the code for two W & top jet mass related analyses: t
 Both analyses run off of the custom UHH2 MiniAOD N-tuples in the [UHH2 framework](https://github.com/UHH2/UHH2). To install the UHH2 modules, simply clone the repo into a valid `10_6_X` UHH2 installation and add the directory to the `Makefile.local` and run `make` in the `UHH2` directory.
 The first step is to run the pre-selection in the UHH2 framework. The config-files for all UL-years and the two samples can be found in the `config/` sub-directory. The cpp-modules can be found in the `include/` and `src/` sub-directories. The pre-selection module will write flat ROOT-trees for data and each signal- and background-mc holding the necessary physics objects and variables of the (pre-)selected events.
 
-Once the flat-trees are produced templates/histograms are filled using `coffea`. See [python/README.md](python/README.md) for detailed instructions.
-The templates are then used in maximum-likelihood fits using the [rhalphalib](https://github.com/nsmith-/rhalphalib)-package and [combine](http://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/)
+Once the flat-trees are produced templates/histograms are filled using `coffea`. See [python/README.md](python/README.md) for detailed instructions.  
+
+The templates are then used in maximum-likelihood fits using the [rhalphalib](https://github.com/nsmith-/rhalphalib)-package and [combine](http://cms-analysis.github.io/HiggsAnalysis-CombinedLimit/). See [rhalph/README.md](rhalph/README.md) for detailed instructions.  
 
 ## W/Z+jets EW-Correction and QCD k-factors
 - make sure to get ROOT files from 
