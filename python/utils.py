@@ -43,16 +43,17 @@ def numpy_to_th2(
     th2 = uproot.writing.identify.to_TH2x(
         hist_title,
         hist_title,
-        H.flatten(),
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        1,
-        np.array([1.0]),
+        np.ravel(H, order="C"),  #.flatten(),
+        1,  # fEntries
+        1,  # fTsumw
+        1,  # fTsumw2
+        1,  # fTsumwx
+        1,  # fTsumwx2
+        1,  # fTsumwy
+        1,  # fTsumwy2
+        1,  # fTsumwxy
+        # np.array([1.0]),  # fSumw2
+        np.ravel(np.ones_like(H), order="C"),  # fSumw2
         x_taxis,
         y_taxis,
     )
