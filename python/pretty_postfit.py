@@ -11,7 +11,7 @@ import itertools
 import logging
 import unfolding_plotting
 from coffea.util import load
-
+import pickle
 hep.style.use("CMS")
 
 diverging_colors = [
@@ -404,7 +404,7 @@ def plot_unfolded_mass(
     acceptance_files = {
         matching: [
             load(
-                f"acceptance_efficiency_plots_{n2cut_str}{acceptance_file_matching_str[matching]}/" +
+                f"/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/acceptance_efficiency_plots_{n2cut_str}{acceptance_file_matching_str[matching]}/" +
                 f"misses_acceptance{year}.coffea"
             )
             for year in years
@@ -415,7 +415,7 @@ def plot_unfolded_mass(
     acceptance_files_no_n2 = {
         matching: [
             load(
-                f"acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/" +
+                f"/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/" +
                 f"misses_acceptance{year}.coffea"
             )
             for year in years
@@ -588,6 +588,8 @@ def plot_unfolded_mass(
         "no matching": dict(fillstyle="none", markeredgewidth=2),
         "matching": dict(),
     }
+    
+    output_hists = {}
 
     for ipt in range(0, len(pt_edges) - 1):
         # plot_kwargs = {
@@ -757,6 +759,11 @@ def plot_unfolded_mass(
                     #     color="tab:grey",
                     #     ls="-" if matching == "matching" else "--"
                     # )
+                    output_hists["mc_truth_{}_ipt{}".format(matching, ipt)] = {
+                        "values":truth_values[matching],
+                        "edges": msd_edges_,
+                        "variances":truth_variances[matching],
+                    }
                     hep.histplot(
                         truth_values[matching],
                         msd_edges_,
@@ -778,6 +785,11 @@ def plot_unfolded_mass(
                             **matching_kwargs[matching]
                         )
             for matching in matchings:
+                output_hists["munfold_{}_ipt{}".format(matching, ipt)] = {
+                    "values":unfolding_values[matching],
+                    "edges": msd_edges_,
+                    "variances":unfolding_variances[matching],
+                }
                 ax_.errorbar(
                     msd_centers,
                     unfolding_values[matching],
@@ -812,6 +824,8 @@ def plot_unfolded_mass(
     plt.close()
     del ax_all, f_all
     f, ax = plt.subplots(figsize=(9, 9))
+    
+    
     if plot_truth:
         # hep.histplot(
         #     mc_truth_noreco_sum,
@@ -823,6 +837,11 @@ def plot_unfolded_mass(
         #     color="tab:grey",
         # )
         for matching in matchings:
+            output_hists["mc_truth_{}_sum".format(matching, ipt)] = {
+                "values":mc_truth_sum[matching],
+                "edges": msd_edges_,
+                "variances":mc_truth_variance_sum[matching],
+            }
             hep.histplot(
                 mc_truth_sum[matching],
                 msd_edges_,
@@ -843,6 +862,11 @@ def plot_unfolded_mass(
                     **matching_kwargs[matching]
                 )
     for matching in matchings:
+        output_hists["munfold_{}_sum".format(matching, ipt)] = {
+            "values":unfolding_sum[matching],
+            "edges": msd_edges_,
+            "variances":unfolding_variance_sum[matching],
+        }
         ax.errorbar(
             msd_centers,
             unfolding_sum[matching],
@@ -877,6 +901,8 @@ def plot_unfolded_mass(
     del f, ax
     plt.close()
 
+    #np.save(f"{fit_dir}/m_unfold_hists.npy", output_hists, protocol=2)
+    pickle.dump(output_hists, open(f"{fit_dir}/m_unfold_hists.pkl","wb"),  protocol=2)
 
 if __name__ == "__main__":
     import argparse

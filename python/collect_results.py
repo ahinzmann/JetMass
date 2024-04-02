@@ -2,11 +2,18 @@
 import numpy as np
 import uproot
 from utils import numpy_to_th2, hist_to_th1
-
+import pickle
 
 def get_unfolding_hists(fit_dir):
     # TODO implement here after implementing in pretty_postfit
-    return {}
+    #hists = np.load("{}/m_unfold_hists.npy".format(fit_dir), allow_pickle=True).item()
+    hists = pickle.load(open("{}/m_unfold_hists.pkl".format(fit_dir),"rb"))
+
+    return {
+        k: hist_to_th1(v, k)
+        for k, v in hists.items()
+        if "munfold" not in k 
+    }
 
 
 def get_correlation_matrix(fit_dir):
@@ -20,7 +27,7 @@ def get_correlation_matrix(fit_dir):
         "correlation_matrix",
         "pois",
         "pois"
-    )  # TODO funktioniert noch nicht so ganz  (beim Draw sind die achsen falsch)
+    )
 
 
 if __name__ == "__main__":

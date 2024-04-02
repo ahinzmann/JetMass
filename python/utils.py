@@ -62,11 +62,13 @@ def numpy_to_th2(
 
 def hist_to_th1(H, hist_name=""):
     __from_numpy = isinstance(H, tuple) and isinstance(H[0], np.ndarray)
-
+    __from_dict = isinstance(H, dict)
     x_axis_edges = None
     x_axis_name = ""
     if __from_numpy:
         x_axis_edges = H[1]
+    elif __from_dict:
+        x_axis_edges = H["edges"]
     else:
         x_axis_edges = H.axes[0].edges
         x_axis_name = H.axes[0].name
@@ -76,10 +78,17 @@ def hist_to_th1(H, hist_name=""):
     if __from_numpy:
         values = H[0]
         variances = np.zeros_like(H[0])
+    elif __from_dict:
+        values = H["values"]
+        variances = H.get("variances", np.zeros_like(values))
+        if values.shape != variances.shape:
+            print(variances.shape,values.shape)
+            if variances.shape[1] == values.shape[0]:
+                print("asdasd")
+                variances = variances[0,:]
     else:
         values = H.values()
         variances = H.variances()
-
     values = np.concatenate(([0.0], values, [0.0]))
     variances = np.concatenate(([0.0], variances, [0.0]))
 
