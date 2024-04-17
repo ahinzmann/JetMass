@@ -334,6 +334,8 @@ def plot_unfolded_mass(
     plot_no_matching: bool = False,
     plot_matching_comp: bool = False,
     n2cut: str = "",
+    n2cut_str: str = "no_n2",
+    coffea_hist_path: str = "/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists",
 ):
     import json
     from copy import deepcopy
@@ -351,10 +353,10 @@ def plot_unfolded_mass(
     tagger = "_particlenetDDT" if "particlenetddt" in hist_location.lower() else ""
     print("loading files")
     files = [
-        load(f"/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists/templates_{year}{tagger}_mctruth.coffea")
+        load(f"{coffea_hist_path}/templates_{year}{tagger}_mctruth.coffea")
         for year in years
     ]
-    n2cut_str = "no_n2" if n2cut == "" else n2cut
+    #n2cut_str = "no_n2" if n2cut == "" else n2cut
     # n2_0p124
 
     theory_systs = ["v_qcd", "w_ewk"]
@@ -494,7 +496,7 @@ def plot_unfolded_mass(
 
     var_files = {
         var: [
-            load(f"/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists/templates_{year}{tagger}_{var}_mctruth.coffea")
+            load(f"{coffea_hist_path}/templates_{year}{tagger}_{var}_mctruth.coffea")
             for year in years
         ]
         for var in theory_vars
@@ -578,6 +580,7 @@ def plot_unfolded_mass(
     theory_lower_sum = None
     ymaxs = [100.0, 23.0, 7.0, 0.6]
     ymax_sum = 122.0
+    #ymax_sum = 42.0 # TODO: for pt>500 GeV plots put back to 122.
     if n2cut != "":
         ymaxs = [50., 10., 3., 0.3]
         ymax_sum = 50.
@@ -723,7 +726,7 @@ def plot_unfolded_mass(
         # unfolding_variances = (unfolding_signal_strengths**2 * truth_variances) + (
         #     truth_values * unfolding_uncertainties
         # ) ** 2
-        if True:  # ipt == 1 or ipt == 2:
+        if True:#ipt>0:  # ipt == 1 or ipt == 2: # TODO: for pt>500GeV include bin 0 (pt \in [500,650) )
             if mc_truth_sum is None:
                 mc_truth_noreco_sum = {m: truth_noreco_values[m] for m in matchings}
                 mc_truth_noreco_variance_sum = {m: truth_noreco_variances[m] for m in matchings}
@@ -885,7 +888,8 @@ def plot_unfolded_mass(
         ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.6,
         # r"$650 \leq p_{T,\mathrm{truth}} < 1200~$GeV ",
-        r"$p_{T,\mathrm{truth}} > 500~$GeV ",
+        #r"$p_{T,\mathrm{truth}} > 650~$GeV ", # TODO: put back to 500 GeV momentarily
+        r"$p_{T,\mathrm{truth}} > 500~$GeV ", # TODO: put back to 500 GeV momentarily
         fontsize=20
     )
 
@@ -927,10 +931,12 @@ if __name__ == "__main__":
     parser.add_argument("--skip-templates", action="store_true")
     parser.add_argument("--n2cut", default="", choices=["", "n2_0p147", "n2_0p17", "n2_0p25", "n2_0p2"])
     parser.add_argument("--skipmunfold", action="store_true")
+    parser.add_argument("--coffea_hists", default=None, help="path to coffea hists - used to gather mctruth.")
+    parser.add_argument("--n2gen", action="store_true")
 
     args = parser.parse_args()
     exp_label = "Work in progress"
-    if not args.skip_templates:
+    if not args.skip_templates or True:
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data)
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data, region="fail")
     if not args.skipmunfold:
@@ -959,6 +965,8 @@ if __name__ == "__main__":
                 plot_no_matching=args.no_matching,
                 plot_matching_comp=args.matching_comp,
                 n2cut=args.n2cut,
+                n2cut_str="n2_0p2" if args.n2gen else "no_n2",
+                coffea_hist_path=args.coffea_hists,
             )
     if not args.migmat:
         exit(0)

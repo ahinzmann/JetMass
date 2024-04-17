@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os
+import sys
 import subprocess
 import time
 from CombineUtils import import_config
@@ -433,9 +434,11 @@ if __name__ == "__main__":
     parser.add_argument("--sumgenbins", action="store_true")
     parser.add_argument("--impacts", choices=["none", "fits", "plots"], default="none")
     parser.add_argument("--justplots", action="store_true", help="just redo the plots.")
+    parser.add_argument("--n2gen", action="store_true", help="toggle for the scripts to use the coffea hists with n2gen cut")
     args = parser.parse_args()
 
     asimov = "prefitasimov" in args.extra_options.lower()
+    data = not asimov    
 
     JMS_Combination = JetMassCombination(
         args.workdir, args.configs, name=args.name, year=args.year,
@@ -462,17 +465,17 @@ if __name__ == "__main__":
         if unfolding:
             JMS_Combination.update_config()
 
-        fitplotter.plot_fit_result(
-            JMS_Combination.combined_config,
-            plot_total_sig_bkg=False,
-            do_postfit=do_postfit,
-            use_config_samples=unfolding,
-            pseudo_data=False,
-            prefit_asimov=asimov,
-            unfolding=unfolding,
-            fit_shapes_root="fit_shapes.root",
-            sum_genbins=args.sumgenbins,
-        )
+        # fitplotter.plot_fit_result(
+        #     JMS_Combination.combined_config,
+        #     plot_total_sig_bkg=False,
+        #     do_postfit=do_postfit,
+        #     use_config_samples=unfolding,
+        #     pseudo_data=False,
+        #     prefit_asimov=asimov,
+        #     unfolding=unfolding,
+        #     fit_shapes_root="fit_shapes.root",
+        #     sum_genbins=args.sumgenbins,
+        # )
         # do_postfit=True
         for c_name_, config in JMS_Combination._config_dicts.items():
             this_config = deepcopy(config)
@@ -481,11 +484,35 @@ if __name__ == "__main__":
             fitplotter.plot_qcd_bernstein(this_config, do_3d_plot=False)
             fitplotter.plot_qcd_fail_parameters(this_config)
 
-        # print(
-        #     "/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/pretty_postfit.py {} --mctruth --year {}".format(JMS_Combination._combination_dir, args.year)
-        # )
-        # os.system(
-        #     "/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/pretty_postfit.py {} --mctruth --year {}".format(JMS_Combination._combination_dir, args.year)
-        # )
+        def exec_cmd(cmd, verbose=True):
+            if verbose:
+                print(cmd)
+            os.system(cmd)
+
+        if unfolding:
+            exec_cmd(
+                "{}/../python/pretty_postfit.py {} --mctruth --year {} {} --coffea_hists {} {}".format(
+                    sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else ""), "/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists/msdgen30n2cut" if args.n2gen else "/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists", "--n2gen" if args.n2gen else ""
+                )
+            )
+
+            exec_cmd(
+                "python jetmass_scale_fit_utils.py --corrmatrix -i {}/config.json".format(
+                    JMS_Combination._combination_dir
+                )
+            )
+
+            exec_cmd(
+                "{}/../python/collect_results.py --input {}".format(
+                    sys.path[0], JMS_Combination._combination_dir
+                )
+            )
+            
+            exec_cmd(
+                "python {}/../python/create_tgraphasymm.py --input {}".format(
+                    sys.path[0], JMS_Combination._combination_dir
+                )
+            )
+
     else:
         JMS_Combination.impacts(args.impacts)
