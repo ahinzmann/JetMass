@@ -22,6 +22,15 @@ wget https://github.com/Diboson3D/UHHNtupleConverter/raw/master/NLOweights/ZJets
 
 
 ## setting up python `venv`
-- install python 3.9
-- create venv for most python scripts.
-  - the ones that will use the venv have the pythonwrapper `bin/pythonJMS.sh` in their shebang (i.e. `#!/usr/bin/env pythonJMS.sh`)
+- make sure to have python 3.9 installed
+- most python scripts will use the venv - they have the python-wrapper `bin/pythonJMS.sh` in their shebang (i.e. `#!/usr/bin/env pythonJMS.sh`)
+  - make sure to have `JetMass/bin` in your `$PATH`
+  - in order to create the python venv do:
+    ```
+    python -m venv <venv-path-wherever>
+    source <venv-path-wherever>/bin/activate
+    pip install pip --upgrade
+    pip install -r python/requirements.txt
+    deactivate
+    ```
+  - adjust `VENVPYTHON` in [bin/pythonJMS.sh#L6](bin/pythonJMS.sh#L6)
