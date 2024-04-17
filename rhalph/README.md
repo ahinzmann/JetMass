@@ -38,6 +38,16 @@ cd CMSSW_11_3_4/src
 cmsenv
 ```
 
+install fork of rhalphalib:
+
+```
+pip install --user git+https://github.com/stalbrec/rhalphalib@jetmass-final
+```
+expose executables and python scripts to environment in the most hacky way:
+```
+export PATH=$PATH:<path-to>/JetMass/util/python:<path-to>/JetMass/bin
+```
+
 ### Installing `python3` venv for additional utilities
 make sure to setup the virtual environment as described in the main [README.md](../README.md)
 
@@ -112,4 +122,19 @@ combineTool.py -M Impacts -d model_combined.root -m 0 --robustFit 1 --doFits --e
 combineTool.py -M Impacts -d model_combined.root -m 0 -o impacts.json
 
 for ipt in 0 1 2 3; do echo $ipt ;printf "%s\n" 0 1 2 3 |xargs -I{} -P 5 -n1 plotImpacts.py -i impacts.json -o impacts_r_ptgen${ipt}_msdgen{} --POI r_ptgen${ipt}_msdgen{} --per-page 35 --translate ../../POI_rename.json --height 600;done
+```
+
+
+## Unfolding
+
+- perform unfolding fits:
+
+```bash
+./unfolding_fit.py --nonuniform --name <date>
+./unfolding_fit.py --nonuniform --name <date>Asimov --prefitAsimov
+./unfolding_fit.py --nonuniform --name <date>Pseudo --prefitAsimov --splitPseudo
+
+./unfolding_fit.py --nonuniform --particlenet --name <date> 
+./unfolding_fit.py --nonuniform --particlenet --name <date>Asimov --prefitAsimov
+./unfolding_fit.py --nonuniform --particlenet --name <date>Pseudo --prefitAsimov --splitPseudo
 ```

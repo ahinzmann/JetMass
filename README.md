@@ -22,4 +22,6 @@ wget https://github.com/Diboson3D/UHHNtupleConverter/raw/master/NLOweights/ZJets
 
 
 ## setting up python `venv`
-- TODO
+- install python 3.9
+- create venv for most python scripts.
+  - the ones that will use the venv have the pythonwrapper `bin/pythonJMS.sh` in their shebang (i.e. `#!/usr/bin/env pythonJMS.sh`)
