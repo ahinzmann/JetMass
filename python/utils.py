@@ -43,7 +43,7 @@ def numpy_to_th2(
     th2 = uproot.writing.identify.to_TH2x(
         hist_title,
         hist_title,
-        np.ravel(H, order="C"),  #.flatten(),
+        np.ravel(H, order="C"),
         1,  # fEntries
         1,  # fTsumw
         1,  # fTsumw2
@@ -82,10 +82,10 @@ def hist_to_th1(H, hist_name=""):
         values = H["values"]
         variances = H.get("variances", np.zeros_like(values))
         if values.shape != variances.shape:
-            print(variances.shape,values.shape)
+            print(variances.shape, values.shape)
             if variances.shape[1] == values.shape[0]:
                 print("asdasd")
-                variances = variances[0,:]
+                variances = variances[0, :]
     else:
         values = H.values()
         variances = H.variances()
