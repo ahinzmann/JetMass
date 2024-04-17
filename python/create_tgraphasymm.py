@@ -3,9 +3,10 @@ import argparse
 import numpy as np
 import pickle
 
+
 def dict_to_tga(H):
     edges = H["edges"]
-    
+
     x = (edges[1:]+edges[:-1])/2.
     xl = x-edges[:-1]
     xh = edges[1:]-x
@@ -18,9 +19,10 @@ def dict_to_tga(H):
 
     return tga
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    
+
     parser.add_argument(
         "--input",
         "-i",
@@ -36,16 +38,15 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    hists = pickle.load(open("{}/m_unfold_hists.pkl".format(args.input),"rb"))
+    hists = pickle.load(open("{}/m_unfold_hists.pkl".format(args.input), "rb"))
 
-
-    tgraphs =  {
+    tgraphs = {
         k: dict_to_tga(v)
         for k, v in hists.items()
-        if "munfold" in k 
+        if "munfold" in k
     }
 
     fout = ROOT.TFile("{}/{}_results.root".format(args.input, args.name), "UPDATE")
-    for k,v in tgraphs.items():
-        v.SetNameTitle(k,k)
+    for k, v in tgraphs.items():
+        v.SetNameTitle(k, k)
         v.Write()

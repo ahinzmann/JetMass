@@ -356,7 +356,7 @@ def plot_unfolded_mass(
         load(f"{coffea_hist_path}/templates_{year}{tagger}_mctruth.coffea")
         for year in years
     ]
-    #n2cut_str = "no_n2" if n2cut == "" else n2cut
+    # n2cut_str = "no_n2" if n2cut == "" else n2cut
     # n2_0p124
 
     theory_systs = ["v_qcd", "w_ewk"]
@@ -406,7 +406,7 @@ def plot_unfolded_mass(
     acceptance_files = {
         matching: [
             load(
-                f"/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/acceptance_efficiency_plots_{n2cut_str}{acceptance_file_matching_str[matching]}/" +
+                f"{coffea_hist_path}/acceptance_efficiency_plots_{n2cut_str}{acceptance_file_matching_str[matching]}/" +
                 f"misses_acceptance{year}.coffea"
             )
             for year in years
@@ -417,7 +417,7 @@ def plot_unfolded_mass(
     acceptance_files_no_n2 = {
         matching: [
             load(
-                f"/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/" +
+                f"{coffea_hist_path}/acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/" +
                 f"misses_acceptance{year}.coffea"
             )
             for year in years
@@ -579,8 +579,7 @@ def plot_unfolded_mass(
     theory_upper_sum = None
     theory_lower_sum = None
     ymaxs = [100.0, 23.0, 7.0, 0.6]
-    ymax_sum = 122.0
-    #ymax_sum = 42.0 # TODO: for pt>500 GeV plots put back to 122.
+    ymax_sum = 122.0  # TODO: for pt>650 GeV plots change to 42.0 .
     if n2cut != "":
         ymaxs = [50., 10., 3., 0.3]
         ymax_sum = 50.
@@ -591,7 +590,7 @@ def plot_unfolded_mass(
         "no matching": dict(fillstyle="none", markeredgewidth=2),
         "matching": dict(),
     }
-    
+
     output_hists = {}
 
     for ipt in range(0, len(pt_edges) - 1):
@@ -726,7 +725,7 @@ def plot_unfolded_mass(
         # unfolding_variances = (unfolding_signal_strengths**2 * truth_variances) + (
         #     truth_values * unfolding_uncertainties
         # ) ** 2
-        if True:#ipt>0:  # ipt == 1 or ipt == 2: # TODO: for pt>500GeV include bin 0 (pt \in [500,650) )
+        if True:  # ipt>0: # TODO: for pt>650GeV exclude bin 0 (pt \in [500,650) )
             if mc_truth_sum is None:
                 mc_truth_noreco_sum = {m: truth_noreco_values[m] for m in matchings}
                 mc_truth_noreco_variance_sum = {m: truth_noreco_variances[m] for m in matchings}
@@ -763,9 +762,9 @@ def plot_unfolded_mass(
                     #     ls="-" if matching == "matching" else "--"
                     # )
                     output_hists["mc_truth_{}_ipt{}".format(matching, ipt)] = {
-                        "values":truth_values[matching],
+                        "values": truth_values[matching],
                         "edges": msd_edges_,
-                        "variances":truth_variances[matching],
+                        "variances": truth_variances[matching],
                     }
                     hep.histplot(
                         truth_values[matching],
@@ -789,9 +788,9 @@ def plot_unfolded_mass(
                         )
             for matching in matchings:
                 output_hists["munfold_{}_ipt{}".format(matching, ipt)] = {
-                    "values":unfolding_values[matching],
+                    "values": unfolding_values[matching],
                     "edges": msd_edges_,
-                    "variances":unfolding_variances[matching],
+                    "variances": unfolding_variances[matching],
                 }
                 ax_.errorbar(
                     msd_centers,
@@ -827,8 +826,7 @@ def plot_unfolded_mass(
     plt.close()
     del ax_all, f_all
     f, ax = plt.subplots(figsize=(9, 9))
-    
-    
+
     if plot_truth:
         # hep.histplot(
         #     mc_truth_noreco_sum,
@@ -840,10 +838,10 @@ def plot_unfolded_mass(
         #     color="tab:grey",
         # )
         for matching in matchings:
-            output_hists["mc_truth_{}_sum".format(matching, ipt)] = {
-                "values":mc_truth_sum[matching],
+            output_hists["mc_truth_{}_sum".format(matching)] = {
+                "values": mc_truth_sum[matching],
                 "edges": msd_edges_,
-                "variances":mc_truth_variance_sum[matching],
+                "variances": mc_truth_variance_sum[matching],
             }
             hep.histplot(
                 mc_truth_sum[matching],
@@ -865,10 +863,10 @@ def plot_unfolded_mass(
                     **matching_kwargs[matching]
                 )
     for matching in matchings:
-        output_hists["munfold_{}_sum".format(matching, ipt)] = {
-            "values":unfolding_sum[matching],
+        output_hists["munfold_{}_sum".format(matching)] = {
+            "values": unfolding_sum[matching],
             "edges": msd_edges_,
-            "variances":unfolding_variance_sum[matching],
+            "variances": unfolding_variance_sum[matching],
         }
         ax.errorbar(
             msd_centers,
@@ -888,8 +886,7 @@ def plot_unfolded_mass(
         ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.6,
         # r"$650 \leq p_{T,\mathrm{truth}} < 1200~$GeV ",
-        #r"$p_{T,\mathrm{truth}} > 650~$GeV ", # TODO: put back to 500 GeV momentarily
-        r"$p_{T,\mathrm{truth}} > 500~$GeV ", # TODO: put back to 500 GeV momentarily
+        r"$p_{T,\mathrm{truth}} > 500~$GeV ",  # TODO: for 650 GeV change the label accordingly
         fontsize=20
     )
 
@@ -905,8 +902,9 @@ def plot_unfolded_mass(
     del f, ax
     plt.close()
 
-    #np.save(f"{fit_dir}/m_unfold_hists.npy", output_hists, protocol=2)
-    pickle.dump(output_hists, open(f"{fit_dir}/m_unfold_hists.pkl","wb"),  protocol=2)
+    # np.save(f"{fit_dir}/m_unfold_hists.npy", output_hists, protocol=2)
+    pickle.dump(output_hists, open(f"{fit_dir}/m_unfold_hists.pkl", "wb"),  protocol=2)
+
 
 if __name__ == "__main__":
     import argparse
@@ -936,7 +934,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     exp_label = "Work in progress"
-    if not args.skip_templates or True:
+    if not args.skip_templates:
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data)
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data, region="fail")
     if not args.skipmunfold:
@@ -954,6 +952,9 @@ if __name__ == "__main__":
             #     plot_no_matching=args.matching_comp,
             # )
             print(f"plotting munfold ({yaxis}) inclusive tagger region")
+            extra_args = {}
+            if args.coffea_hists:
+                extra_args["coffea_hist_path"] = args.coffea_hists
             plot_unfolded_mass(
                 args.fit_dir,
                 data=args.data,
@@ -966,7 +967,7 @@ if __name__ == "__main__":
                 plot_matching_comp=args.matching_comp,
                 n2cut=args.n2cut,
                 n2cut_str="n2_0p2" if args.n2gen else "no_n2",
-                coffea_hist_path=args.coffea_hists,
+                **extra_args
             )
     if not args.migmat:
         exit(0)

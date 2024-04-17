@@ -4,15 +4,16 @@ import uproot
 from utils import numpy_to_th2, hist_to_th1
 import pickle
 
+
 def get_unfolding_hists(fit_dir):
     # TODO implement here after implementing in pretty_postfit
-    #hists = np.load("{}/m_unfold_hists.npy".format(fit_dir), allow_pickle=True).item()
-    hists = pickle.load(open("{}/m_unfold_hists.pkl".format(fit_dir),"rb"))
+    # hists = np.load("{}/m_unfold_hists.npy".format(fit_dir), allow_pickle=True).item()
+    hists = pickle.load(open("{}/m_unfold_hists.pkl".format(fit_dir), "rb"))
 
     return {
         k: hist_to_th1(v, k)
         for k, v in hists.items()
-        if "munfold" not in k 
+        if "munfold" not in k
     }
 
 
