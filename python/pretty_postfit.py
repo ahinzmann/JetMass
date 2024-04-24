@@ -417,7 +417,7 @@ def plot_unfolded_mass(
     acceptance_files_no_n2 = {
         matching: [
             load(
-                f"{coffea_hist_path}/acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/" +
+                f"{coffea_hist_path}/acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/".replace("msdgen30n2cut/","") +
                 f"misses_acceptance{year}.coffea"
             )
             for year in years
@@ -425,16 +425,22 @@ def plot_unfolded_mass(
         for matching in matchings
     }
 
+    #print(matchings[0])
+    #print(acceptance_files[matchings[0]][0]["acceptance"][0][0])
+    #print(acceptance_files_no_n2[matchings[0]][0]["acceptance"][0][0])
+    #print(acceptance_files[matchings[0]][0]["total"][{"ptgen": 0}].values())
+    #print(acceptance_files_no_n2[matchings[0]][0]["total"][{"ptgen": 0}].values())
+
     print("getting hists")
 
     acceptance_years = {
         matching: [
             [
                 acceptance_files[matching][ifile]["acceptance"][iptgen][0]
-                * (
-                    acceptance_files_no_n2[matching][ifile]["total"][{"ptgen": iptgen}].values()
-                    / acceptance_files[matching][ifile]["total"][{"ptgen": iptgen}].values()
-                )
+                #* (
+                #    acceptance_files_no_n2[matching][ifile]["total"][{"ptgen": iptgen}].values()
+                #    / acceptance_files[matching][ifile]["total"][{"ptgen": iptgen}].values()
+                #)
                 for ifile in range(len(acceptance_files[matching]))
             ]
             for iptgen in range(len(pt_edges) - 1)
@@ -548,7 +554,7 @@ def plot_unfolded_mass(
     }
     for matching in matchings:
         for iptgen in range(len(pt_edges) - 1):
-            truth_mc[matching][iptgen] /= acceptance_years[matching][iptgen][0] * efficiency_years[matching][iptgen][0]
+            truth_mc[matching][iptgen] /= (acceptance_years[matching][iptgen][0] * efficiency_years[matching][iptgen][0])
             for var in theory_vars:
                 theory_vars_hists[matching][var][iptgen] /= (
                     acceptance_years[matching][iptgen][0] * efficiency_years[matching][iptgen][0]
@@ -579,10 +585,10 @@ def plot_unfolded_mass(
     theory_upper_sum = None
     theory_lower_sum = None
     ymaxs = [100.0, 23.0, 7.0, 0.6]
-    ymax_sum = 122.0  # TODO: for pt>650 GeV plots change to 42.0 .
-    if n2cut != "":
-        ymaxs = [50., 10., 3., 0.3]
-        ymax_sum = 50.
+    ymax_sum = 36.0  # TODO: for pt>650 GeV plots change to 42.0 .
+    if n2cut_str == "n2_0p2":
+        ymaxs = [50., 10., 4., 0.3]
+        ymax_sum = 16.
 
     # markers = ["o", "v", "^"]
     # linestyle = ["-", "--", ":"]
@@ -725,7 +731,7 @@ def plot_unfolded_mass(
         # unfolding_variances = (unfolding_signal_strengths**2 * truth_variances) + (
         #     truth_values * unfolding_uncertainties
         # ) ** 2
-        if True:  # ipt>0: # TODO: for pt>650GeV exclude bin 0 (pt \in [500,650) )
+        if ipt>0:  # ipt>0: # TODO: for pt>650GeV exclude bin 0 (pt \in [500,650) )
             if mc_truth_sum is None:
                 mc_truth_noreco_sum = {m: truth_noreco_values[m] for m in matchings}
                 mc_truth_noreco_variance_sum = {m: truth_noreco_variances[m] for m in matchings}
@@ -886,7 +892,7 @@ def plot_unfolded_mass(
         ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.6,
         # r"$650 \leq p_{T,\mathrm{truth}} < 1200~$GeV ",
-        r"$p_{T,\mathrm{truth}} > 500~$GeV ",  # TODO: for 650 GeV change the label accordingly
+        r"$p_{T,\mathrm{truth}} > 650~$GeV ",  # TODO: for 650 GeV change the label accordingly
         fontsize=20
     )
 

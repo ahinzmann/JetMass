@@ -19,10 +19,10 @@ def get_unfolding_hists(fit_dir):
 
 def get_correlation_matrix(fit_dir):
     corr_mat_npy = np.load("{}/poi_correlation_matrix.npy".format(fit_dir), allow_pickle=True, encoding="bytes").item()
-    edges = np.arange(0., len(corr_mat_npy[b"pois"])+1, dtype=float)
+    edges = np.arange(0., len(corr_mat_npy["pois"])+1, dtype=float) # b"pois"
     print(edges)
     return numpy_to_th2(
-        corr_mat_npy[b"covarianceMatrix"],
+        corr_mat_npy["covarianceMatrix"], # b"covarianceMatrix"
         edges,
         edges,
         "correlation_matrix",
