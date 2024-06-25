@@ -7,7 +7,7 @@ def exec_cmd(cmd, debug=False):
 
 for tagger in ["", "--particlenet"]:
     for name, args in [
-        ("07-08-23",""),
+        #("07-08-23",""),
         #("07-08-23Asimov","--prefitAsimov"),
         #("07-08-23Pseudo","--prefitAsimov --splitPseudo"),
         ("N2Cut_02-04-24","--n2gen"),

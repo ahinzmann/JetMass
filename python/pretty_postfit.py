@@ -335,7 +335,7 @@ def plot_unfolded_mass(
     plot_matching_comp: bool = False,
     n2cut: str = "",
     n2cut_str: str = "no_n2",
-    coffea_hist_path: str = "/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists",
+    coffea_hist_path: str = "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/coffea_hists",
 ):
     import json
     from copy import deepcopy
@@ -812,6 +812,14 @@ def plot_unfolded_mass(
                 )
         cms_label(exp_label=exp_label, year=year, ax=ax, fs=20, data=data)
 
+        if n2cut_str == "n2_0p2":
+          ax.text(
+            ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+            ax.get_ylim()[1]*0.5,
+            r"$N_{2}^{\beta=1} < 0.2$",
+            fontsize=20
+          )
+
         ax.set_ylabel(y_label)
         ax.set_xlabel(x_label)
         ax.set_xlim(msd_min, msd_max)
@@ -895,6 +903,13 @@ def plot_unfolded_mass(
         r"$p_{T,\mathrm{truth}} > 650~$GeV ",  # TODO: for 650 GeV change the label accordingly
         fontsize=20
     )
+    if n2cut_str == "n2_0p2":
+      ax.text(
+        ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+        ax.get_ylim()[1]*0.5,
+        r"$N_{2}^{\beta=1} < 0.2$",
+        fontsize=20
+      )
 
     ax.set_xlim(msd_min, msd_max)
     ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
@@ -997,7 +1012,7 @@ if __name__ == "__main__":
     tagger_str = "n2ddt" if args.tagger == "substructure" else "pNetddt"
     for year in years:
         msd_corr = polynomial_msd_correction_set[f"response_g_jec_{year}"]
-        sel_events_tree_fname = f"WJetsToQQ_tinyTree_{year}_notagger.parquet"
+        sel_events_tree_fname = f"/nfs/dust/cms/user/hinzmann/jetmass/parquet_trees/WJetsToQQ_tinyTree_{year}_notagger.parquet"
         events = ak.from_parquet(sel_events_tree_fname)
         events["pt_raw"] = events.Jets.pt[:, 0]
         events["pt"] = events.pt_raw * events.jecfactor[:, 0]
@@ -1016,7 +1031,22 @@ if __name__ == "__main__":
         del sel_events_tree_fname
     n_reco = (msd_reco_edges.shape[0] - 1) * (pt_reco_edges.shape[0] - 1)
     n_gen = (msd_gen_edges.shape[0] - 1) * (pt_gen_edges.shape[0] - 1)
-    print("Condition number:", np.linalg.cond(migmat.values().reshape((n_gen, n_reco))))
+    
+    response_matrix=migmat.values().reshape((n_gen, n_reco))
+    print(response_matrix)
+    print("Condition number (response matrix):", np.linalg.cond(response_matrix))
+
+    probability_matrix=response_matrix[:][:]
+    for i in range(n_gen):
+      response_sum=0
+      for j in range(n_reco):
+        response_sum+=response_matrix[i,j]
+      for j in range(n_reco):
+        if response_sum>0:
+          probability_matrix[i,j]/=response_sum
+    print(probability_matrix)
+    print("Condition number (probability matrix):", np.linalg.cond(probability_matrix))
+    
     unfolding_plotting.plot_migration_matrix(
         migmat,
         f"{args.fit_dir}/migration_matrix_prefit.pdf"

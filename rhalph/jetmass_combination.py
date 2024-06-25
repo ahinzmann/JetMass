@@ -55,7 +55,7 @@ class JetMassCombination(object):
 
         # create bigger workdir on dust for combineTool workflows
         basename = os.path.basename(self.workdir)
-        self._dust_dir = "/nfs/dust/cms/user/albrechs/JetMassFits/CombineToolWorkdir/{}".format(basename)
+        self._dust_dir = "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/CombineToolWorkdir/{}".format(basename)
         print(self._dust_dir)
         if not os.path.exists(self._dust_dir):
             os.makedirs(self._dust_dir)
@@ -492,7 +492,7 @@ if __name__ == "__main__":
         if unfolding:
             exec_cmd(
                 "{}/../python/pretty_postfit.py {} --mctruth --year {} {} --coffea_hists {} {}".format(
-                    sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else ""), "/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists/msdgen30n2cut" if args.n2gen else "/nfs/dust/cms/user/albrechs/JetMassFits/coffea_hists", "--n2gen" if args.n2gen else ""
+                    sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else ""), "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/coffea_hists/msdgen30n2cut" if args.n2gen else "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/coffea_hists", "--n2gen" if args.n2gen else ""
                 )
             )
 
