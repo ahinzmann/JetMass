@@ -1036,20 +1036,29 @@ if __name__ == "__main__":
     print(response_matrix)
     print("Condition number (response matrix):", np.linalg.cond(response_matrix))
 
+    unfolding_plotting.plot_migration_matrix(
+        migmat,
+        f"{args.fit_dir}/migration_matrix_prefit.pdf"
+    )
+
     probability_matrix=response_matrix[:][:]
+    response_sum=[]
     for i in range(n_gen):
-      response_sum=0
+      response_sum+=[0]
       for j in range(n_reco):
-        response_sum+=response_matrix[i,j]
+        response_sum[-1]+=response_matrix[i,j]
       for j in range(n_reco):
-        if response_sum>0:
-          probability_matrix[i,j]/=response_sum
+        if response_sum[-1]>0:
+          probability_matrix[i,j]/=response_sum[-1]
+      response_sum[-1]=1/response_sum[-1]
+    r_norm=np.array(response_sum)
     print(probability_matrix)
     print("Condition number (probability matrix):", np.linalg.cond(probability_matrix))
     
     unfolding_plotting.plot_migration_matrix(
         migmat,
-        f"{args.fit_dir}/migration_matrix_prefit.pdf"
+        f"{args.fit_dir}/probability_matrix_prefit.pdf",
+        r_gen=r_norm
     )
 
     fit_results = json.load(open(glob.glob(args.fit_dir + "/*fitResult.json")[0], "r"))

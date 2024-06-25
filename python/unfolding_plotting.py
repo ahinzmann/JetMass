@@ -2,7 +2,7 @@
 import hist
 import numpy as np
 import seaborn as sns
-from matplotlib.colors import LogNorm
+from matplotlib.colors import Normalize,LogNorm
 import matplotlib.pyplot as plt
 import awkward as ak
 import mplhep as hep
@@ -464,8 +464,8 @@ def plot_migration_matrix(
             reco_positions,
         ),
         content.T,
-        cmap="magma",
-        norm=LogNorm(),
+        cmap="Blues",#"magma",
+        norm=(Normalize(0,1) if "probability" in outname else LogNorm()),
     )
 
     ax.set_xticks(pt_gen_labels_positions, pt_gen_labels)
@@ -508,7 +508,7 @@ def plot_migration_matrix(
     ax.text(0.05 * ax.get_xlim()[1], 0.9 * ax.get_ylim()[1], r"$W(q\bar{q})$+jets")
     ax.text(0.05 * ax.get_xlim()[1], 0.85 * ax.get_ylim()[1], extratext)
 
-    f.colorbar(c, cax=cax, orientation="vertical", label="Events")
+    f.colorbar(c, cax=cax, orientation="vertical", label=("Probability" if "probability" in outname else "Events"))
     f.savefig(
         outname,
         bbox_inches="tight"
