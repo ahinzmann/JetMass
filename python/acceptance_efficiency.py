@@ -342,7 +342,7 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
             msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0)],
             weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0)],
         )
-    print("Gen pT, mSD cut xsec =", hists["gen_pt_msd"].values().sum()/lumis[year])
+    print("Gen pT>650, mSD>30 cut xsec =", hists["gen_pt_msd"].values().sum()/lumis[year])
     hists["gen_pt_msd_n2"] = hist.Hist(
             pt_gen_ax0,
             msd_gen_ax0,
@@ -353,7 +353,53 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
             msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max)],
             weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max)],
         )
-    print("Gen pT, mSD, N2 cut xsec =", hists["gen_pt_msd_n2"].values().sum()/lumis[year])
+    print("Gen pT>650, mSD>30, N2<0.2 cut xsec =", hists["gen_pt_msd_n2"].values().sum()/lumis[year])
+
+    hists["gen_pt_msd"] = hist.Hist(
+            pt_gen_ax0,
+            msd_gen_ax0,
+            storage=hist.storage.Weight(),
+        )
+    hists["gen_pt_msd"].fill(
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0)],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0)],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0)],
+        )
+    print("Gen pT>650, 30<mSD<260 cut xsec =", hists["gen_pt_msd"].values().sum()/lumis[year])
+    hists["gen_pt_msd_n2"] = hist.Hist(
+            pt_gen_ax0,
+            msd_gen_ax0,
+            storage=hist.storage.Weight(),
+        )
+    hists["gen_pt_msd_n2"].fill(
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.gentopjet_n2_0 < n2_max)],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.gentopjet_n2_0 < n2_max)],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.gentopjet_n2_0 < n2_max)],
+        )
+    print("Gen pT>650, 30<mSD<260, N2<0.2 cut xsec =", hists["gen_pt_msd_n2"].values().sum()/lumis[year])
+
+    hists["gen_pt_msd"] = hist.Hist(
+            pt_gen_ax0,
+            msd_gen_ax0,
+            storage=hist.storage.Weight(),
+        )
+    hists["gen_pt_msd"].fill(
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1050.0)],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1050.0)],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1050.0)],
+        )
+    print("Gen pT>650, 30<mSD<1050 cut xsec =", hists["gen_pt_msd"].values().sum()/lumis[year])
+    hists["gen_pt_msd_n2"] = hist.Hist(
+            pt_gen_ax0,
+            msd_gen_ax0,
+            storage=hist.storage.Weight(),
+        )
+    hists["gen_pt_msd_n2"].fill(
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1050.0) & (events.gentopjet_n2_0 < n2_max)],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1050.0) & (events.gentopjet_n2_0 < n2_max)],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1050.0) & (events.gentopjet_n2_0 < n2_max)],
+        )
+    print("Gen pT>650, 30<mSD<1050, N2<0.2 cut xsec =", hists["gen_pt_msd_n2"].values().sum()/lumis[year])
     #####
 
     return hists

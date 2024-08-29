@@ -335,6 +335,7 @@ def plot_unfolded_mass(
     plot_matching_comp: bool = False,
     n2cut: str = "",
     n2cut_str: str = "no_n2",
+    theory_uncertainty: str = "Theory",
     coffea_hist_path: str = "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/coffea_hists",
 ):
     import json
@@ -359,7 +360,10 @@ def plot_unfolded_mass(
     # n2cut_str = "no_n2" if n2cut == "" else n2cut
     # n2_0p124
 
-    theory_systs = ["v_qcd", "w_ewk"]
+    if theory_uncertainty=="Theory":
+      theory_systs = ["v_qcd", "w_ewk"]
+    else:
+      theory_systs = [theory_uncertainty]
     theory_vars = [f"{syst}_{direc}" for syst in theory_systs for direc in ["up", "down"]]
 
     data_label = ("unfolded data" if data else "unfolded pseudo data") + r"(stat. $\bigoplus$ syst. unc.)"
@@ -377,6 +381,8 @@ def plot_unfolded_mass(
 
     region = "inclusive" if inclusive_tagger else "pass"
     region_str = "inclusive" if inclusive_tagger else ""
+    if theory_uncertainty!="Theory":
+      region_str+="_"+theory_uncertainty
 
     matchings = ["matching"]
     if plot_no_matching:
@@ -581,6 +587,8 @@ def plot_unfolded_mass(
     legend_fontsize = fontsize + 4
     unfolding_sum = None
     unfolding_variance_sum = None
+
+    doRatio=True
     f_all, ax_all = plt.subplots(figsize=(10, 10))
     theory_upper_sum = None
     theory_lower_sum = None
@@ -604,7 +612,10 @@ def plot_unfolded_mass(
         #     "mc": dict(ls=linestyle[ipt]),
         #     "data": dict(fmt=markers[ipt], markersize=6)
         # }
-        f, ax = plt.subplots(figsize=(10, 10))
+        if doRatio:
+          f, (ax,axratio) = plt.subplots(2,1,gridspec_kw={'height_ratios': [4,1],'hspace' : 0.08},figsize=(9, 12))
+        else:
+          f, ax = plt.subplots(figsize=(10, 10))
         pt_bin_tex = r" ($%s \leq p_{T,\mathrm{truth}} < %s $)" % (
             str(configs["unfolding_bins"]["ptgen"][ipt]),
             str(configs["unfolding_bins"]["ptgen"][ipt + 1]),
@@ -624,7 +635,7 @@ def plot_unfolded_mass(
             y_label = r"$\frac{d\sigma}{d m_\mathrm{SD}}~[\frac{fb}{\mathrm{GeV}}]$"
 
         x_label = r"$m_{\mathrm{SD, gen}} [GeV]$"
-        msd_max = 260.
+        msd_max = 250.
         msd_min = 30.
         msd_edges_ = truth_mc["matching"][ipt].axes[0].edges.copy()
         msd_edges_[0] = msd_min
@@ -635,7 +646,7 @@ def plot_unfolded_mass(
         # setting last bin edge to 1050
         # this number is the upper bound of mtruth values in the signal region
         # (estimated from tinyTrees (~1042))
-        msd_edges_for_binwidth[-1] = 1050.
+        msd_edges_for_binwidth[-1] = 1000. #put a round number instead of 1050.
         scale = {matching: 1.0 for matching in matchings}
         if binwnorm:
             scale = {matching: binwnorm / np.diff(msd_edges_for_binwidth) for matching in matchings}
@@ -702,11 +713,11 @@ def plot_unfolded_mass(
         }
 
         theory_band_low = {
-            matching: theory_lower[matching]["v_qcd"] ** 2 + theory_lower[matching]["w_ewk"] ** 2
+            matching: sum(theory_lower[matching][unc] ** 2 for unc in theory_systs)
             for matching in matchings
         }
         theory_band_hi = {
-            matching: theory_upper[matching]["v_qcd"] ** 2 + theory_upper[matching]["w_ewk"] ** 2
+            matching: sum(theory_upper[matching][unc] ** 2 for unc in theory_systs)
             for matching in matchings
         }
 
@@ -789,7 +800,7 @@ def plot_unfolded_mass(
                             (truth_values[matching]-np.sqrt(theory_band_low[matching]))[ibin],
                             (truth_values[matching]+np.sqrt(theory_band_hi[matching]))[ibin],
                             alpha=0.2,
-                            label="Theory uncertainties{}".format(matching_str[matching]) if ibin == 0 else None,
+                            label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
                             **matching_kwargs[matching]
                         )
             for matching in matchings:
@@ -810,6 +821,31 @@ def plot_unfolded_mass(
                     markersize=6,
                     **marker_kwargs[matching]
                 )
+        if doRatio:
+            if plot_truth:
+                for matching in matchings:
+                    for ibin in range(len(msd_edges_)-1):
+                        axratio.fill_between(
+                            msd_edges_[ibin:ibin+2],
+                            (1.-np.sqrt(theory_band_low[matching])/truth_values[matching])[ibin],
+                            (1.+np.sqrt(theory_band_hi[matching])/truth_values[matching])[ibin],
+                            alpha=0.2,
+                            label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
+                            **matching_kwargs[matching]
+                        )
+            for matching in matchings:
+                  axratio.errorbar(
+                    msd_centers,
+                    unfolding_values[matching]/truth_values[matching],
+                    yerr=np.sqrt(unfolding_variances[matching])/truth_values[matching],
+                    xerr=msd_xerr,
+                    label=data_label + " " + pt_bin_tex,
+                    color="k",
+                    alpha=alpha,
+                    fmt="o",
+                    markersize=6,
+                    **marker_kwargs[matching]
+                  )
         cms_label(exp_label=exp_label, year=year, ax=ax, fs=20, data=data)
 
         if n2cut_str == "n2_0p2":
@@ -821,11 +857,27 @@ def plot_unfolded_mass(
           )
 
         ax.set_ylabel(y_label)
-        ax.set_xlabel(x_label)
+        if doRatio:
+          ax.set_xlabel("")
+        else: 
+          ax.set_xlabel(x_label)
         ax.set_xlim(msd_min, msd_max)
         ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+        if doRatio:
+          ax.set_xticklabels(["", "", "", "", "", ""])
+        else:
+          ax.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
         ax.set_ylim(0, ymaxs[ipt])
         ax.legend(fontsize=legend_fontsize)
+
+        if doRatio:
+          axratio.set_xlim(msd_min, msd_max)
+          axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+          axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+          axratio.set_ylim(0., 2)
+          axratio.set_xlabel(x_label)
+          axratio.set_ylabel("Data/Sim")
+
         f.savefig(f"{out_dir}/m_unfold_pt{ipt}{region_str}.pdf", bbox_inches="tight")
         del f, ax
 
@@ -834,13 +886,18 @@ def plot_unfolded_mass(
     ax_all.set_xlabel(x_label)
     ax_all.set_xlim(msd_min, msd_max)
     ax_all.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+    ax_all.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
     ax_all.legend(fontsize=legend_fontsize)
     cms_label(exp_label=exp_label, year=year, fs=20, ax=ax_all, data=data)
     f_all.savefig(f"{out_dir}/m_unfold_pt_all{region_str}.pdf", bbox_inches="tight")
     plt.close()
     del ax_all, f_all
-    f, ax = plt.subplots(figsize=(9, 9))
-
+    
+    if doRatio:
+      f, (ax,axratio) = plt.subplots(2,1,gridspec_kw={'height_ratios': [4,1],'hspace' : 0.08},figsize=(9, 12))
+    else:
+      f, ax = plt.subplots(figsize=(9, 9))
+    
     if plot_truth:
         # hep.histplot(
         #     mc_truth_noreco_sum,
@@ -873,7 +930,17 @@ def plot_unfolded_mass(
                     (mc_truth_sum[matching]-np.sqrt(theory_lower_sum[matching]))[ibin],
                     (mc_truth_sum[matching]+np.sqrt(theory_upper_sum[matching]))[ibin],
                     alpha=0.2,
-                    label="Theory uncertainties{}".format(matching_str[matching]) if ibin == 0 else None,
+                    label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
+                    **matching_kwargs[matching]
+                )
+            if doRatio:
+              for ibin in range(len(msd_edges_)-1):
+                axratio.fill_between(
+                    msd_edges_[ibin:ibin+2],
+                    (1.-np.sqrt(theory_lower_sum[matching])/mc_truth_sum[matching])[ibin],
+                    (1.+np.sqrt(theory_upper_sum[matching])/mc_truth_sum[matching])[ibin],
+                    alpha=0.2,
+                    label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
     for matching in matchings:
@@ -893,6 +960,18 @@ def plot_unfolded_mass(
             markersize=6,
             **marker_kwargs[matching]
         )
+        if doRatio:
+          axratio.errorbar(
+            msd_centers,
+            unfolding_sum[matching]/mc_truth_sum[matching],
+            yerr=np.sqrt(unfolding_variance_sum[matching])/mc_truth_sum[matching],
+            xerr=msd_xerr,
+            label=data_label,
+            color="k",
+            fmt="o",
+            markersize=6,
+            **marker_kwargs[matching]
+          )
 
     cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
     ax.legend(fontsize=legend_fontsize)
@@ -913,12 +992,28 @@ def plot_unfolded_mass(
 
     ax.set_xlim(msd_min, msd_max)
     ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+    if doRatio:
+      ax.set_xticklabels(["", "", "", "", "", ""])
+    else:
+      ax.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
 
     # ax.set_yscale("log")
     # ax.set_ylim(-1, 90.0)
     ax.set_ylim(0., ymax_sum)
-    ax.set_xlabel(x_label)
+    if doRatio:
+      ax.set_xlabel("")
+    else: 
+      ax.set_xlabel(x_label)
     ax.set_ylabel(y_label)
+
+    if doRatio:
+     axratio.set_xlim(msd_min, msd_max)
+     axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+     axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+     axratio.set_ylim(0., 2)
+     axratio.set_xlabel(x_label)
+     axratio.set_ylabel("Data/Sim")
+
     f.savefig(f"{out_dir}/m_unfold_sum{region_str}.pdf", bbox_inches="tight")
     del f, ax
     plt.close()
@@ -952,6 +1047,7 @@ if __name__ == "__main__":
     parser.add_argument("--skipmunfold", action="store_true")
     parser.add_argument("--coffea_hists", default=None, help="path to coffea hists - used to gather mctruth.")
     parser.add_argument("--n2gen", action="store_true")
+    parser.add_argument("--theory_uncertainty", default="Theory")
 
     args = parser.parse_args()
     exp_label = "Work in progress"
@@ -988,6 +1084,7 @@ if __name__ == "__main__":
                 plot_matching_comp=args.matching_comp,
                 n2cut=args.n2cut,
                 n2cut_str="n2_0p2" if args.n2gen else "no_n2",
+                theory_uncertainty=args.theory_uncertainty,
                 **extra_args
             )
     if not args.migmat:

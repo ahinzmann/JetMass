@@ -3,7 +3,8 @@
 # SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 # VENVDIR=$SCRIPT_DIR/pythonJMS
 # VENVPYTHON=$VENVDIR/bin/python
-VENVPYTHON=/nfs/dust/cms/user/albrechs/python/coffea/bin/python
+#VENVPYTHON=/nfs/dust/cms/user/albrechs/python/coffea/bin/python
+VENVPYTHON=/nfs/dust/cms/user/hinzmann/jetmass/JetMass/venv/bin/python
 
 # #ToDo:just use miniconda to install python3.9/3.10
 # PYTHON3=$(which python3)
