@@ -635,9 +635,11 @@ def plot_unfolded_mass(
             y_label = r"$\frac{d\sigma}{d m_\mathrm{SD}}~[\frac{fb}{\mathrm{GeV}}]$"
 
         x_label = r"$m_{\mathrm{SD, gen}} [GeV]$"
-        msd_max = 250.
+        msd_max = 1000.
         msd_min = 30.
         msd_edges_ = truth_mc["matching"][ipt].axes[0].edges.copy()
+        print("lower edge",msd_edges_[0]," modified to", msd_min)
+        print("upper edge",msd_edges_[-1]," modified to", msd_max)
         msd_edges_[0] = msd_min
         msd_edges_[-1] = msd_max
         msd_centers = (msd_edges_[:-1]+msd_edges_[1:])/2
@@ -744,14 +746,14 @@ def plot_unfolded_mass(
         # ) ** 2
         if ipt>0:  # ipt>0: # TODO: for pt>650GeV exclude bin 0 (pt \in [500,650) )
             if mc_truth_sum is None:
-                mc_truth_noreco_sum = {m: truth_noreco_values[m] for m in matchings}
-                mc_truth_noreco_variance_sum = {m: truth_noreco_variances[m] for m in matchings}
-                mc_truth_sum = {m: truth_values[m] for m in matchings}
-                mc_truth_variance_sum = {m: truth_variances[m] for m in matchings}
-                theory_lower_sum = {m: theory_band_low[m] for m in matchings}
-                theory_upper_sum = {m: theory_band_hi[m] for m in matchings}
-                unfolding_sum = {m: unfolding_values[m] for m in matchings}
-                unfolding_variance_sum = {m: unfolding_variances[m] for m in matchings}
+                mc_truth_noreco_sum = {m: deepcopy(truth_noreco_values[m]) for m in matchings}
+                mc_truth_noreco_variance_sum = {m: deepcopy(truth_noreco_variances[m]) for m in matchings}
+                mc_truth_sum = {m: deepcopy(truth_values[m]) for m in matchings}
+                mc_truth_variance_sum = {m: deepcopy(truth_variances[m]) for m in matchings}
+                theory_lower_sum = {m: deepcopy(theory_band_low[m]) for m in matchings}
+                theory_upper_sum = {m: deepcopy(theory_band_hi[m]) for m in matchings}
+                unfolding_sum = {m: deepcopy(unfolding_values[m]) for m in matchings}
+                unfolding_variance_sum = {m: deepcopy(unfolding_variances[m]) for m in matchings}
             else:
                 for matching in matchings:
                     mc_truth_noreco_sum[matching] += truth_noreco_values[matching]
@@ -862,7 +864,7 @@ def plot_unfolded_mass(
         else: 
           ax.set_xlabel(x_label)
         ax.set_xlim(msd_min, msd_max)
-        ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+        ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
         if doRatio:
           ax.set_xticklabels(["", "", "", "", "", ""])
         else:
@@ -872,20 +874,20 @@ def plot_unfolded_mass(
 
         if doRatio:
           axratio.set_xlim(msd_min, msd_max)
-          axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+          axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
           axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
           axratio.set_ylim(0., 2)
           axratio.set_xlabel(x_label)
           axratio.set_ylabel("Data/Sim")
 
         f.savefig(f"{out_dir}/m_unfold_pt{ipt}{region_str}.pdf", bbox_inches="tight")
-        del f, ax
+        del f, ax, axratio
 
     ax_all.set_yscale("log")
     ax_all.set_ylabel(y_label)
     ax_all.set_xlabel(x_label)
     ax_all.set_xlim(msd_min, msd_max)
-    ax_all.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+    ax_all.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
     ax_all.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
     ax_all.legend(fontsize=legend_fontsize)
     cms_label(exp_label=exp_label, year=year, fs=20, ax=ax_all, data=data)
@@ -991,7 +993,7 @@ def plot_unfolded_mass(
       )
 
     ax.set_xlim(msd_min, msd_max)
-    ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+    ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
     if doRatio:
       ax.set_xticklabels(["", "", "", "", "", ""])
     else:
@@ -1008,7 +1010,7 @@ def plot_unfolded_mass(
 
     if doRatio:
      axratio.set_xlim(msd_min, msd_max)
-     axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 250.0])
+     axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
      axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
      axratio.set_ylim(0., 2)
      axratio.set_xlabel(x_label)
@@ -1017,7 +1019,6 @@ def plot_unfolded_mass(
     f.savefig(f"{out_dir}/m_unfold_sum{region_str}.pdf", bbox_inches="tight")
     del f, ax
     plt.close()
-
     # np.save(f"{fit_dir}/m_unfold_hists.npy", output_hists, protocol=2)
     pickle.dump(output_hists, open(f"{fit_dir}/m_unfold_hists.pkl", "wb"),  protocol=2)
 

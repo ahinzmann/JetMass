@@ -977,11 +977,11 @@ if __name__ == "__main__":
         if args.config.endswith(".json"):
             configs = json.load(open(args.config))
         else:
-            execfile(args.config)  # noqa # type: ignore
+            exec(open(args.config).read())  # noqa # type: ignore
         existing_config = args.workdir + "/" + configs["ModelName"] + "/config.json"
         if os.path.isfile(existing_config) and args.unfolding:
             use_existing_config = (
-                raw_input(      # noqa # type: ignore
+                input(      # noqa # type: ignore
                     "There already is a directory corresponding to this config. "
                     "Do you want to load the existing config? [Y/N]"
                 ).lower()
