@@ -14,10 +14,10 @@ from coffea_util import CoffeaWorkflow
 from utils import jms_correction_files
 from copy import deepcopy
 
-jetmass_path = "/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass"
-ddtmaps_n2_path = f"{jetmass_path}/Histograms/ddtmaps_n2.npy"
-ddtmaps_particlenet_path = f"{jetmass_path}/Histograms/ddtmaps_particlenet.npy"
-kfactor_path = f"{jetmass_path}/NLOweights/"
+jetmass_path = "/nfs/dust/cms/user/hinzmann/jetmass"
+ddtmaps_n2_path = f"{jetmass_path}/ddtmaps/ddtmaps_n2.npy"
+ddtmaps_particlenet_path = f"{jetmass_path}/ddtmaps/ddtmaps_particlenet.npy"
+kfactor_path = f"{jetmass_path}/NLOWeights"
 
 
 class JMSTemplates(processor.ProcessorABC):
@@ -179,12 +179,12 @@ class JMSTemplates(processor.ProcessorABC):
         }
 
         self.trigger_scalefactors = correctionlib.CorrectionSet.from_file(
-            "/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/notebooks/data/"
+            "/nfs/dust/cms/user/hinzmann/jetmass/JetMassNotebooks/data/"
             + "HLT_AK8PFJet_MC_trigger_sf_c2e731345f.json"
         )
 
         self.mjet_reco_correction = correctionlib.CorrectionSet.from_file(
-            "/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/"
+            "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/"
             + jms_correction_files["notagger"]
         )
 
@@ -204,10 +204,10 @@ class JMSTemplates(processor.ProcessorABC):
 
         self.corrections = corrections_extractor.make_evaluator()
 
-        self._vjets_corrections = correctionlib.CorrectionSet.from_file(
-            "/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/"
-            "ULvjets_corrections.json"
-        )
+        #self._vjets_corrections = correctionlib.CorrectionSet.from_file(
+        #    "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/"
+        #    "ULvjets_corrections.json"
+        #)
 
         self._selections = ["vjets", "ttbar"]
 
@@ -675,6 +675,11 @@ class JMSTemplates(processor.ProcessorABC):
                 variation_weights["fsr_up"] = events["ps_weights"][:, 5] / events["ps_weights"][:, 0]
                 variation_weights["isr_down"] = events["ps_weights"][:, 26] / events["ps_weights"][:, 0]
                 variation_weights["isr_up"] = events["ps_weights"][:, 27] / events["ps_weights"][:, 0]
+                # for factor 4
+                #variation_weights["fsr_down"] = events["ps_weights"][:, 6] / events["ps_weights"][:, 0]
+                #variation_weights["fsr_up"] = events["ps_weights"][:, 7] / events["ps_weights"][:, 0]
+                #variation_weights["isr_down"] = events["ps_weights"][:, 28] / events["ps_weights"][:, 0]
+                #variation_weights["isr_up"] = events["ps_weights"][:, 29] / events["ps_weights"][:, 0]
 
             else:
                 variation_weights["fsr_down"] = 1.0
@@ -682,7 +687,29 @@ class JMSTemplates(processor.ProcessorABC):
                 variation_weights["isr_down"] = 1.0
                 variation_weights["isr_up"] = 1.0
 
-            if "WJets" in dataset or "ZJets" in dataset:
+            model_uncertainty_map={'Madgraph+Pythia': [[4248.748046875, 1950.68505859375, 3420.052001953125, 9013.298828125], [1137.9599609375, 566.2576904296875, 814.9030151367188, 2945.991943359375], [526.6923217773438, 263.8905944824219, 357.5408935546875, 1671.18603515625], [52.632930755615234, 26.49795913696289, 25.409000396728516, 212.7095947265625]], 'Madgraph+Herwig': [[4954.89111328125, 2149.37109375, 3797.093994140625, 5445.283203125], [1264.583984375, 499.2561950683594, 939.0938720703125, 1580.64404296875], [586.7092895507812, 273.48370361328125, 377.1571960449219, 829.7686157226562], [64.3490982055664, 30.3870792388916, 23.237180709838867, 82.36943054199219]], 'Pythia': [[1775.532958984375, 2102.533935546875, 4230.81396484375, 2258.155029296875], [387.2319030761719, 529.7987060546875, 978.967529296875, 578.1860961914062], [169.04600524902344, 262.5823974609375, 366.9169921875, 291.5531005859375], [12.388580322265625, 20.840530395507812, 26.876819610595703, 22.360410690307617]], 'Madgraph+Pythia_matched': [[431.5899963378906, 1160.4649658203125, 2545.98193359375, 2715.133056640625], [121.23719787597656, 338.66571044921875, 612.3568725585938, 942.3109130859375], [51.543968200683594, 162.98060607910156, 252.2751007080078, 559.7239990234375], [6.170756816864014, 18.149290084838867, 19.964210510253906, 83.4867172241211]], 'Madgraph+Herwig_matched': [[731.4122924804688, 1557.5, 3367.653076171875, 2267.81689453125], [187.9049072265625, 372.1142883300781, 831.7598876953125, 720.782470703125], [82.22386169433594, 203.77220153808594, 309.2331848144531, 345.2055969238281], [8.93737506866455, 21.44969940185547, 21.44969940185547, 41.25749969482422]], 'Pythia_matched': [[571.126220703125, 1746.572998046875, 3659.6650390625, 889.49560546875], [128.99139404296875, 444.3352966308594, 863.3652954101562, 198.31520080566406], [59.0753288269043, 224.03509521484375, 317.0176086425781, 94.38094329833984], [4.554941177368164, 17.485679626464844, 23.504680633544922, 6.6869049072265625]], 'Madgraph+Pythia_unmatched': [[3817.157958984375, 790.2199096679688, 874.069580078125, 6298.1650390625], [1016.7230224609375, 227.59210205078125, 202.54600524902344, 2003.6810302734375], [475.1482849121094, 100.91000366210938, 105.26589965820312, 1111.4620361328125], [46.4621696472168, 8.348671913146973, 5.444786071777344, 129.222900390625]], 'Madgraph+Herwig_unmatched': [[4223.47900390625, 591.8717041015625, 429.4410095214844, 3177.466064453125], [1076.678955078125, 127.14179992675781, 107.33399963378906, 859.8612060546875], [504.48541259765625, 69.71153259277344, 67.9240493774414, 484.56298828125], [55.4117317199707, 8.937376022338867, 1.7874749898910522, 41.11193084716797]], 'Pythia_unmatched': [[1204.406982421875, 355.96148681640625, 571.14892578125, 1368.6590576171875], [258.2405090332031, 85.46336364746094, 115.60220336914062, 379.87091064453125], [109.970703125, 38.54732894897461, 49.899478912353516, 197.1721954345703], [7.83364200592041, 3.354846954345703, 3.3721439838409424, 15.673500061035156]]}
+            matched_name=("_matched" if "WJetsMatched" in dataset else "_unmatched" if "WJetsUnmatched" in dataset else "")
+            #print(dataset,matched_name)
+            model_nominal=np.concatenate(model_uncertainty_map['Madgraph+Pythia'+matched_name])
+            model_up=np.concatenate(model_uncertainty_map['Madgraph+Herwig'+matched_name])/model_nominal
+            model_down=np.concatenate(model_uncertainty_map['Pythia'+matched_name])/model_nominal
+            #print(model_nominal)
+            def herwigWeight(pt,msd):
+              ptmsd_bin =  4*(np.trunc(pt/1200) % 2 + np.trunc(pt/800) % 2 + np.trunc(pt/650) % 2) + np.trunc(msd/90) % 2 + np.trunc(msd/80) % 2 + np.trunc(msd/70) % 2
+              #print(pt,msd,ptmsd_bin,model_up/model_nominal)
+              weight=np.take(model_up,ptmsd_bin,axis=0)
+              return weight
+            def pythiaWeight(pt,msd):
+              ptmsd_bin =  4*(np.trunc(pt/1200) % 2 + np.trunc(pt/800) % 2 + np.trunc(pt/650) % 2) + np.trunc(msd/90) % 2 + np.trunc(msd/80) % 2 + np.trunc(msd/70) % 2
+              #print(pt,msd,ptmsd_bin,model_down/model_nominal)
+              weight=np.take(model_down,ptmsd_bin,axis=0)
+              return weight
+            variation_weights["model_up"] = herwigWeight(events.pt_gen_ak8,events.msd_gen_ak8)
+            variation_weights["model_down"] = pythiaWeight(events.pt_gen_ak8,events.msd_gen_ak8)
+            #print(variation_weights["model_up"])
+            #print(variation_weights["model_down"])
+
+            if ("WJets" in dataset or "ZJets" in dataset) and False: # disable with missing file ULvjets_corrections.json
                 boson = "W" if "W" in dataset else "Z"
                 v_qcd_systs = [
                     f"{syst}_{direction}" for direction in ["up", "down"] for syst in ["d1K_NLO", "d2K_NLO", "d3K_NLO"]
@@ -931,14 +958,16 @@ class JMSTemplates(processor.ProcessorABC):
                     < 0
                 ),
             )
-            # selections.add(
-            #     "gensel_drmatch",
-            #     (events.pass_gen_selection == 1) & (events.dR_reco_gen < 0.4) & (mJgen_ > 30.),
-            # )
+            ###### WITHOUT N2 selection
+            #selections.add(
+            #    "gensel_drmatch",
+            #    (events.pass_gen_selection == 1) & (events.dR_reco_gen < 0.4) & (mJgen_ > 30.),
+            #)
 
             if "n2_beta1_gen" not in events.fields:
                 events.n2_beta1_gen = ak.ones_like(events.pt)
 
+            ###### WITH N2 selection
             selections.add(
                 "gensel_drmatch",
                 (events.pass_gen_selection == 1)
@@ -946,6 +975,7 @@ class JMSTemplates(processor.ProcessorABC):
                 & (mJgen_ > 30.)
                 & (events.n2_beta1_gen < 0.2),
             )
+            
             selections.add(
                 "recosel",
                 (events.pass_reco_selection == 1)
@@ -1156,6 +1186,7 @@ if __name__ == "__main__":
     workflow.parser.add_argument("--variation", default="nominal", choices=[
         "isr_up", "isr_down",
         "fsr_up", "fsr_down",
+        "model_up", "model_down",
         "pu_up", "pu_down",
         "toppt_off",
         "v_qcd_up", "v_qcd_down",
@@ -1182,7 +1213,7 @@ if __name__ == "__main__":
     workflow.processor_schema = BaseSchema
 
     sample_pattern = (
-        "/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/{SELECTION}Trees/workdir_{SELECTION}_{YEAR}/*{SAMPLE}*.root"
+        "/nfs/dust/cms/user/hinzmann/jetmass/{SELECTION}Trees/workdir_{SELECTION}_{YEAR}/*{SAMPLE}*.root"
     )
     sample_names = {
         "vjets": [
@@ -1224,9 +1255,9 @@ if __name__ == "__main__":
                 "WJets",
                 "WJetsMatched",
                 "WJetsUnmatched",
-                "ZJets",
-                "ZJetsMatched",
-                "ZJetsUnmatched",
+                #"ZJets",
+                #"ZJetsMatched",
+                #"ZJetsUnmatched",
             ]
         }
 
@@ -1275,7 +1306,7 @@ if __name__ == "__main__":
             print(f"{selection}_{k}", len(files[f"{selection}_{k}"]["files"]))
 
     output_file_path = os.path.join(os.getcwd(), args.output)
-    print("changing into /tmp dir")
+    print("changing into /tmp dir:", os.environ["TMPDIR"])
     os.chdir(os.environ["TMPDIR"])
     if args.scaleout > 0:
         print("init dask client")
@@ -1289,7 +1320,10 @@ if __name__ == "__main__":
 
     print("starting coffea runner")
 
+    print(files)
     output = workflow.run(files)
+    
+    print("moving to output path:", output_file_path)
 
     if not output_file_path.endswith(".coffea"):
         output_file_path += ".coffea"

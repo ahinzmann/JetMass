@@ -129,7 +129,9 @@ class JetMassCombination(object):
                 model_processes.pop()
             else:
                 [p.terminate() for p in model_processes]
-                raise RuntimeError("One of the processes had an issue. Check the logs!")
+                print("One of the processes had an issue. Check the logs!")
+                break
+                #raise RuntimeError("One of the processes had an issue. Check the logs!")
             time.sleep(2)
 
     def combine_models(self):
@@ -141,7 +143,7 @@ class JetMassCombination(object):
                 "cp {}/{}/config.json {}/{}config.json".format(self.workdir, model, self._combination_dir, model)
             )
 
-        with open("{}/build.sh".format(self._combination_dir), "wb") as build_script:
+        with open("{}/build.sh".format(self._combination_dir), "w") as build_script:
             # combine cards
             cmd = ""
             combination_cmd = "combineCards.py "
@@ -185,7 +187,7 @@ class JetMassCombination(object):
                 resulting_sections.append(section)
             return " ".join(resulting_sections)
 
-        with open("{}/wrapper.sh".format(self._combination_dir), "wb") as wrapper:
+        with open("{}/wrapper.sh".format(self._combination_dir), "w") as wrapper:
             with open("{}/wrapper_template.sh".format(self._combination_dir), "r") as template:
                 for line in template:
                     if "PostFitShapesFromWorkspace" in line and self._split_postfitshapes:
@@ -244,6 +246,7 @@ class JetMassCombination(object):
 
     def run_combined_fit(self):
         os.system("chmod +x {}/wrapper.sh".format(self._combination_dir))
+        print("bash {}/wrapper.sh".format(self._combination_dir))
         os.system("bash {}/wrapper.sh".format(self._combination_dir))
 
     def combine_fit_shapes(self):
@@ -286,7 +289,9 @@ class JetMassCombination(object):
                 model_processes.pop()
             else:
                 [p.terminate() for p in model_processes if p.returncode]
-                raise RuntimeError("One of the processes had an issue. Check the logs!")
+                print("One of the processes had an issue. Check the logs!")
+                break
+                #raise RuntimeError("One of the processes had an issue. Check the logs!")
             time.sleep(2)
 
         for fname in fit_shapes_files:
@@ -308,7 +313,7 @@ class JetMassCombination(object):
                     tfile.Delete("{};*".format(hist_path))
             tfile.Close()
 
-        os.system("hadd {}/fit_shapes_split_years.root {}".format(self._combination_dir, " ".join(fit_shapes_files)))
+        os.system("hadd -f {}/fit_shapes_split_years.root {}".format(self._combination_dir, " ".join(fit_shapes_files)))
 
     def combine_fit_shapes_from_precompiled(self):
         split_fit_shapes_filename = "{}/fit_shapes_split_years.root".format(self._combination_dir)
@@ -492,7 +497,7 @@ if __name__ == "__main__":
         if unfolding:
             exec_cmd(
                 "{}/../python/pretty_postfit.py {} --mctruth --year {} {} --coffea_hists {} {}".format(
-                    sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else ""), "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/coffea_hists/msdgen30n2cut" if args.n2gen else "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/coffea_hists", "--n2gen" if args.n2gen else ""
+                    sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else ""), "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_withN2" if args.n2gen else "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_noN2", "--n2gen" if args.n2gen else ""
                 )
             )
 

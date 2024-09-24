@@ -420,16 +420,16 @@ def plot_unfolded_mass(
         for matching in matchings
     }
 
-    acceptance_files_no_n2 = {
-        matching: [
-            load(
-                f"{coffea_hist_path}/acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/".replace("msdgen30n2cut/","") +
-                f"misses_acceptance{year}.coffea"
-            )
-            for year in years
-        ]
-        for matching in matchings
-    }
+    #acceptance_files_no_n2 = {
+    #    matching: [
+    #        load(
+    #            f"{coffea_hist_path}/acceptance_efficiency_plots_no_n2{acceptance_file_matching_str[matching]}/".replace("withN2","noN2") +
+    #            f"misses_acceptance{year}.coffea"
+    #        )
+    #        for year in years
+    #    ]
+    #    for matching in matchings
+    #}
 
     #print(matchings[0])
     #print(acceptance_files[matchings[0]][0]["acceptance"][0][0])
@@ -635,7 +635,7 @@ def plot_unfolded_mass(
             y_label = r"$\frac{d\sigma}{d m_\mathrm{SD}}~[\frac{fb}{\mathrm{GeV}}]$"
 
         x_label = r"$m_{\mathrm{SD, gen}} [GeV]$"
-        msd_max = 1000.
+        msd_max = 1000. # or 1000. for Rivet or 250 for Paper
         msd_min = 30.
         msd_edges_ = truth_mc["matching"][ipt].axes[0].edges.copy()
         print("lower edge",msd_edges_[0]," modified to", msd_min)

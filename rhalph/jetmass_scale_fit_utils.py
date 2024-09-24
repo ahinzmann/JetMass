@@ -180,7 +180,7 @@ def build_mass_scale_variations(configs, args):
                 grid_nuisances.append(
                     [
                         {
-                            mass_scale_setup_dict.keys()[i]: {
+                            list(mass_scale_setup_dict.keys())[i]: {
                                 "application_info": list(mass_scale_setup_dict.values())[i],
                                 "nuisance": rl.NuisanceParameter(mass_scale_names[i], "shape", 0, -0.5, 0.5),
                             }

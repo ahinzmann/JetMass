@@ -22,8 +22,9 @@ function flatten_eta_regions {
 
 flatten_templates () {
   YEARS=(UL16preVFP UL16postVFP UL17 UL18)
-  outdir=flat_templates/
-  indir=coffea_hists/
+  #YEARS=(UL18)
+  outdir=flat_templates_withN2/
+  indir=coffea_hists_withN2/
 
   VAR=${1:-none}
   MASS=$2
@@ -40,7 +41,7 @@ flatten_templates () {
     echo "You have to provide a variation name!"
     exit -1
   fi
-    VJETSONLY=""
+    VJETSONLY="--VJetsOnly" #### only VJETS
   if [[ ${VAR} == *"qcd"* ]]; then
     VJETSONLY="--VJetsOnly"
   elif [[ ${VAR} == *"ewk"* ]]; then
@@ -85,14 +86,15 @@ flatten_templates () {
 }
 
 # run the things
-VARS_ALL=(nominal jec fsr isr triggersf pu toppt_off v_qcd w_ewk z_ewk)
+# VARS_ALL=(nominal jec fsr isr triggersf pu toppt_off v_qcd w_ewk z_ewk)
 # VARS_ALL=(v_qcd w_ewk z_ewk)
 # VARS_ALL=(nominal)
 # VARS=(${2:-${VARS_ALL[@]}})
+VARS_ALL=(model)
 VARS=(${VARS_ALL[@]})
 MAXPROCS=5
-# NAMEPREFIX=_particlenet
 NAMEPREFIX=${1:-}
+# NAMEPREFIX=_particlenetDDT
 # MASS=mPnet
 MASS=mjet
 export -f flatten_templates

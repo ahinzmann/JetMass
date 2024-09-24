@@ -20,6 +20,7 @@ function submit_templates_parallel {
   fi
   
   for YEAR in UL16preVFP UL16postVFP UL17 UL18
+  #for YEAR in UL18
   do
     if [ ${VAR} == "nominal" ]; then
       echo "default -> ${YEAR}" 
@@ -66,7 +67,8 @@ function submit_templates {
     echo "You did not provide a valid tagger"
   fi
   
-  for YEAR in UL16preVFP UL16postVFP UL17 UL18
+  #for YEAR in UL16preVFP UL16postVFP UL17 UL18
+  for YEAR in UL18
   do
     if [ ${VAR} == "nominal" ]; then
       echo "default -> ${YEAR}" 
@@ -96,8 +98,8 @@ VARIATIONS_PART2=(isr_up isr_down fsr_up fsr_down pu_up pu_down toppt_off)
 VARIATIONS_PART3=(v_qcd_up v_qcd_down w_ewk_up w_ewk_down z_ewk_up z_ewk_down)
 VARIATIONS_GENHISTS=(nominal v_qcd_up v_qcd_down w_ewk_up w_ewk_down)
 TAGGER=${3:-substructure}
-# VJETSONLY="--VJetsOnly"
-VJETSONLY=""
+VJETSONLY="--VJetsOnly"
+#VJETSONLY=""
 if [ "$VARIATION" == "all" ];
 then
   VARIATIONS=${VARIATIONS_ALL[@]}

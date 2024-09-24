@@ -69,20 +69,29 @@ def jet_mass_producer(args, configs):
         # "endcap": ROOT.TFile(configs["histLocation"].replace(".root", "_endcap.root")),
     }
 
-    for var in [
+    if args.noShapeSystematics:
+      systematics=[
+            "toppt_off",
+      ]
+    else:
+      systematics=[
             "jec_up", "jec_down",
             "triggersf_up", "triggersf_down",
             "pu_up", "pu_down",
             "jer_up", "jer_down",
             "isr_up", "isr_down",
             "fsr_up", "fsr_down",
+            "model_up", #"model_down",
             "toppt_off",
             "v_qcd_up", "v_qcd_down",
             "w_ewk_up", "w_ewk_down",
             "z_ewk_up", "z_ewk_down",
-    ]:
+    ]
+    for var in systematics:
         fname = configs["histLocation"].replace(".root", "_{}.root".format(var))
+        print(fname)
         if os.path.isfile(fname):
+            print("read")
             aux_hist_files[var] = ROOT.TFile(fname, "READ")
 
     do_qcd_estimation = len(qcd_estimation_channels) > 0
@@ -120,6 +129,7 @@ def jet_mass_producer(args, configs):
             dataset_fraction = float(split_sample_suffix.replace("p", "."))
             print("found {} -> scaling by {:.2f}".format(dataset_fraction, 1./dataset_fraction))
             hist.Scale(1./dataset_fraction)
+        #print(hist_dir,hist_file_,hist.Integral())
         return hist
 
     model_name = configs.get("ModelName", "Jet_Mass_Model")  # get name from config, or fall back to default
@@ -480,6 +490,7 @@ def jet_mass_producer(args, configs):
         "pu": rl.NuisanceParameter(nuisance_name("pu_variation"), "shape", 0, -10, 10),
         "isr": rl.NuisanceParameter(nuisance_name("isr_variation"), "shape", 0, -10, 10),
         "fsr": rl.NuisanceParameter(nuisance_name("fsr_variation"), "shape", 0, -10, 10),
+        "model": rl.NuisanceParameter(nuisance_name("model_variation"), "shape", 0, -10, 10),
         "v_qcd": rl.NuisanceParameter(nuisance_name("v_dKEnv"), "shape", 0, -10, 10),
         "w_ewk": rl.NuisanceParameter(nuisance_name("w_dkappaEnv"), "shape", 0, -10, 10),
         "z_ewk": rl.NuisanceParameter(nuisance_name("z_dkappaEnv"), "shape", 0, -10, 10),
@@ -665,6 +676,15 @@ def jet_mass_producer(args, configs):
                         else:
                             logger.warn("FSR variation hists not present.")
 
+                    # model down
+                    if "WJets" in sample_name:# sample.sampletype == rl.Sample.SIGNAL:
+                        if "model_up" in aux_hist_files:# and "model_down" in aux_hist_files:
+                            hist_model_up = get_hist(hist_dir % (sample_name, ""), "model_up")
+                            hist_model_down = get_hist(hist_dir % (sample_name, ""), "triggersf_down")
+                            sample.setParamEffect(extra_nuisances["model"], hist_model_up, hist_model_down)
+                        else:
+                            logger.warn("model variation hists not present.")
+
                     if "TTTo" in sample.name and "toppt_off" in aux_hist_files:
                         hist_toppt_off = get_hist(hist_dir % (sample_name, ""), "toppt_off")
                         sample.setParamEffect(extra_nuisances["toppt"], effect_up=hist_toppt_off)  # , scale=0.5)
@@ -697,6 +717,9 @@ def jet_mass_producer(args, configs):
                                         norm_nuisances[sample_name][norm_nuisance_region][0],
                                         norm_nuisances[sample_name][norm_nuisance_region][1],
                                     )
+
+                else:
+                    print("NO NUISANCE PARAMETERS")
 
                 ch.addSample(sample)
 
@@ -795,7 +818,7 @@ def jet_mass_producer(args, configs):
                 print("Using QCD efficiency (N2-ddt) of %.2f%% to scale initial QCD in pass region" % (qcd_eff * 100))
             tf_params = data_norms["eff_arr"] * tf_params(ptscaled, rhoscaled)
         print(year_str, list(data_norms["eff_arr"][:, 0]))
-        exit(0)
+        #exit(0)
         for channel_name, config in channels.items():
             if "QcdEstimation" not in config or config["QcdEstimation"] == "False":
                 continue
@@ -896,6 +919,7 @@ def jet_mass_producer(args, configs):
                     prefit_asimov += sample.getExpectation(nominal=True)
             prefit_asimov_data = (prefit_asimov, c.observable.binning, c.observable.name)
             c.setObservation(prefit_asimov_data)
+    print("render in dir",model_dir)
     model.renderCombine(model_dir)
 
 
@@ -916,6 +940,7 @@ if __name__ == "__main__":
     parser.add_argument("--skipTemplatePlots", action="store_true")
     parser.add_argument("--customCombineWrapper", action="store_true")
     parser.add_argument("--noNuisances", action="store_true")
+    parser.add_argument("--noShapeSystematics", action="store_true")
     parser.add_argument("--JMRparameter", action="store_true")
     parser.add_argument("--splitPseudo", action="store_true")
     parser.add_argument("--prefitAsimov", action="store_true")
@@ -979,16 +1004,16 @@ if __name__ == "__main__":
         else:
             exec(open(args.config).read())  # noqa # type: ignore
         existing_config = args.workdir + "/" + configs["ModelName"] + "/config.json"
-        if os.path.isfile(existing_config) and args.unfolding:
-            use_existing_config = (
-                input(      # noqa # type: ignore
-                    "There already is a directory corresponding to this config. "
-                    "Do you want to load the existing config? [Y/N]"
-                ).lower()
-                == "y"
-            )
-            if use_existing_config:
-                configs = json.load(open(existing_config))
+        #if os.path.isfile(existing_config) and args.unfolding:
+        #    use_existing_config = (
+        #        input(      # noqa # type: ignore
+        #            "There already is a directory corresponding to this config. "
+        #            "Do you want to load the existing config? [Y/N]"
+        #        ).lower()
+        #        == "y"
+        #    )
+        #    if use_existing_config:
+        #        configs = json.load(open(existing_config))
     except IndexError:
         print("You must specify a configuration JSON!")
         sys.exit(0)
@@ -1025,7 +1050,7 @@ if __name__ == "__main__":
 
     if not args.tagger.startswith("_") and args.tagger != "":
         args.tagger = "_" + args.tagger
-    configs["histLocation"] = configs["histLocation"].replace(configs["year"], configs["year"] + args.tagger).replace("/flat_templates/", "/flat_templates/" if args.unfolding else "/flat_templates/DPNote_06-07-23/")
+    configs["histLocation"] = configs["histLocation"].replace(configs["year"], configs["year"] + args.tagger).replace("/flat_templates/", "/flat_templates_withN2/" if "N2cut" in args.workdir else "/flat_templates_noN2/" if args.unfolding else "/flat_templates/DPNote_06-07-23/")
     
 
     configs["nuisance_year_decorrelation"] = [
@@ -1044,6 +1069,14 @@ if __name__ == "__main__":
     # args.separateMassScales = configs.get("separateMassScales", "False") == "True"
     args.VaryOnlySignal = configs.get("VaryOnlySignal", "False") == "True"
     args.JECVar = configs.get("JECVar", "True") == "True"
+
+    ############################## REMOVE ALL NUISANCES
+    #args.noNuisances=True
+    ############################## REMOVE SHAPE SYSTEMATICS
+    args.noShapeSystematics=True
+    args.JECVar=False
+    args.JMRparameter=False
+    args.pTdependetMassScale=False
 
     if not args.justplots:
         jet_mass_producer(args, configs)
@@ -1092,11 +1125,13 @@ if __name__ == "__main__":
             # )
         if args.build:
             os.chdir(model_dir)
+            print("bash build.sh")
             os.system("bash build.sh")
             exit(0)
         # from runFit import runFits
         # runFits([configs['ModelName']])
         # exedir = os.getcwd()
+        print("bash " + model_dir + "/wrapper.sh")
         os.system("bash " + model_dir + "/wrapper.sh")
         # os.system("cd "+exedir)
 
