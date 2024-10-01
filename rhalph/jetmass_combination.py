@@ -495,9 +495,15 @@ if __name__ == "__main__":
             os.system(cmd)
 
         if unfolding:
+            #exec_cmd(
+            #    "{}/../python/pretty_postfit.py {} --mctruth --year {} {} --coffea_hists {} {}".format(
+            #        sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else ""), "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_withN2" if args.n2gen else "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_noN2", "--n2gen" if args.n2gen else ""
+            #    )
+            #)
+
             exec_cmd(
                 "{}/../python/pretty_postfit.py {} --mctruth --year {} {} --coffea_hists {} {}".format(
-                    sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else ""), "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_withN2" if args.n2gen else "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_noN2", "--n2gen" if args.n2gen else ""
+                    sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else "")+(" --nomatching" if "NoMatching" in args.workdir else ""), "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_withN2" if args.n2gen else "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/coffea_hists_noN2", "--n2gen" if args.n2gen else ""
                 )
             )
 

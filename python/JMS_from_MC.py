@@ -440,7 +440,7 @@ class JMSExtractor(object):
                 n_pt_bins = h_[0].axes["pt_reco"].size
                 fit_results = {var: [] for var in fit_variables}
                 for fit_variable in fit_variables:
-                    f = plt.figure(figsize=(20, 12))
+                    f = plt.figure(figsize=(12, 12))
                     columns = 3
                     rows = ceil(n_pt_bins / columns)
                     grid = f.add_gridspec(rows, columns, hspace=0.3)
@@ -502,7 +502,7 @@ class JMSExtractor(object):
 
     def plot_extracted_jms(self):
         for grooming in self.groomings:
-            f, ax = fax(12, 9)
+            f, ax = fax(9, 9)
 
             ax.errorbar(
                 self.pt_centers(),
@@ -550,7 +550,7 @@ class JMSExtractor(object):
         corrections = []
         for grooming in self.groomings:
             grooming_text = "groomed" if grooming == "g" else "ungroomed"
-            f, ax = fax(12, 9)
+            f, ax = fax(9, 9)
             jms_fits = JMSFitter(self.pt_centers(), self.pt_widths(), ax, poly_dim=poly_dim)
             for method in methods:
                 for jec in jecs:
@@ -584,7 +584,7 @@ if __name__ == "__main__":
     corrections = []
 
     for year in years:
-        wjets_jms_extractor = JMSExtractor(f"WJetsToQQ_tinyTree_{year}_{args.tagger}.parquet", year=year)
+        wjets_jms_extractor = JMSExtractor(f"/nfs/dust/cms/user/hinzmann/jetmass/parquet_trees/WJetsToQQ_tinyTree_{year}_{args.tagger}.parquet", year=year)
         wjets_jms_extractor.plot_dir = f"jms_from_mc_plots_{args.tagger}_{args.output_suffix}"
         wjets_jms_extractor.pt_binning = np.array([575, 650, 725, 800, 1000, 1200, 3000])
         print("set pt binning to", wjets_jms_extractor.pt_binning)

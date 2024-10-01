@@ -161,8 +161,8 @@ def plot_templates(
                 if "hist" in genbin:
                     hists.append(genbin["hist"])
                     colors.append(genbin_colors[genbin_name])
-                    pt_gen_bin_tex = r"$p_{T,gen} \in" + f"[{genbin['pt_low']},{genbin['pt_hi']})$"
-                    msd_gen_bin_tex = r"$m_{SD,gen} \in" + f"[{genbin['msd_low']},{genbin['msd_hi']})$"
+                    pt_gen_bin_tex = r"$p_{T, ptcl} \in" + f"[{genbin['pt_low']},{genbin['pt_hi']})$"
+                    msd_gen_bin_tex = r"$m_{SD, ptcl} \in" + f"[{genbin['msd_low']},{genbin['msd_hi']})$"
                     labels.append(pt_gen_bin_tex + " " + msd_gen_bin_tex)
             hep.histplot(hists, label=labels, stack=True, histtype="fill", color=colors)
 
@@ -177,7 +177,7 @@ def plot_templates(
             ax.text(
                 np.diff(ax.get_xlim()) * 0.4,
                 ax.get_ylim()[1] * 0.15,
-                r"$%.0f~\mathrm{GeV} \leq p_{T,\mathrm{reco}} < %.0f~\mathrm{GeV}$" % (ptreco_low, ptreco_hi),
+                r"$%.0f~\mathrm{GeV} \leq p_{T, \mathrm{reco}} < %.0f~\mathrm{GeV}$" % (ptreco_low, ptreco_hi),
                 fontsize=fs + 2,
             )
 
@@ -394,16 +394,16 @@ def plot_unfolded_mass(
         "matching": " (with $W$ matching)",
         "no matching": " (without $W$ matching)",
     }
-    if not plot_no_matching and not plot_matching_comp:
+    if not plot_matching_comp:
         matching_str = {
             "no matching": "",
             "matching": "",
         }
 
-    if n2cut == "":
+    if plot_matching_comp:
         matching_kwargs = {"matching": dict(color="tab:blue"), "no matching": dict(color="tab:red")}
     else:
-        matching_kwargs = {"matching": dict(color="tab:red"), "no matching": dict(color="tab:red")}
+        matching_kwargs = {"matching": dict(color="tab:blue"), "no matching": dict(color="tab:blue")}
 
     acceptance_file_matching_str = {
         "matching": "",
@@ -465,9 +465,9 @@ def plot_unfolded_mass(
     efficiency_years = {
         matching: [
             [
-                # acceptance_file["sf_efficiency"]["pass_gen_pass_reco_pass_dR"][iptgen][0]
-                acceptance_file["pass_gen_pass_reco_pass_dR_withSFHEM"][{"ptgen": iptgen}].values()
-                / acceptance_file["pass_gen_pass_reco_pass_dR"][{"ptgen": iptgen}].values()
+                acceptance_file["sf_efficiency"]["pass_gen_pass_reco_pass_dR"][iptgen][0]
+                #acceptance_file["pass_gen_pass_reco_pass_dR_withSFHEM"][{"ptgen": iptgen}].values()
+                #/ acceptance_file["pass_gen_pass_reco_pass_dR"][{"ptgen": iptgen}].values()
                 for acceptance_file in acceptance_files[matching]
             ]
             for iptgen in range(len(pt_edges) - 1)
@@ -498,8 +498,14 @@ def plot_unfolded_mass(
     if "no matching" in matchings:
         truth_mc_years["no matching"] = [
             [
-                deepcopy(f_["pass_gen_pass_reco_pass_dR_withSFHEM"][{"ptgen": iptgen}])
-                for f_ in acceptance_files["no matching"]
+                deepcopy(f_[f"vjets_mjet_unfolding_{region}"][{"ptgen": iptgen, "dataset": "vjets_WJetsMatched"}])
+                for f_ in files
+                #deepcopy(f_["pass_gen_pass_reco_pass_dR_withSFHEM"][{"ptgen": iptgen}])
+                #for f_ in acceptance_files["no matching"]
+                #deepcopy(f_[f"vjets_mjet_unfolding_{region}"][{"ptgen": iptgen, "dataset": "vjets_WJets"}])
+                #for f_ in files
+                #acceptance_file["total"][{"ptgen": iptgen}]
+                #for acceptance_file in acceptance_files["no matching"]
             ]
             for iptgen in range(len(pt_edges) - 1)
         ]
@@ -521,7 +527,7 @@ def plot_unfolded_mass(
                         f_var[f"vjets_mjet_unfolding_{region}"][
                             {
                                 "ptgen": iptgen,
-                                "dataset": "vjets_WJetsMatched" if matching == "matching" else "vjets_WJets",
+                                "dataset": "vjets_WJetsMatched",# if matching == "matching" else "vjets_WJets",
                             }
                         ]
                     )
@@ -594,7 +600,7 @@ def plot_unfolded_mass(
     theory_lower_sum = None
     ymaxs = [100.0, 23.0, 7.0, 0.6]
     ymax_sum = 36.0  # TODO: for pt>650 GeV plots change to 42.0 .
-    if n2cut_str == "n2_0p2":
+    if n2cut_str == "n2_0p2":# and (not plot_no_matching):
         ymaxs = [50., 10., 4., 0.3]
         ymax_sum = 16.
 
@@ -616,7 +622,7 @@ def plot_unfolded_mass(
           f, (ax,axratio) = plt.subplots(2,1,gridspec_kw={'height_ratios': [4,1],'hspace' : 0.08},figsize=(9, 12))
         else:
           f, ax = plt.subplots(figsize=(10, 10))
-        pt_bin_tex = r" ($%s \leq p_{T,\mathrm{truth}} < %s $)" % (
+        pt_bin_tex = r"$%s \leq p_{T, \mathrm{ptcl}} < %s $" % (
             str(configs["unfolding_bins"]["ptgen"][ipt]),
             str(configs["unfolding_bins"]["ptgen"][ipt + 1]),
         )
@@ -634,10 +640,10 @@ def plot_unfolded_mass(
                 flat_scale[matching] = 1.0 / lumis[year]
             y_label = r"$\frac{d\sigma}{d m_\mathrm{SD}}~[\frac{fb}{\mathrm{GeV}}]$"
 
-        x_label = r"$m_{\mathrm{SD, gen}} [GeV]$"
-        msd_max = 1000. # or 1000. for Rivet or 250 for Paper
+        x_label = r"$m_{\mathrm{SD, ptcl}} [GeV]$"
+        msd_max = 250. # or 1000. for Rivet or 250 for Paper
         msd_min = 30.
-        msd_edges_ = truth_mc["matching"][ipt].axes[0].edges.copy()
+        msd_edges_ = truth_mc[matchings[0]][ipt].axes[0].edges.copy()
         print("lower edge",msd_edges_[0]," modified to", msd_min)
         print("upper edge",msd_edges_[-1]," modified to", msd_max)
         msd_edges_[0] = msd_min
@@ -770,16 +776,17 @@ def plot_unfolded_mass(
             if plot_truth:
 
                 for matching in matchings:
-                    # hep.histplot(
-                    #     truth_noreco_values[matching],
-                    #     msd_edges_,
-                    #     yerr=np.sqrt(truth_noreco_variances[matching]),
-                    #     label="Simulation (no reco-sel){}".format(pt_bin_tex),
-                    #     ax=ax_,
-                    #     alpha=alpha,
-                    #     color="tab:grey",
-                    #     ls="-" if matching == "matching" else "--"
-                    # )
+                    if False:
+                     hep.histplot(
+                         truth_noreco_values[matching],
+                         msd_edges_,
+                         yerr=np.sqrt(truth_noreco_variances[matching]),
+                         label="Simulation (no reco-sel){}".format(("" if ax_==ax else " ("+pt_bin_tex+")")),
+                         ax=ax_,
+                         alpha=alpha,
+                         color="tab:grey",
+                         ls="-" if matching == "matching" else "--"
+                     )
                     output_hists["mc_truth_{}_ipt{}".format(matching, ipt)] = {
                         "values": truth_values[matching],
                         "edges": msd_edges_,
@@ -789,7 +796,7 @@ def plot_unfolded_mass(
                         truth_values[matching],
                         msd_edges_,
                         yerr=np.sqrt(truth_variances[matching]),
-                        label="Simulation{}{}".format(matching_str[matching], pt_bin_tex),
+                        label="Simulation{}{}".format(matching_str[matching], ("" if ax_==ax else " ("+pt_bin_tex+")")),
                         ax=ax_,
                         ls="-",
                         alpha=alpha,
@@ -816,7 +823,7 @@ def plot_unfolded_mass(
                     unfolding_values[matching],
                     yerr=np.sqrt(unfolding_variances[matching]),
                     xerr=msd_xerr,
-                    label=data_label + " " + pt_bin_tex,
+                    label=data_label + " " + ("" if ax_==ax else " ("+pt_bin_tex+")"),
                     color="k",
                     alpha=alpha,
                     fmt="o",
@@ -841,15 +848,21 @@ def plot_unfolded_mass(
                     unfolding_values[matching]/truth_values[matching],
                     yerr=np.sqrt(unfolding_variances[matching])/truth_values[matching],
                     xerr=msd_xerr,
-                    label=data_label + " " + pt_bin_tex,
+                    label=data_label + " " + "("+pt_bin_tex+")",
                     color="k",
-                    alpha=alpha,
+                    alpha=1.0,
                     fmt="o",
                     markersize=6,
                     **marker_kwargs[matching]
                   )
         cms_label(exp_label=exp_label, year=year, ax=ax, fs=20, data=data)
 
+        ax.text(
+        ax.get_xlim()[0]+0.5*np.diff(ax_.get_xlim()),
+        ax.get_ylim()[1]*0.6,
+        pt_bin_tex,
+        fontsize=20
+        )
         if n2cut_str == "n2_0p2":
           ax.text(
             ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
@@ -901,16 +914,17 @@ def plot_unfolded_mass(
       f, ax = plt.subplots(figsize=(9, 9))
     
     if plot_truth:
-        # hep.histplot(
-        #     mc_truth_noreco_sum,
-        #     msd_edges_,
-        #     yerr=np.sqrt(mc_truth_noreco_variance_sum),
-        #     ax=ax,
-        #     label="Simulation (no reco-sel)",
-        #     alpha=0.8,
-        #     color="tab:grey",
-        # )
         for matching in matchings:
+            if False:
+             hep.histplot(
+                 mc_truth_noreco_sum[matching],
+                 msd_edges_,
+                 yerr=np.sqrt(mc_truth_noreco_variance_sum[matching]),
+                 ax=ax,
+                 label="Simulation (no reco-sel)",
+                 alpha=0.8,
+                 color="tab:grey",
+             )
             output_hists["mc_truth_{}_sum".format(matching)] = {
                 "values": mc_truth_sum[matching],
                 "edges": msd_edges_,
@@ -980,8 +994,7 @@ def plot_unfolded_mass(
     ax.text(
         ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.6,
-        # r"$650 \leq p_{T,\mathrm{truth}} < 1200~$GeV ",
-        r"$p_{T,\mathrm{truth}} > 650~$GeV ",  # TODO: for 650 GeV change the label accordingly
+        r"$p_{T, \mathrm{ptcl}} > 650~$GeV ",
         fontsize=20
     )
     if n2cut_str == "n2_0p2":
@@ -989,6 +1002,13 @@ def plot_unfolded_mass(
         ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.5,
         r"$N_{2}^{\beta=1} < 0.2$",
+        fontsize=20
+      )
+    if plot_no_matching:
+      ax.text(
+        ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+        ax.get_ylim()[1]*0.4,
+        "W-match",
         fontsize=20
       )
 
@@ -1042,7 +1062,7 @@ if __name__ == "__main__":
     parser.add_argument("--tagger", default="substructure", choices=["substructure", "particlenetDDT"])
     parser.add_argument("--migmat", action="store_true")
     parser.add_argument("--matching-comp", action="store_true")
-    parser.add_argument("--no-matching", action="store_true")
+    parser.add_argument("--nomatching", action="store_true")
     parser.add_argument("--skip-templates", action="store_true")
     parser.add_argument("--n2cut", default="", choices=["", "n2_0p147", "n2_0p17", "n2_0p25", "n2_0p2"])
     parser.add_argument("--skipmunfold", action="store_true")
@@ -1081,7 +1101,7 @@ if __name__ == "__main__":
                 exp_label=exp_label,
                 yaxis=yaxis,
                 inclusive_tagger=True,
-                plot_no_matching=args.no_matching,
+                plot_no_matching=args.nomatching,
                 plot_matching_comp=args.matching_comp,
                 n2cut=args.n2cut,
                 n2cut_str="n2_0p2" if args.n2gen else "no_n2",
