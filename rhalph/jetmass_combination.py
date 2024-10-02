@@ -115,7 +115,7 @@ class JetMassCombination(object):
             if self._job_index != "" and "--job_index" not in self.extra_options:
                 cmd += " --job_index {} ".format(self._job_index)
             cmd += " --build "
-            cmd += " --skipTemplatePlots "
+            #cmd += " --skipTemplatePlots "
             if self._config_update != "{}":
                 cmd += " --config-update \"{}\" ".format(self._config_update.replace('"', '\\"'))
             cmd += "{} ".format(self.configs[model_name])
@@ -280,7 +280,7 @@ class JetMassCombination(object):
             cmd += "--output {} ".format(fit_shape_filename)
             cmd += "-f {}/fitDiagnostics.root:fit_s &> /dev/null".format(self._combination_dir)
             print(cmd)
-            with open("{}/{}.log".format(self.workdir, model_name), "wb") as log:
+            with open("{}/{}.log".format(self.workdir, model_name), "ab") as log:
                 model_processes.append(subprocess.Popen(cmd, stdout=log, stderr=log, shell=True))
         print("getting postfit shapes...")
         while len(model_processes) > 0:

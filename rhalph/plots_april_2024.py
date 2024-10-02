@@ -21,5 +21,5 @@ for tagger in ["--particlenet", ""]:
         ("18-09-24NoMatching",""),
         ("N2Cut_18-09-24NoMatching","--n2gen"),
     ]:
-#        exec_cmd("./unfolding_fit.py --nonuniform --name {} {} {}".format(name, args, tagger), debug=False)
-        exec_cmd("./unfolding_fit.py --nonuniform --justplots --name {} {} {}".format(name, args, tagger), debug=False)
+        exec_cmd("./unfolding_fit.py --nonuniform --name {} {} {}".format(name, args, tagger), debug=False)
+#        exec_cmd("./unfolding_fit.py --nonuniform --justplots --name {} {} {}".format(name, args, tagger), debug=False)

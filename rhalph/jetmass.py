@@ -1050,8 +1050,8 @@ if __name__ == "__main__":
 
     if not args.tagger.startswith("_") and args.tagger != "":
         args.tagger = "_" + args.tagger
-    configs["histLocation"] = configs["histLocation"].replace(configs["year"], configs["year"] + args.tagger).replace("/flat_templates/", "/flat_templates_withN2/" if "N2cut" in args.workdir else "/flat_templates_noN2/" if args.unfolding else "/flat_templates/DPNote_06-07-23/")
-    
+    configs["histLocation"] = configs["histLocation"].replace(configs["year"], configs["year"] + args.tagger).replace("/flat_templates/", "/flat_templates_withN2/" if "N2Cut" in args.workdir else "/flat_templates_noN2/" if args.unfolding else "/flat_templates/DPNote_06-07-23/")
+    print(configs["histLocation"])
 
     configs["nuisance_year_decorrelation"] = [
         # "CMS_lumi",
@@ -1065,7 +1065,7 @@ if __name__ == "__main__":
 
     args.freezeParameters = [nuisance_name_(par_name, configs) for par_name in args.freezeParameters]
     args.TaggingEff = configs.get("TaggingEff", "True") == "True"
-    args.pTdependetMassScale = configs.get("pTdependentMassScale", "True") == "True"
+    args.pTdependetMassScale = configs.get("pTdependetMassScale", "True") == "True"
     # args.separateMassScales = configs.get("separateMassScales", "False") == "True"
     args.VaryOnlySignal = configs.get("VaryOnlySignal", "False") == "True"
     args.JECVar = configs.get("JECVar", "True") == "True"
@@ -1073,10 +1073,11 @@ if __name__ == "__main__":
     ############################## REMOVE ALL NUISANCES
     #args.noNuisances=True
     ############################## REMOVE SHAPE SYSTEMATICS
-    args.noShapeSystematics=True
-    args.JECVar=False
-    args.JMRparameter=False
-    args.pTdependetMassScale=False
+    if "NoSys" in args.workdir:
+      args.noShapeSystematics=True
+      args.JECVar=False
+      args.JMRparameter=False
+      args.pTdependetMassScale=False
 
     if not args.justplots:
         jet_mass_producer(args, configs)
