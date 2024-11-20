@@ -500,10 +500,18 @@ def jet_mass_producer(args, configs):
 
     # top_tag_eff = rl.IndependentParameter("top_tag_eff_sf",1.,-10,10)
     # W_tag_eff = rl.IndependentParameter("W_tag_eff_sf",1.,-10,10)
+    W_tag_eff_parameters={}
     for channel_name, config in channels.items():
         ttbar_top_tag_eff = rl.IndependentParameter(nuisance_name("%sttbar_top_tag_eff_sf" % channel_name), 1.0, 0, 4)
         ttbar_W_tag_eff = rl.IndependentParameter(nuisance_name("%sttbar_W_tag_eff_sf" % channel_name), 1.0, 0, 4)
-        wjets_W_tag_eff = rl.IndependentParameter(nuisance_name("%swjets_W_tag_eff_sf" % channel_name), 1.0, 0, 4)
+        if args.unfolding:
+          # pT-independent SF (because JMAR only checks SF from ttbar until 400 GeV)
+          if not nuisance_name("wjets_W_tag_eff_sf") in W_tag_eff_parameters.keys():
+            W_tag_eff_parameters[nuisance_name("wjets_W_tag_eff_sf")] = rl.NuisanceParameter(nuisance_name("wjets_W_tag_eff_sf"), "lnN")
+          wjets_W_tag_eff = W_tag_eff_parameters[nuisance_name("wjets_W_tag_eff_sf")]
+          print("ACCOUNT FOR TAGGING EFFICIENCY PARAMETER",nuisance_name("wjets_W_tag_eff_sf"))
+        else:
+          wjets_W_tag_eff = rl.IndependentParameter(nuisance_name("%swjets_W_tag_eff_sf" % channel_name), 1.0, 0, 4)
 
         # using hists with /variable/ in their name (default: Mass, if defined get from config)
         variable = "mjet" if "variable" not in config else config["variable"]
@@ -778,7 +786,7 @@ def jet_mass_producer(args, configs):
             if config["selection"] == "W":
                 signals = ["WJetsMatched"]
                 if args.unfolding:
-                    signals = deepcopy(config["signal"])
+                    signals = config["signal"]
 
                 expec_pass = sum(
                     [
@@ -793,13 +801,22 @@ def jet_mass_producer(args, configs):
                         for signal in config["signal"]
                     ]
                 )
+                #print(expec_pass,expec_fail)
+                #for signal in config["signal"]:
+                #  print(signal, channel_name + "pass",model[channel_name + "pass"][signal].getExpectation(nominal=True).sum())
+                #  print(signal, channel_name + "fail",model[channel_name + "fail"][signal].getExpectation(nominal=True).sum())
                 rpf = np.divide(expec_pass, expec_fail, out=np.zeros_like(expec_pass), where=expec_fail != 0)
                 for signal in signals:
                     wjets_W_pass_sample = model[channel_name + "pass"][signal]
                     wjets_W_fail_sample = model[channel_name + "fail"][signal]
-                    if rpf > 0.0 and not args.unfolding:
+                    if rpf > 0.0:
+                     if not args.unfolding:
                         wjets_W_pass_sample.setParamEffect(wjets_W_tag_eff, 1.0 * wjets_W_tag_eff)
-                        wjets_W_fail_sample.setParamEffect(wjets_W_tag_eff, (1 - wjets_W_tag_eff) * rpf + 1.0)
+                        wjets_W_fail_sample.setParamEffect(wjets_W_tag_eff, (1.0 - wjets_W_tag_eff) * rpf + 1.0)
+                     else:
+                        wjets_W_pass_sample.setParamEffect(wjets_W_tag_eff, 1.3, 1./1.3) # Constrain to 30%
+                        wjets_W_fail_sample.setParamEffect(wjets_W_tag_eff, (1.0 - 1.3) * rpf + 1.0, 1.0/((1.0 - 1.3) * rpf + 1.0))
+                        print("ACCOUNT FOR TAGGING EFFICIENCY",wjets_W_pass_sample,wjets_W_tag_eff,rpf)
                 # for signal in config["signal_fail"]:
                     # if rpf > 0.0 and not args.unfolding:
 

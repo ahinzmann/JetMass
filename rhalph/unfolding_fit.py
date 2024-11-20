@@ -14,7 +14,8 @@ if __name__ == "__main__":
     parser.add_argument("--justplots", action="store_true", help="just redo the plots.")
     parser.add_argument("--nonuniform", action="store_true")
     parser.add_argument("--n2gen", action="store_true")
-    
+    parser.add_argument("--TaggingEff", action="store_true")
+   
     args = parser.parse_args()
 
     cmd = "python jetmass_combination.py -M unfolding --year RunII --configs configs/unfolding/WJets*.py "
@@ -42,8 +43,8 @@ if __name__ == "__main__":
             "substructure": r'\"regularizationStrength\":0.9,\"regularization\": [\"pt\"]',
         },
         "nonuniform": {
-            "particlenet": r'\"scaleGenBinWidth\":\"False\", \"uniformGenbins\":\"False\",\"regularizationStrength\":1.3,\"regularization\": [\"msd\",\"pt\"]', # noqa
-            "substructure": r'\"scaleGenBinWidth\":\"False\", \"uniformGenbins\":\"False\",\"regularizationStrength\":1.45,\"regularization\": [\"msd\", \"pt\"]', # noqa
+            "particlenet": r'\"scaleGenBinWidth\":\"False\", \"uniformGenbins\":\"False\",\"regularizationStrength\":1.3,\"regularization\": [\"msd\",\"pt\"]'+(r',\"TaggingEff\":\"True\"' if args.TaggingEff else ''), # noqa
+            "substructure": r'\"scaleGenBinWidth\":\"False\", \"uniformGenbins\":\"False\",\"regularizationStrength\":1.45,\"regularization\": [\"msd\", \"pt\"]'+(r',\"TaggingEff\":\"True\"' if args.TaggingEff else ''), # noqa
             # "particlenet": r'\"scaleGenBinWidth\":\"False\", \"uniformGenbins\":\"False\",\"regularizationStrength\":1.35,\"regularization\": [\"msd\",\"pt\"]', # noqa
             # "substructure": r'\"scaleGenBinWidth\":\"False\", \"uniformGenbins\":\"False\",\"regularizationStrength\":1.4,\"regularization\": [\"msd\", \"pt\"]', # noqa
             # "particlenet": r'\"scaleGenBinWidth\":\"True\", \"uniformGenbins\":\"False\",\"regularizationStrength\":0.000230,\"regularization\": [\"pt\"]', # noqa

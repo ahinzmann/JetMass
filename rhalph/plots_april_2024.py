@@ -14,12 +14,12 @@ for tagger in ["--particlenet", ""]:
         #("N2Cut_02-04-24Asimov","--prefitAsimov --n2gen"),
         #("N2Cut_02-04-24Pseudo","--prefitAsimov --splitPseudo --n2gen"),
 
-        ("18-09-24",""),
-        ("N2Cut_18-09-24","--n2gen"),
+        #("18-09-24",""),
+        #("N2Cut_18-09-24","--n2gen"),
         #("18-09-24NoSys",""),
         #("N2Cut_18-09-24NoSys","--n2gen"),
-        ("18-09-24NoMatching",""),
+        #("18-09-24NoMatching",""),
         ("N2Cut_18-09-24NoMatching","--n2gen"),
     ]:
-        exec_cmd("./unfolding_fit.py --nonuniform --name {} {} {}".format(name, args, tagger), debug=False)
-#        exec_cmd("./unfolding_fit.py --nonuniform --justplots --name {} {} {}".format(name, args, tagger), debug=False)
+        exec_cmd("./unfolding_fit.py --TaggingEff --nonuniform --name {} {} {}".format(name, args, tagger), debug=False)
+#        exec_cmd("./unfolding_fit.py --TaggingEff --nonuniform --justplots --name {} {} {}".format(name, args, tagger), debug=False)

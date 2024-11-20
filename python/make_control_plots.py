@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 from __future__ import print_function
-import UHH2.JetMass.plotter as plotter
+import plotter as plotter
 import ROOT
 import os
 import numpy as np

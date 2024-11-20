@@ -149,7 +149,7 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
     pass_reco_sel_pNetddt = pass_reco_sel & (pNetddt(events))
 
     if n2_max > 0:
-        pass_gen_sel = pass_gen_sel & (events.gentopjet_n2_0 < n2_max)
+        pass_gen_sel = pass_gen_sel & (events.n2_beta1_gen < n2_max)
 
     hists = {}
 
@@ -349,9 +349,9 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
             storage=hist.storage.Weight(),
         )
     hists["gen_pt_msd_n2"].fill(
-            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max)],
-            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max)],
-            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max)],
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.n2_beta1_gen < n2_max)],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.n2_beta1_gen < n2_max)],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.n2_beta1_gen < n2_max)],
         )
     print("Gen pT>650, mSD>30, N2<0.2 cut xsec =", hists["gen_pt_msd_n2"].values().sum()/lumis[year])
     hists["gen_pt_msd_match"] = hist.Hist(
@@ -371,9 +371,9 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
             storage=hist.storage.Weight(),
         )
     hists["gen_pt_msd_n2_match"].fill(
-            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max) & events.IsMergedWZ == 1],
-            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max) & events.IsMergedWZ == 1],
-            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.gentopjet_n2_0 < n2_max) & events.IsMergedWZ == 1],
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.n2_beta1_gen < n2_max) & events.IsMergedWZ == 1],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.n2_beta1_gen < n2_max) & events.IsMergedWZ == 1],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.n2_beta1_gen < n2_max) & events.IsMergedWZ == 1],
         )
     print("Gen pT>650, mSD>30, N2<0.2 cut, W-match xsec =", hists["gen_pt_msd_n2_match"].values().sum()/lumis[year])
 
@@ -395,9 +395,9 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
             storage=hist.storage.Weight(),
         )
     hists["gen_pt_msd_n2_260"].fill(
-            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.gentopjet_n2_0 < n2_max)],
-            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.gentopjet_n2_0 < n2_max)],
-            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.gentopjet_n2_0 < n2_max)],
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.n2_beta1_gen < n2_max)],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.n2_beta1_gen < n2_max)],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 260.0) & (events.n2_beta1_gen < n2_max)],
         )
     print("Gen pT>650, 30<mSD<260, N2<0.2 cut xsec =", hists["gen_pt_msd_n2_260"].values().sum()/lumis[year])
 
@@ -418,9 +418,9 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
             storage=hist.storage.Weight(),
         )
     hists["gen_pt_msd_n2_1000"].fill(
-            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1000.0) & (events.gentopjet_n2_0 < n2_max)],
-            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1000.0) & (events.gentopjet_n2_0 < n2_max)],
-            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1000.0) & (events.gentopjet_n2_0 < n2_max)],
+            ptgen=events.pt_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1000.0) & (events.n2_beta1_gen < n2_max)],
+            msdgen=events.msd_gen_ak8[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1000.0) & (events.n2_beta1_gen < n2_max)],
+            weight=events.weight[(events.pt_gen_ak8 > 650.0) & (events.msd_gen_ak8 > 30.0) & (events.msd_gen_ak8 < 1000.0) & (events.n2_beta1_gen < n2_max)],
         )
     print("Gen pT>650, 30<mSD<1000, N2<0.2 cut xsec =", hists["gen_pt_msd_n2_1000"].values().sum()/lumis[year])
     #####

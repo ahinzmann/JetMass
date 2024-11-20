@@ -709,7 +709,7 @@ class JMSTemplates(processor.ProcessorABC):
             #print(variation_weights["model_up"])
             #print(variation_weights["model_down"])
 
-            if ("WJets" in dataset or "ZJets" in dataset) and False: # disable with missing file ULvjets_corrections.json
+            if ("WJets" in dataset or "ZJets" in dataset):
                 boson = "W" if "W" in dataset else "Z"
                 v_qcd_systs = [
                     f"{syst}_{direction}" for direction in ["up", "down"] for syst in ["d1K_NLO", "d2K_NLO", "d3K_NLO"]
