@@ -5,8 +5,10 @@ import mplhep as hep
 import json
 hep.style.use("CMS")
 import re
-#fit_dir = "../rhalph/UnfoldingParticleNet_N2Cut_02-04-24/FullRunII"
-fit_dir = "../rhalph/UnfoldingSubstructure_N2Cut_02-04-24/FullRunII"
+#fit_dir = "../rhalph/UnfoldingParticleNet_18-09-24/FullRunII"
+fit_dir = "../rhalph/UnfoldingSubstructure_18-09-24/FullRunII"
+#fit_dir = "../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII"
+#fit_dir = "../rhalph/UnfoldingSubstructure_N2Cut_18-09-24/FullRunII"
 
 config = json.load(open(f"{fit_dir}/config.json","r"))
 fit_results = json.load(open(f"{fit_dir}/FullRunIIfitResult.json","r"))
