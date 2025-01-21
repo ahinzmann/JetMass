@@ -229,7 +229,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     preselection_tree = load_tree(
-        dirname=f"/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/vjetsTrees/workdir_vjets_{args.year}/",
+        dirname=f"/data/dust/user/albrechs/UHH2/JetMassOutput/vjetsTrees/workdir_vjets_{args.year}/",
         fname_pattern="*WJetsToQQ*.root",
         year=args.year,
     )

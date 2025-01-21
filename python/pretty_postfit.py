@@ -336,7 +336,7 @@ def plot_unfolded_mass(
     n2cut: str = "",
     n2cut_str: str = "no_n2",
     theory_uncertainty: str = "Theory",
-    coffea_hist_path: str = "/nfs/dust/cms/user/hinzmann/jetmass/JetMassFits/coffea_hists",
+    coffea_hist_path: str = "/data/dust/user/hinzmann/jetmass/JetMassFits/coffea_hists",
 ):
     import json
     from copy import deepcopy
@@ -366,7 +366,7 @@ def plot_unfolded_mass(
       theory_systs = [theory_uncertainty]
     theory_vars = [f"{syst}_{direc}" for syst in theory_systs for direc in ["up", "down"]]
 
-    data_label = ("unfolded data" if data else "unfolded pseudo data") + r"(stat. $\bigoplus$ syst. unc.)"
+    data_label = ("data" if data else "unfolded pseudo data") + r"(stat. $\bigoplus$ syst. unc.)"
     out_dir = f"{fit_dir}/plots/pretty_unfold_{yaxis}{n2cut}/"
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
@@ -1130,7 +1130,7 @@ if __name__ == "__main__":
     tagger_str = "n2ddt" if args.tagger == "substructure" else "pNetddt"
     for year in years:
         msd_corr = polynomial_msd_correction_set[f"response_g_jec_{year}"]
-        sel_events_tree_fname = f"/nfs/dust/cms/user/hinzmann/jetmass/parquet_trees/WJetsToQQ_tinyTree_{year}_notagger.parquet"
+        sel_events_tree_fname = f"/data/dust/user/hinzmann/jetmass/parquet_trees/WJetsToQQ_tinyTree_{year}_notagger.parquet"
         events = ak.from_parquet(sel_events_tree_fname)
         events["pt_raw"] = events.Jets.pt[:, 0]
         events["pt"] = events.pt_raw * events.jecfactor[:, 0]

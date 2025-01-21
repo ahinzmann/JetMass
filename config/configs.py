@@ -1,4 +1,4 @@
-#!/nfs/dust/cms/user/albrechs/python/coffea/bin/python
+#!/data/dust/user/albrechs/python/coffea/bin/python
 
 import os
 from collections import OrderedDict
@@ -6,7 +6,7 @@ from lxml.etree import tostring
 from lxml.builder import ElementMaker
 
 import sys
-uhh2datasets_path = "/nfs/dust/cms/user/albrechs/UHH2/UHH2-Datasets"
+uhh2datasets_path = "/data/dust/user/albrechs/UHH2/UHH2-Datasets"
 sys.path.append(uhh2datasets_path)
 from CrossSectionHelper import MCSampleValuesHelper
 
@@ -162,7 +162,7 @@ class SFrameConfig(object):
         self.AnalysisName = "JetMass"  # i.e. name of the directory of the analysis (.../UHH2/<AnalysisName>/)
 
         self.output_directory = (
-            "./" if self.test_config else f"/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/{self.selection}Trees/"
+            "./" if self.test_config else f"/data/dust/user/albrechs/UHH2/JetMassOutput/{self.selection}Trees/"
         )
         if not os.path.isdir(self.output_directory):
             os.makedirs(self.output_directory)

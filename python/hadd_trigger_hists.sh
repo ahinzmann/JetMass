@@ -2,7 +2,7 @@
 
 YEARS=(UL16preVFP UL16postVFP UL17 UL18)
 
-export WORKDIR=${1:-/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/ttbarTrees/ForTriggerEff}
+export WORKDIR=${1:-/data/dust/user/albrechs/UHH2/JetMassOutput/ttbarTrees/ForTriggerEff}
 
 function hadd_sample {
   YEAR=${1:-UL17}

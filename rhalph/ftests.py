@@ -445,7 +445,7 @@ if __name__ == "__main__":
 
             # if algo == "saturated":
 
-            #     process_TF_prep('/nfs/dust/cms/user/albrechs/JetMassCalibration/FTest_DataTFScan_QCDOrder0x4_%s_Seed*'%algo,
+            #     process_TF_prep('/data/dust/user/albrechs/JetMassCalibration/FTest_DataTFScan_QCDOrder0x4_%s_Seed*'%algo,
             #                     'VJetsMCTFPt0Rho4DataResTFPt%iRho%i/',
             #                     "/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_2_17/CMSSW_10_2_17/src/UHH2/JetMass/rhalph/Data2TfFTestPlots%s/"%algo,
             #                     algo,

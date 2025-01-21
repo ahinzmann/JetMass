@@ -15,8 +15,8 @@ import correctionlib
 hep.style.use("CMS")
 
 
-ddtmaps_n2_path = "/nfs/dust/cms/user/hinzmann/jetmass/ddtmaps/ddtmaps_n2.npy"
-ddtmaps_particlenet_path = "/nfs/dust/cms/user/hinzmann/jetmass/ddtmaps/ddtmaps_particlenet.npy"
+ddtmaps_n2_path = "/data/dust/user/hinzmann/jetmass/ddtmaps/ddtmaps_n2.npy"
+ddtmaps_particlenet_path = "/data/dust/user/hinzmann/jetmass/ddtmaps/ddtmaps_particlenet.npy"
 
 
 def load_tree(
@@ -63,11 +63,11 @@ def load_tree(
 
 def create_hists(events, year, n2_max=-999.0, nomatching=False):
     trigger_scalefactors = correctionlib.CorrectionSet.from_file(
-        "/nfs/dust/cms/user/hinzmann/jetmass/JetMassNotebooks/data/"
+        "/data/dust/user/hinzmann/jetmass/JetMassNotebooks/data/"
         + "HLT_AK8PFJet_MC_trigger_sf_c2e731345f.json"
     )
     msd_corrector = correctionlib.CorrectionSet.from_file(
-        "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/"
+        "/data/dust/user/hinzmann/jetmass/JetMass/python/"
         + jms_correction_files["notagger"]
     )[f"response_g_jec_{year}"]
     trigger_sf_evaluator_450 = trigger_scalefactors[f"HLT_AK8PFJet450_triggersf_{year}"]
@@ -516,7 +516,7 @@ if __name__ == "__main__":
         out = load(outfile)
     else:
         tree = load_tree(
-            dirname=f"/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/vjetsTrees/workdir_vjets_{args.year}/",
+            dirname=f"/data/dust/user/albrechs/UHH2/JetMassOutput/vjetsTrees/workdir_vjets_{args.year}/",
             fname_pattern="*WJetsToQQ*.root",
             year=args.year,
         )

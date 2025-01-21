@@ -149,8 +149,8 @@ if __name__ == "__main__":
     workflow.processor_instance = DDTMapPrep(tagger=args.tagger)
     workflow.processor_schema = BaseSchema
 
-    # path = '/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/vjetsTrees/workdir_{SELECTION}_{YEAR}/'
-    path = "/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/vjetsTrees/ForDDTMaps/workdir_{SELECTION}_ddt_{YEAR}/"
+    # path = '/data/dust/user/albrechs/UHH2/JetMassOutput/vjetsTrees/workdir_{SELECTION}_{YEAR}/'
+    path = "/data/dust/user/albrechs/UHH2/JetMassOutput/vjetsTrees/ForDDTMaps/workdir_{SELECTION}_ddt_{YEAR}/"
 
     sample_pattern = os.path.join(path, "*QCD*.root")
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
         samples = {
             "UL18": {
                 "files": [
-                    "/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/vjetsTrees/ForDDTMaps/workdir_vjets_ddt_UL18/"
+                    "/data/dust/user/albrechs/UHH2/JetMassOutput/vjetsTrees/ForDDTMaps/workdir_vjets_ddt_UL18/"
                     "uhh2.AnalysisModuleRunner.MC.QCD_HT700to1000_UL18_71.root"
                 ]
             }

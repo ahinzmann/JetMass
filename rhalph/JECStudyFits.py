@@ -144,7 +144,7 @@ if __name__ == "__main__":
     # date_str = "05-07-23_noRobustHesse_range10_Strat1"
     date_str = "05-07-23_noRobustHesse_range15_Strat0_rrange"
     # date_str = "05-07-23_noRobustHesse_range15_Strat0"
-    base_dir = "/nfs/dust/cms/user/albrechs/JetMassFits/JMSFits/{}/".format(date_str)
+    base_dir = "/data/dust/user/albrechs/JetMassFits/JMSFits/{}/".format(date_str)
     submitter = JobSubmitter(base_dir)
     common_wrapper_lines = [
         "#!/bin/bash",

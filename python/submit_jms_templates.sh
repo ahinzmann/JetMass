@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source /data/dust/user/hinzmann/jetmass/JetMass/venv/bin/activate
+
 function submit_templates_parallel {
   SCALEOUT=$1
   VAR=${2:-nominal}
@@ -24,14 +26,14 @@ function submit_templates_parallel {
   do
     if [ ${VAR} == "nominal" ]; then
       echo "default -> ${YEAR}" 
-      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}.coffea --year ${YEAR} --tagger ${TAGGER} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}.stdout &
+      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}.coffea --year ${YEAR} --tagger ${TAGGER} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}.stdout 2>&1 &
     elif [[ ${VAR} == *"jec"* ]]; then
       echo "jec-variation (${VAR}) -> ${YEAR}" $VAR $YEAR
       DIRECTION=${VAR#*_}
-      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --JEC ${DIRECTION} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}_${VAR}.stdout &
+      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --JEC ${DIRECTION} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}_${VAR}.stdout 2>&1 &
     else
       echo "variation ${VAR} -> ${YEAR}"
-      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --variation ${VAR} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}_${VAR}.stdout &
+      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --variation ${VAR} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}_${VAR}.stdout 2>&1 &
     fi
   done
 }
@@ -67,25 +69,32 @@ function submit_templates {
     echo "You did not provide a valid tagger"
   fi
   
-  #for YEAR in UL16preVFP UL16postVFP UL17 UL18
-  for YEAR in UL18
+  for YEAR in UL16preVFP UL16postVFP UL17 UL18
+  #for YEAR in UL18
   do
+    if [ $YEAR == "UL18" ]; then
+      LAST=""
+    else
+      LAST=&
+    fi  
     if [ ${VAR} == "nominal" ]; then
       echo "default -> ${YEAR}" 
-      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}.coffea --year ${YEAR} --tagger ${TAGGER} --scaleout ${SCALEOUT} ${VJETSONLY}
+      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}.coffea --year ${YEAR} --tagger ${TAGGER} --scaleout ${SCALEOUT} ${VJETSONLY} &
     elif [[ ${VAR} == *"jec"* ]]; then
       echo "jec-variation (${VAR}) -> ${YEAR}" $VAR $YEAR
       DIRECTION=${VAR#*_}
-      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --JEC ${DIRECTION} --scaleout ${SCALEOUT} ${VJETSONLY}
+      echo ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --JEC ${DIRECTION} --scaleout ${SCALEOUT} ${VJETSONLY}
+      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --JEC ${DIRECTION} --scaleout ${SCALEOUT} ${VJETSONLY} &
     elif [[ ${VAR} == *"trigger"* ]]; then
       echo "triggersf-variation (${VAR}) -> ${YEAR}" $VAR $YEAR
       DIRECTION=${VAR#*_}
-      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --triggersf ${DIRECTION} --scaleout ${SCALEOUT} ${VJETSONLY}
+      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --triggersf ${DIRECTION} --scaleout ${SCALEOUT} ${VJETSONLY} &
     else
       echo "variation ${VAR} -> ${YEAR}"
-      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --variation ${VAR} ${SCALEOUTARG} ${VJETSONLY}
+      ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --variation ${VAR} ${SCALEOUTARG} ${VJETSONLY} &
     fi
   done
+  wait
 }
 
 export TMPDIR=/tmp/
@@ -96,10 +105,12 @@ VARIATIONS_ALL=(nominal jec_up jec_down triggersf_up triggersf_down isr_up isr_d
 VARIATIONS_PART1=(nominal jec_up jec_down triggersf_up triggersf_down)
 VARIATIONS_PART2=(isr_up isr_down fsr_up fsr_down pu_up pu_down toppt_off)
 VARIATIONS_PART3=(v_qcd_up v_qcd_down w_ewk_up w_ewk_down z_ewk_up z_ewk_down)
+VARIATIONS_PART4=(jec_AbsoluteStat_up jec_AbsoluteScale_up jec_AbsoluteMPFBias_up jec_Fragmentation_up jec_SinglePionECAL_up jec_SinglePionHCAL_up jec_FlavorQCD_up jec_TimePtEta_up jec_RelativePtBB""RelativePtEC1_up jec_RelativePtEC2_up jec_RelativePtHF_up jec_RelativeBal_up jec_RelativeFSR_up jec_RelativeSample_up jec_RelativeStatFSR_up jec_RelativeStatEC_up jec_RelativeStatHF_up jec_RelativeJEREC1_up jec_RelativeJEREC2_up jec_RelativeJERHF_up jec_PileUpDataMC_up jec_PileUpPtRef_up jec_PileUpPtBB_up jec_PileUpPtEC1_up jec_PileUpPtEC2_up jec_PileUpPtHF_up)
+VARIATIONS_PART5=(jec_AbsoluteStat_down jec_AbsoluteScale_down jec_AbsoluteMPFBias_down jec_Fragmentation_down jec_SinglePionECAL_down jec_SinglePionHCAL_down jec_FlavorQCD_down jec_TimePtEta_down jec_RelativePtBB""RelativePtEC1_down jec_RelativePtEC2_down jec_RelativePtHF_down jec_RelativeBal_down jec_RelativeFSR_down jec_RelativeSample_down jec_RelativeStatFSR_down jec_RelativeStatEC_down jec_RelativeStatHF_down jec_RelativeJEREC1_down jec_RelativeJEREC2_down jec_RelativeJERHF_down jec_PileUpDataMC_down jec_PileUpPtRef_down jec_PileUpPtBB_down jec_PileUpPtEC1_down jec_PileUpPtEC2_down jec_PileUpPtHF_down)
 VARIATIONS_GENHISTS=(nominal v_qcd_up v_qcd_down w_ewk_up w_ewk_down)
 TAGGER=${3:-substructure}
-VJETSONLY="--VJetsOnly"
-#VJETSONLY=""
+#VJETSONLY="--VJetsOnly"
+VJETSONLY=""
 if [ "$VARIATION" == "all" ];
 then
   VARIATIONS=${VARIATIONS_ALL[@]}
@@ -112,6 +123,12 @@ then
 elif [ "$VARIATION" == "part3" ];
 then
   VARIATIONS=${VARIATIONS_PART3[@]}
+elif [ "$VARIATION" == "jecs_up" ];
+then
+  VARIATIONS=${VARIATIONS_PART4[@]}
+elif [ "$VARIATION" == "jecs_down" ];
+then
+  VARIATIONS=${VARIATIONS_PART5[@]}
 elif [ "$VARIATION" == "mgen" ];
 then
   VARIATIONS=${VARIATIONS_GENHISTS[@]}

@@ -18,6 +18,20 @@ logging.basicConfig()
 logger = logging.getLogger()
 logger.setLevel(logging.ERROR)
 
+JECsources = ["AbsoluteStat", "AbsoluteScale", "AbsoluteMPFBias", "Fragmentation",
+"SinglePionECAL", "SinglePionHCAL", "FlavorQCD", "TimePtEta",
+"RelativePtBB","RelativePtEC1", "RelativePtEC2", "RelativePtHF", "RelativeBal", "RelativeFSR", "RelativeSample",
+"RelativeStatFSR", "RelativeStatEC", "RelativeStatHF", "RelativeJEREC1", "RelativeJEREC2", "RelativeJERHF",
+"PileUpDataMC", "PileUpPtRef", "PileUpPtBB", "PileUpPtEC1", "PileUpPtEC2", "PileUpPtHF",
+  ]
+#JECsources = ["AbsoluteStat", "AbsoluteScale", "AbsoluteMPFBias",
+#"SinglePionECAL", "SinglePionHCAL", "FlavorQCD", "TimePtEta",
+#"RelativeBal", "RelativeFSR", "RelativeSample", "RelativeStatEC",
+#  ]
+#JECsources = ["RelativeSample",
+#  ]
+#JECsources = ["",
+#  ]
 
 def nuisance_name_(name, configs):
     result = (
@@ -75,7 +89,8 @@ def jet_mass_producer(args, configs):
       ]
     else:
       systematics=[
-            "jec_up", "jec_down",
+            #"jec_up", "jec_down",
+            "prefiring",
             "triggersf_up", "triggersf_down",
             "pu_up", "pu_down",
             "jer_up", "jer_down",
@@ -86,7 +101,9 @@ def jet_mass_producer(args, configs):
             "v_qcd_up", "v_qcd_down",
             "w_ewk_up", "w_ewk_down",
             "z_ewk_up", "z_ewk_down",
-    ]
+      ]
+      systematics+=[("jec_"+source+"_up").replace("__","_") for source in JECsources]
+      systematics+=[("jec_"+source+"_down").replace("__","_") for source in JECsources]
     for var in systematics:
         fname = configs["histLocation"].replace(".root", "_{}.root".format(var))
         print(fname)
@@ -484,12 +501,15 @@ def jet_mass_producer(args, configs):
                     norm_nuisances[sample] = nuisance_par_dict
 
     # jec variation nuisances
-    jec_var_nuisance = rl.NuisanceParameter(nuisance_name("jec_variation"), "shape", 0, -10, 10)
+    #jec_var_nuisances = [rl.NuisanceParameter(nuisance_name("jec_variation"), "shape", 0, -10, 10)]
+    jec_var_nuisances = [ rl.NuisanceParameter(nuisance_name(("jec_"+source+"_variation").replace("__","_")), "shape", 0, -10, 10) for source in JECsources ]
+   
     extra_nuisances = {
         "triggersf": rl.NuisanceParameter(nuisance_name("triggersf_variation"), "shape", 0, -10, 10),
         "pu": rl.NuisanceParameter(nuisance_name("pu_variation"), "shape", 0, -10, 10),
         "isr": rl.NuisanceParameter(nuisance_name("isr_variation"), "shape", 0, -10, 10),
         "fsr": rl.NuisanceParameter(nuisance_name("fsr_variation"), "shape", 0, -10, 10),
+        "prefiring": rl.NuisanceParameter(nuisance_name("prefiring_variation"), "shape", 0, -10, 10),
         "model": rl.NuisanceParameter(nuisance_name("model_variation"), "shape", 0, -10, 10),
         "v_qcd": rl.NuisanceParameter(nuisance_name("v_dKEnv"), "shape", 0, -10, 10),
         "w_ewk": rl.NuisanceParameter(nuisance_name("w_dkappaEnv"), "shape", 0, -10, 10),
@@ -643,12 +663,22 @@ def jet_mass_producer(args, configs):
                     if args.JECVar and (
                         (sample.sampletype == rl.Sample.SIGNAL or sample.sampletype == rl.Sample.BACKGROUND)
                     ):
-                        if "jec_up" in aux_hist_files and "jec_down" in aux_hist_files:
-                            hist_jec_up = get_hist(hist_dir % (sample_name, ""), "jec_up")
-                            hist_jec_down = get_hist(hist_dir % (sample_name, ""), "jec_down")
-                            sample.setParamEffect(jec_var_nuisance, hist_jec_up, hist_jec_down)
+                      for source in JECsources:
+                        if ("jec_"+source+"_up").replace("__","_") in aux_hist_files and ("jec_"+source+"_down").replace("__","_") in aux_hist_files:
+                            print("read jec hist",sample_name,source)
+                            hist_jec_up = get_hist(hist_dir % (sample_name, ""), ("jec_"+source+"_up").replace("__","_"))
+                            hist_jec_down = get_hist(hist_dir % (sample_name, ""), ("jec_"+source+"_down").replace("__","_"))
+                            sample.setParamEffect(jec_var_nuisances[JECsources.index(source)], hist_jec_up, hist_jec_down)
                         else:
                             logger.warn("JEC variation hists not present.")
+
+                    # Prefiring
+                    if "prefiring" in aux_hist_files:
+                        hist_prefiring_up = get_hist(hist_dir % (sample_name, ""), "prefiring")
+                        hist_prefiring_down = get_hist(hist_dir % (sample_name, ""), "triggersf_down")
+                        sample.setParamEffect(extra_nuisances["prefiring"], hist_prefiring_up, hist_prefiring_down)
+                    else:
+                        logger.warn("Prefiring variation hists not present.")
 
                     # TriggeSF down
                     if "triggersf_up" in aux_hist_files and "triggersf_down" in aux_hist_files:
@@ -1075,6 +1105,20 @@ if __name__ == "__main__":
         # "normUnc",
         "triggersf_variation",
         "jec_variation",
+        
+        "jec_AbsoluteStat_variation",
+        "jec_TimePtEta_variation",
+        "jec_RelativePtEC1_variation",
+        "jec_RelativePtEC2_variation",
+        "jec_RelativeSample_variation",
+        "jec_RelativeStatFSR_variation",
+        "jec_RelativeStatEC_variation",
+        "jec_RelativeStatHF_variation",
+        "jec_RelativeJEREC1_variation",
+        "jec_RelativeJEREC2_variation",
+        
+        "prefiring",
+        
         # "isr_variation", "fsr_variation",
         "toppt_reweight",
         "tag_eff_sf",

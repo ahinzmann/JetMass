@@ -1,4 +1,5 @@
-#!/usr/bin/env pythonJMS.sh
+#!/usr/bin/env python
+###!/usr/bin/env pythonJMS.sh
 import awkward as ak
 import numpy as np
 from coffea import processor
@@ -14,11 +15,35 @@ from coffea_util import CoffeaWorkflow
 from utils import jms_correction_files
 from copy import deepcopy
 
-jetmass_path = "/nfs/dust/cms/user/hinzmann/jetmass"
+jetmass_path = "/data/dust/user/hinzmann/jetmass"
 ddtmaps_n2_path = f"{jetmass_path}/ddtmaps/ddtmaps_n2.npy"
 ddtmaps_particlenet_path = f"{jetmass_path}/ddtmaps/ddtmaps_particlenet.npy"
 kfactor_path = f"{jetmass_path}/NLOWeights"
 
+JECsources = ["AbsoluteStat", "AbsoluteScale", "AbsoluteMPFBias", "Fragmentation",
+"SinglePionECAL", "SinglePionHCAL", "FlavorQCD", "TimePtEta",
+"RelativePtBB","RelativePtEC1", "RelativePtEC2", "RelativePtHF", "RelativeBal", "RelativeFSR", "RelativeSample",
+"RelativeStatFSR", "RelativeStatEC", "RelativeStatHF", "RelativeJEREC1", "RelativeJEREC2", "RelativeJERHF",
+"PileUpDataMC", "PileUpPtRef", "PileUpPtBB", "PileUpPtEC1", "PileUpPtEC2", "PileUpPtHF",
+"Total",
+  ]
+
+if True:
+  cset={}
+  sfs={}
+  for year in ["UL16preVFP","UL16postVFP","UL17","UL18"]:
+    cset[year]=correctionlib.CorrectionSet.from_file("jet_jerc_"+year+".json")
+    if year=="UL16preVFP":
+      yearset="Summer19UL16APV_V7_MC"
+    if year=="UL16postVFP":
+      yearset="Summer19UL16_V7_MC"
+    if year=="UL17":
+      yearset="Summer19UL17_V5_MC"
+    if year=="UL18":
+      yearset="Summer19UL18_V5_MC"
+    for source in JECsources:
+      print(yearset+"_"+source+"_"+"AK4PFchs")
+      sfs[source+year]=cset[year][yearset+"_"+source+"_"+"AK4PFchs"]
 
 class JMSTemplates(processor.ProcessorABC):
     def __init__(
@@ -179,12 +204,12 @@ class JMSTemplates(processor.ProcessorABC):
         }
 
         self.trigger_scalefactors = correctionlib.CorrectionSet.from_file(
-            "/nfs/dust/cms/user/hinzmann/jetmass/JetMassNotebooks/data/"
+            "/data/dust/user/hinzmann/jetmass/JetMassNotebooks/data/"
             + "HLT_AK8PFJet_MC_trigger_sf_c2e731345f.json"
         )
 
         self.mjet_reco_correction = correctionlib.CorrectionSet.from_file(
-            "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/"
+            "/data/dust/user/hinzmann/jetmass/JetMass/python/"
             + jms_correction_files["notagger"]
         )
 
@@ -204,10 +229,10 @@ class JMSTemplates(processor.ProcessorABC):
 
         self.corrections = corrections_extractor.make_evaluator()
 
-        #self._vjets_corrections = correctionlib.CorrectionSet.from_file(
-        #    "/nfs/dust/cms/user/hinzmann/jetmass/JetMass/python/"
-        #    "ULvjets_corrections.json"
-        #)
+        self._vjets_corrections = correctionlib.CorrectionSet.from_file(
+            "/data/dust/user/hinzmann/jetmass/JetMass/python/"
+            "ULvjets_corrections.json"
+        )
 
         self._selections = ["vjets", "ttbar"]
 
@@ -612,6 +637,8 @@ class JMSTemplates(processor.ProcessorABC):
         )
         treat_HEM = False
         event_weight_for_gen = deepcopy(events.weight)
+        #print("weight", events.weight)
+        #print("prefiringweight", events.prefiringweight)
         if isMC:
             if self._year == "UL18":
                 events["weight"] = ak.where(
@@ -657,6 +684,23 @@ class JMSTemplates(processor.ProcessorABC):
             "up": events.jecfactor_up,
             "down": events.jecfactor_down,
         }
+        
+        for s in JECsources:
+         if s in self._jec:
+          factors_up=[]
+          factors_down=[]
+          sf=sfs[s+self._year]
+          #print([inp.name for inp in sf.inputs])
+          for pt,eta,jec in zip(events.pt,events.eta,events.jecfactor):
+            unc=sf.evaluate(eta,pt)
+            #print(pt,eta,unc)
+            factors_up+=[jec*(1.+unc)]
+            factors_down+=[jec*(1.-unc)]
+          jecfactors[s+"_up"]=np.array(factors_up)
+          jecfactors[s+"_down"]=np.array(factors_down)
+        
+        #print(jecfactors["down"],jecfactors["Total_down"],jecfactors["up"],jecfactors["Total_up"])
+       
         if "data" in dataset.lower():
             jecfactor = jecfactors["nominal"]
         else:
@@ -667,6 +711,7 @@ class JMSTemplates(processor.ProcessorABC):
         if self._variation_weight != "nominal" and "data" not in dataset.lower() and len(events) > 0:
             variation_weights = {
                 "toppt_off": 1. / events["toppt_weight"],
+                "prefiring": 1. / (1.-(1.-events.prefiringweight)*0.2), # 20% of weight as uncertainty
                 "pu_down": events["weight_pu_down"]/events["weight_pu"],
                 "pu_up": events["weight_pu_up"]/events["weight_pu"],
             }
@@ -1189,6 +1234,7 @@ if __name__ == "__main__":
         "model_up", "model_down",
         "pu_up", "pu_down",
         "toppt_off",
+        "prefiring",
         "v_qcd_up", "v_qcd_down",
         "w_ewk_up", "w_ewk_down",
         "z_ewk_up", "z_ewk_down",
@@ -1213,7 +1259,7 @@ if __name__ == "__main__":
     workflow.processor_schema = BaseSchema
 
     sample_pattern = (
-        "/nfs/dust/cms/user/hinzmann/jetmass/{SELECTION}Trees/workdir_{SELECTION}_{YEAR}/*{SAMPLE}*.root"
+        "/data/dust/user/hinzmann/jetmass/{SELECTION}Trees/workdir_{SELECTION}_{YEAR}/*{SAMPLE}*.root"
     )
     sample_names = {
         "vjets": [

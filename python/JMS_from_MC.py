@@ -584,7 +584,7 @@ if __name__ == "__main__":
     corrections = []
 
     for year in years:
-        wjets_jms_extractor = JMSExtractor(f"/nfs/dust/cms/user/hinzmann/jetmass/parquet_trees/WJetsToQQ_tinyTree_{year}_{args.tagger}.parquet", year=year)
+        wjets_jms_extractor = JMSExtractor(f"/data/dust/user/hinzmann/jetmass/parquet_trees/WJetsToQQ_tinyTree_{year}_{args.tagger}.parquet", year=year)
         wjets_jms_extractor.plot_dir = f"jms_from_mc_plots_{args.tagger}_{args.output_suffix}"
         wjets_jms_extractor.pt_binning = np.array([575, 650, 725, 800, 1000, 1200, 3000])
         print("set pt binning to", wjets_jms_extractor.pt_binning)

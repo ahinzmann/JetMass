@@ -41,7 +41,8 @@ flatten_templates () {
     echo "You have to provide a variation name!"
     exit -1
   fi
-    VJETSONLY="--VJetsOnly" #### only VJETS
+  VJETSONLY=""
+#  VJETSONLY="--VJetsOnly" #### only VJETS
   if [[ ${VAR} == *"qcd"* ]]; then
     VJETSONLY="--VJetsOnly"
   elif [[ ${VAR} == *"ewk"* ]]; then
@@ -60,7 +61,7 @@ flatten_templates () {
       # JEC on pt&mJ
       ./create_root_templates.py -i $indir/${NAME}.coffea -o $outdir/${NAME}_1d --JEC "pt&mJ" --mass ${MASS}
       ./create_root_templates.py -i $indir/${NAME}.coffea -o $outdir/${NAME}_1d_unfolding --JEC "pt&mJ" --unfolding --mass ${MASS} ${VJETSONLY}
-    elif [ "$VAR" == "toppt_off" ]; then
+    elif [[ "$VAR" == "toppt_off" || "$VAR" == "prefiring" ]]; then
       echo "flattening ${YEAR} templates for variation of ${VAR}"
       # JEC on pt
       ./create_root_templates.py -i $indir/${NAME}_${VAR}.coffea -o $outdir/${NAME}_1d_jecpt_${VAR} --JEC "pt" --mass ${MASS} ${VJETSONLY}
@@ -68,7 +69,7 @@ flatten_templates () {
 
       # JEC on pt&mJ
       ./create_root_templates.py -i $indir/${NAME}_${VAR}.coffea -o $outdir/${NAME}_1d_${VAR} --JEC "pt&mJ" --mass ${MASS} ${VJETSONLY}
-      ./create_root_templates.py -i $indir/${NAME}_${VAR}.coffea -o $outdir/${NAME}_1d_unfolding_${VAR} --JEC "pt&mJ" --unfolding --mass ${MASS}${VJETSONLY}
+      ./create_root_templates.py -i $indir/${NAME}_${VAR}.coffea -o $outdir/${NAME}_1d_unfolding_${VAR} --JEC "pt&mJ" --unfolding --mass ${MASS} ${VJETSONLY}
     else
       for DIR in up down;
       do
@@ -90,7 +91,9 @@ flatten_templates () {
 # VARS_ALL=(v_qcd w_ewk z_ewk)
 # VARS_ALL=(nominal)
 # VARS=(${2:-${VARS_ALL[@]}})
-VARS_ALL=(model)
+# VARS_ALL=(model)
+# VARS_ALL=(prefiring)
+ VARS_ALL=(jec_AbsoluteStat jec_AbsoluteScale jec_AbsoluteMPFBias jec_Fragmentation jec_SinglePionECAL jec_SinglePionHCAL jec_FlavorQCD jec_TimePtEta jec_RelativePtBB jec_RelativePtEC1 jec_RelativePtEC2 jec_RelativePtHF jec_RelativeBal jec_RelativeFSR jec_RelativeSample jec_RelativeStatFSR jec_RelativeStatEC jec_RelativeStatHF jec_RelativeJEREC1 jec_RelativeJEREC2 jec_RelativeJERHF jec_PileUpDataMC jec_PileUpPtRef jec_PileUpPtBB jec_PileUpPtEC1 jec_PileUpPtEC2 jec_PileUpPtHF)
 VARS=(${VARS_ALL[@]})
 MAXPROCS=5
 NAMEPREFIX=${1:-}

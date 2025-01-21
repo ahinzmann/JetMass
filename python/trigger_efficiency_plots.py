@@ -278,7 +278,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("--workdir", default="/nfs/dust/cms/user/albrechs/UHH2/JetMassOutput/ttbarTrees/ForTriggerEff")
+    parser.add_argument("--workdir", default="/data/dust/user/albrechs/UHH2/JetMassOutput/ttbarTrees/ForTriggerEff")
     parser.add_argument("--outdir", default=".")
     args = parser.parse_args()
 
