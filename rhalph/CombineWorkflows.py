@@ -427,7 +427,7 @@ class CombineWorkflows(object):
                 "combine -M FitDiagnostics -d {WORKSPACE} --saveShapes -n '' "
                 "--cminDefaultMinimizerStrategy 0 --robustFit 1 "
                 "--robustHesse 1 "
-                "{FREEZEPARAMS} &> /dev/null"
+                "{FREEZEPARAMS}"# &> /dev/null"
             ).format(
                 # BUILDPREFIX=self._build_prefix,
                 FREEZEPARAMS=self.freezeParameters,

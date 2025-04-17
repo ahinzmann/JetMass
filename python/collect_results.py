@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #!/usr/bin/env pythonJMS.sh
 import numpy as np
 import uproot

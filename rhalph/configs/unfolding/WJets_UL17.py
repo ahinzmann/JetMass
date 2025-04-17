@@ -15,7 +15,7 @@ configs = {
     "QCDSigmaScale": 10.0,
     "QCDFailConstant": "False",
     "separateMassScales": "False",
-    "regularization": ["pt"],
+    "regularization": ["msd", "pt"],
     "regularizationStrength": 0.825,
     "uniformGenbins": "True",
     "scaleGenBinWidth": "False",

@@ -410,7 +410,7 @@ class JetMassCombination(object):
             cmd += r'for ipt in 0 1 2 3; do echo $ipt ;printf "%s\n" 0 1 2 3 |'
             cmd += "xargs -I{} -P 5 -n1 plotImpacts.py -i impacts.json -o impacts_r_ptgen${ipt}_msdgen{}"
             cmd += " --POI r_ptgen${ipt}_msdgen{} --per-page 35 "
-            cmd += " --translate ${CMSSW_BASE}/../POI_rename.json --height 600;done"
+            cmd += " --translate /data/dust/user/hinzmann/jetmass/JetMass/rhalph/POI_rename.json --height 600;done"
         print(cmd)
         # os.system(cmd)
 

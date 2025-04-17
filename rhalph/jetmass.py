@@ -51,7 +51,8 @@ def jet_mass_producer(args, configs):
     """
     rebin_msd = True
     binnings = {"W": np.linspace(50, 300, 26), "top": np.linspace(50, 300, 26)}
-    binning_info = configs.get("binning", binnings["W"])
+    binning_info = [50,200,26] if "Asimov" in args.workdir else configs.get("binning", binnings["W"]) ### HACK BY ANDREAS SINCE EMPTY BINS BREAK THE TOY GENERATION
+    print(binning_info)
     min_msd, max_msd = (binning_info[0], binning_info[1])
     binwidth = binning_info[2]
     nbins = int(np.floor((max_msd - min_msd) / binwidth))
@@ -116,7 +117,9 @@ def jet_mass_producer(args, configs):
     qcd_fail_region_constant = configs.get("QCDFailConstant", "False") == "True"
     qcd_fail_sigma_scale = configs.get("QCDSigmaScale", 1.0)
     TF_ranges = (-50, 50)
+    #TF_ranges = (1, 1) ## Increased by Andreas from 50
     qcdparam_lo, qcdparam_hi = (-50, 50)
+    #qcdparam_lo, qcdparam_hi = (0, 0) ## Increased by Andreas from 50
     QCDFailUnbound = False
 
     lumi_scale = 1.0
@@ -665,7 +668,7 @@ def jet_mass_producer(args, configs):
                     ):
                       for source in JECsources:
                         if ("jec_"+source+"_up").replace("__","_") in aux_hist_files and ("jec_"+source+"_down").replace("__","_") in aux_hist_files:
-                            print("read jec hist",sample_name,source)
+                            #print("read jec hist",sample_name,source)
                             hist_jec_up = get_hist(hist_dir % (sample_name, ""), ("jec_"+source+"_up").replace("__","_"))
                             hist_jec_down = get_hist(hist_dir % (sample_name, ""), ("jec_"+source+"_down").replace("__","_"))
                             sample.setParamEffect(jec_var_nuisances[JECsources.index(source)], hist_jec_up, hist_jec_down)

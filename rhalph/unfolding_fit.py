@@ -18,9 +18,9 @@ if __name__ == "__main__":
    
     args = parser.parse_args()
 
-    cmd = "python jetmass_combination.py -M unfolding --year RunII --configs configs/unfolding/WJets*.py "
+    cmd = "python jetmass_combination.py -M unfolding --year "+(args.name.split("-")[-1] if "UL" in args.name else "RunII")+" --configs configs/unfolding/WJets"+("_"+args.name.split("-")[-1] if "UL" in args.name else "")+"*.py "
 
-    regularization = "nonuniform" if args.nonuniform else "uniform"
+    regularization ="no" if "NoReg" in args.name else ("nonuniform" if args.nonuniform else "uniform")
 
     extra_options = ""
     if args.prefitAsimov:
@@ -49,8 +49,13 @@ if __name__ == "__main__":
             # "substructure": r'\"scaleGenBinWidth\":\"False\", \"uniformGenbins\":\"False\",\"regularizationStrength\":1.4,\"regularization\": [\"msd\", \"pt\"]', # noqa
             # "particlenet": r'\"scaleGenBinWidth\":\"True\", \"uniformGenbins\":\"False\",\"regularizationStrength\":0.000230,\"regularization\": [\"pt\"]', # noqa
             # "substructure": r'\"scaleGenBinWidth\":\"True\", \"uniformGenbins\":\"False\",\"regularizationStrength\":0.000415,\"regularization\": [\"pt\"]', # noqa
+        },
+        "no": {
+            "particlenet": r'\"regularization\": []'+(r',\"TaggingEff\":\"True\"' if args.TaggingEff else ''), # noqa
+            "substructure": r'\"regularization\": []'+(r',\"TaggingEff\":\"True\"' if args.TaggingEff else ''), # noqa
         }
     }
+
     if args.particlenet:
         cmd += " --workdir UnfoldingParticleNet{} ".format(fit_name)
         # cmd += r' --config-update "{\"regularizationStrength\":1.24}" '

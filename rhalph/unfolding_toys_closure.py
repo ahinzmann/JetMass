@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from __future__ import print_function
 import os
 import json
@@ -98,6 +99,8 @@ class UnfoldingToyClosure(object):
             cmd += "--setParameters {}=1 ".format("=1,".join(self._pois))
             cmd += "--robustFit 1 "
             cmd += "--robustHesse 1 "
+            #cmd += "--toysFrequentist " ## Added+removed by Andreas...
+            #cmd += "--cminFallbackAlgo Minuit2,1 " ## Added+removed by Andreas...
             cmd += "-n .{}{} ".format(self._name, i)
             cmd += "--seed {} ".format(self._base_seed + i)
             cmd += "-t {} ".format(self._toys_per_job)
@@ -107,6 +110,7 @@ class UnfoldingToyClosure(object):
             # cmd += "--memory 4 "
             cmd += "--task-name {}_job_{} ".format(self._name, i)
             if debug:
+                print("cd "+self._workdir)
                 print(cmd)
             else:
                 os.system(cmd)
@@ -115,9 +119,10 @@ class UnfoldingToyClosure(object):
         fname = "{}/higgsCombine.{}{}.FitDiagnostics.mH120.{}.root".format(
             self._workdir, self._name, i_job, self._base_seed + i_job
         )
+        print(fname)
         dummy = np.array([[]]*len(self._pois)).T
         if not os.path.isfile(fname):
-            print("fit {} produced no output".format(i_job))
+            print("fit {} produced no output".format(i_job)+": "+fname)
             return dummy
         try:
             file_ = uproot.open(fname)
@@ -128,9 +133,12 @@ class UnfoldingToyClosure(object):
             return dummy
         result_arrays = limit.arrays(["trackedParam_{}".format(poi) for poi in self._pois])
         error_arrays = limit.arrays(["trackedError_{}".format(poi) for poi in self._pois])
+        #print(result_arrays[:])
         # reformat and get rid of duplicate entries
-        result_arrays = np.array([result_arrays["trackedParam_{}".format(poi).encode()][::4] for poi in self._pois])
-        error_arrays = np.array([error_arrays["trackedError_{}".format(poi).encode()][::4] for poi in self._pois])
+        #print(result_arrays["trackedParam_{}".format(self._pois[0])])
+        result_arrays = np.array([result_arrays["trackedParam_{}".format(poi)][::4] for poi in self._pois])
+        error_arrays = np.array([error_arrays["trackedError_{}".format(poi)][::4] for poi in self._pois])
+        #print(result_arrays.shape)
 
         # transpose and reshape to return array of type [poi, toy] instead of [toy, poi]
         n_pois, n_toy_valid = result_arrays.shape
