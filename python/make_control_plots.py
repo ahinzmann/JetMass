@@ -9,7 +9,7 @@ ROOT.PyConfig.IgnoreCommandLineOptions = True
 ROOT.gROOT.SetBatch(1)
 
 plotter.draw_extra_text = True
-plotter.private_work = True
+plotter.private_work = False
 
 
 def plot_variable(

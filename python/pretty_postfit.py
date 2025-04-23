@@ -1073,7 +1073,7 @@ if __name__ == "__main__":
     parser.add_argument("--theory_uncertainty", default="Theory")
 
     args = parser.parse_args()
-    exp_label = "" #"Work in progress"
+    exp_label = "Preliminary" #"Work in progress"
     if not args.skip_templates:
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data)
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data, region="fail")

@@ -2,7 +2,7 @@ import os
 import sys
 import ROOT
 import numpy as np
-sys.path.append("/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/")
+#sys.path.append("/afs/desy.de/user/a/albrechs/xxl/af-cms/UHH2/10_6_28/CMSSW_10_6_28/src/UHH2/JetMass/python/")
 import plotter  # noqa: E402
 import cms_style  # noqa: E402
 
@@ -91,14 +91,14 @@ def plot_fit_result(
     plotter.draw_extra_text = True
     plotter.year = config.get("year", "2017")
     # plotter.legend_bbox = (0.60, 0.2, 0.9, 0.6)
-    plotter.legend_bbox = (0.6, 0.5, 0.87, 0.9)
+    plotter.legend_bbox = (0.53, 0.5, 0.87, 0.9)
     if unfolding and not sum_genbins:
         plotter.legend_bbox = (0.6, 0.25, 0.85, 0.9)
     # plotter.y_range_ratio = [0.8,1.2]
     if pseudo_data or prefit_asimov:
-        plotter.extra_text = "Simulation_Work_in_progress"
+        plotter.extra_text = "Simulation Preliminary"
     else:
-        plotter.extra_text = "Work_in_progress"
+        plotter.extra_text = "Preliminary"
     pseudo_data_info = config.get("Pseudo", [])
     if len(pseudo_data_info) > 0 and "lumiScale" in pseudo_data_info[0]:
         lumiScale = float(pseudo_data_info[0].split(":")[-1])
@@ -214,6 +214,9 @@ def plot_fit_result(
                     h_obs.GetYaxis().SetRangeUser(ymin_log, 10**(np.log10(ymax)/(2/3.)))
                 else:
                     h_obs.GetYaxis().SetRangeUser(0., ymax/(2./3.))
+                for bb in reversed(range(h_obs.GetNbinsX())):
+                   if h_obs.GetBinContent(bb+1)==0:
+                      h_obs.GetXaxis().SetRangeUser(h_obs.GetXaxis().GetBinLowEdge(1), h_obs.GetXaxis().GetBinCenter(bb))
 
                 plotter.logY = logY
 

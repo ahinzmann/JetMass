@@ -23,8 +23,8 @@ function flatten_eta_regions {
 flatten_templates () {
   YEARS=(UL16preVFP UL16postVFP UL17 UL18)
   #YEARS=(UL18)
-  outdir=flat_templates_withN2/
-  indir=coffea_hists_withN2/
+  outdir=flat_templates/
+  indir=coffea_hists/
 
   VAR=${1:-none}
   MASS=$2
@@ -43,6 +43,7 @@ flatten_templates () {
   fi
   VJETSONLY=""
 #  VJETSONLY="--VJetsOnly" #### only VJETS
+  VJETSONLY="--control"
   if [[ ${VAR} == *"qcd"* ]]; then
     VJETSONLY="--VJetsOnly"
   elif [[ ${VAR} == *"ewk"* ]]; then
@@ -89,11 +90,11 @@ flatten_templates () {
 # run the things
 # VARS_ALL=(nominal jec fsr isr triggersf pu toppt_off v_qcd w_ewk z_ewk)
 # VARS_ALL=(v_qcd w_ewk z_ewk)
-# VARS_ALL=(nominal)
+ VARS_ALL=(nominal)
 # VARS=(${2:-${VARS_ALL[@]}})
 # VARS_ALL=(model)
 # VARS_ALL=(prefiring)
- VARS_ALL=(jec_AbsoluteStat jec_AbsoluteScale jec_AbsoluteMPFBias jec_Fragmentation jec_SinglePionECAL jec_SinglePionHCAL jec_FlavorQCD jec_TimePtEta jec_RelativePtBB jec_RelativePtEC1 jec_RelativePtEC2 jec_RelativePtHF jec_RelativeBal jec_RelativeFSR jec_RelativeSample jec_RelativeStatFSR jec_RelativeStatEC jec_RelativeStatHF jec_RelativeJEREC1 jec_RelativeJEREC2 jec_RelativeJERHF jec_PileUpDataMC jec_PileUpPtRef jec_PileUpPtBB jec_PileUpPtEC1 jec_PileUpPtEC2 jec_PileUpPtHF)
+# VARS_ALL=(jec_AbsoluteStat jec_AbsoluteScale jec_AbsoluteMPFBias jec_Fragmentation jec_SinglePionECAL jec_SinglePionHCAL jec_FlavorQCD jec_TimePtEta jec_RelativePtBB jec_RelativePtEC1 jec_RelativePtEC2 jec_RelativePtHF jec_RelativeBal jec_RelativeFSR jec_RelativeSample jec_RelativeStatFSR jec_RelativeStatEC jec_RelativeStatHF jec_RelativeJEREC1 jec_RelativeJEREC2 jec_RelativeJERHF jec_PileUpDataMC jec_PileUpPtRef jec_PileUpPtBB jec_PileUpPtEC1 jec_PileUpPtEC2 jec_PileUpPtHF)
 VARS=(${VARS_ALL[@]})
 MAXPROCS=5
 NAMEPREFIX=${1:-}

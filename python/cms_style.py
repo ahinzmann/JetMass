@@ -41,7 +41,7 @@ draw_option = "H"
 
 ratio_plot = True
 additional_pad = False
-label_size_modifier = 1.0
+label_size_modifier = 1.15
 xLabelSize = 18.0 * label_size_modifier
 yLabelSize = 18.0 * label_size_modifier
 xTitleSize = 22.0 * label_size_modifier
@@ -68,7 +68,7 @@ isData = True
 extra_text = "Preliminary"
 
 extra_text_rel_X = 0.12
-font_size_modifier = 1.0
+font_size_modifier = 1.15
 text_padding = 0.1
 
 additional_text_size = 0.3 * font_size_modifier
@@ -91,7 +91,8 @@ def draw_lumi(
     global additional_text_ypos
     global cms_text
     global extra_text
-    lumi_text = "%.1f fb^{-1}, %s (13 TeV)" % (float(lumi), str(year))
+    #lumi_text = "%.1f fb^{-1}, %s (13 TeV)" % (float(lumi), str(year))
+    lumi_text = "%.1f fb^{-1} (13 TeV)" % (float(lumi))
     if private_work:
         cms_text = "Private work"
         if data:
@@ -109,10 +110,10 @@ def draw_lumi(
 
     # text_padding = 0.4
 
-    lumi_text_size = 0.6 * font_size_modifier
-    additional_text_size = lumi_text_size * top_margin
+    lumi_text_size = 0.6 * font_size_modifier * 1.2
+    additional_text_size = lumi_text_size * top_margin /1.2
 
-    cms_text_size = (0.6 if private_work else 0.75) * font_size_modifier
+    cms_text_size = (0.6 if private_work else 0.75) * font_size_modifier *1.2
 
     extra_text_size = cms_text_size * 0.76
 
@@ -152,7 +153,7 @@ def draw_lumi(
             else left_margin + extra_text_rel_X * (1 - left_margin - right_margin)
             if out_of_frame
             else left_margin * (1 + text_padding)
-        )
+        ) *1.1
         counter = 1
         if not out_of_frame:
             y_pos -= extra_text_size * top_margin
@@ -324,7 +325,7 @@ def setup_ratio_hist(ratioHist):
     # ratioHist.GetXaxis().SetTitle("m_{SD} [GeV]")
     ratioHist.GetXaxis().SetTitleFont(43)
     ratioHist.GetXaxis().SetTitleSize(xTitleSize)
-    ratioHist.GetXaxis().SetTitleOffset(xTitleOffset_ratio)
+    #ratioHist.GetXaxis().SetTitleOffset(xTitleOffset_ratio)
     ratioHist.GetXaxis().SetLabelFont(43)
     ratioHist.GetXaxis().SetLabelSize(xLabelSize)
     ratioHist.GetXaxis().SetTickLength(0.08)

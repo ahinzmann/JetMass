@@ -470,17 +470,17 @@ if __name__ == "__main__":
         if unfolding:
             JMS_Combination.update_config()
 
-        # fitplotter.plot_fit_result(
-        #     JMS_Combination.combined_config,
-        #     plot_total_sig_bkg=False,
-        #     do_postfit=do_postfit,
-        #     use_config_samples=unfolding,
-        #     pseudo_data=False,
-        #     prefit_asimov=asimov,
-        #     unfolding=unfolding,
-        #     fit_shapes_root="fit_shapes.root",
-        #     sum_genbins=args.sumgenbins,
-        # )
+        fitplotter.plot_fit_result(
+            JMS_Combination.combined_config,
+            plot_total_sig_bkg=False,
+            do_postfit=do_postfit,
+            use_config_samples=unfolding,
+            pseudo_data=False,
+            prefit_asimov=asimov,
+            unfolding=unfolding,
+            fit_shapes_root="fit_shapes.root",
+            sum_genbins=args.sumgenbins,
+        )
         # do_postfit=True
         for c_name_, config in JMS_Combination._config_dicts.items():
             this_config = deepcopy(config)

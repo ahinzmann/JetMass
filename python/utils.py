@@ -12,10 +12,10 @@ jms_correction_files["substructure"] = jms_correction_files["n2ddt"]
 jms_correction_files["particlenetDDT"] = jms_correction_files["pNetddt"]
 
 year_alias = {
-    "UL16preVFP": "legacy 2016 (early)",
-    "UL16postVFP": "legacy 2016 (late)",
-    "UL17": "legacy 2017",
-    "UL18": "legacy 2018",
+    "UL16preVFP": "2016 (early)",
+    "UL16postVFP": "2016 (late)",
+    "UL17": "2017",
+    "UL18": "2018",
 }
 
 

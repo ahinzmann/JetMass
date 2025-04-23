@@ -1191,13 +1191,13 @@ if __name__ == "__main__":
         if args.build:
             os.chdir(model_dir)
             print("bash build.sh")
-            os.system("bash build.sh")
-            exit(0)
+            #os.system("bash build.sh")
+            #exit(0)
         # from runFit import runFits
         # runFits([configs['ModelName']])
         # exedir = os.getcwd()
         print("bash " + model_dir + "/wrapper.sh")
-        os.system("bash " + model_dir + "/wrapper.sh")
+        #os.system("bash " + model_dir + "/wrapper.sh")
         # os.system("cd "+exedir)
 
     if args.customCombineWrapper:

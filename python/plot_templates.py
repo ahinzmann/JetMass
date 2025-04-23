@@ -81,7 +81,7 @@ reverse_stacking = False
 
 # plotter.legend_on_extern_canvas = True
 plotter.draw_extra_text = True
-plotter.private_work = True
+plotter.private_work = False
 
 
 def plot_mass(

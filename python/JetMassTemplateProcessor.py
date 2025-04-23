@@ -83,6 +83,7 @@ class JMSTemplates(processor.ProcessorABC):
         eta_ax = hist.axis.Regular(100, -6.5, 6.5, name="eta", label=r"$\eta$")
         eta_regions_ax = hist.axis.Variable([0, 1.3, 2.5], name="abs_eta_regions", label=r"$|\eta|$")
         phi_ax = hist.axis.Regular(100, -4, 4, name="phi", label=r"$\Phi$")
+        phieta_ax = hist.axis.Regular(10000, -350, 350, name="phieta", label=r"$\Phi$ + 100 $\eta$")
 
         chf_ax = hist.axis.Regular(51, 0, 1.02, name="chf", label="CHF")
         nhf_ax = hist.axis.Regular(51, 0, 1.02, name="nhf", label="NHF")
@@ -260,6 +261,7 @@ class JMSTemplates(processor.ProcessorABC):
                 "pt": hist.Hist(pT_ax, dataset_ax, jec_applied_ax, storage=hist.storage.Weight()),
                 "eta": hist.Hist(eta_ax, dataset_ax, storage=hist.storage.Weight()),
                 "phi": hist.Hist(phi_ax, dataset_ax, storage=hist.storage.Weight()),
+                "phieta": hist.Hist(phieta_ax, dataset_ax, storage=hist.storage.Weight()),
                 "mjet": hist.Hist(mJ_ax, dataset_ax, jec_applied_ax, storage=hist.storage.Weight()),
                 "rho": hist.Hist(rho_ax, dataset_ax, jec_applied_ax, storage=hist.storage.Weight()),
                 "npv": hist.Hist(
@@ -863,6 +865,7 @@ class JMSTemplates(processor.ProcessorABC):
 
         eta_ = events.eta
         phi_ = events.phi
+        phieta_ = np.add(events.phi,np.floor(events.eta*100./7.)*7.)
 
         # apply trigger sf
         if isMC and selection == "vjets":
@@ -902,6 +905,7 @@ class JMSTemplates(processor.ProcessorABC):
         out["pt"].fill(dataset=dataset, jecAppliedOn="none", pt=pt_raw[m_cps], weight=events.weight[m_cps])
         out["eta"].fill(dataset=dataset, eta=eta_[m_cps], weight=events.weight[m_cps])
         out["phi"].fill(dataset=dataset, phi=phi_[m_cps], weight=events.weight[m_cps])
+        out["phieta"].fill(dataset=dataset, phieta=phieta_[m_cps], weight=events.weight[m_cps])
         out["mjet"].fill(dataset=dataset, jecAppliedOn="mJ", mJ=mjet[m_cps], weight=events.weight[m_cps])
         out["mjet"].fill(dataset=dataset, jecAppliedOn="none", mJ=mjet_raw[m_cps], weight=events.weight[m_cps])
         out["rho"].fill(dataset=dataset, jecAppliedOn="pt&mJ", rho=rho[m_cps], weight=events.weight[m_cps])
@@ -1306,6 +1310,12 @@ if __name__ == "__main__":
                 #"ZJetsUnmatched",
             ]
         }
+    #sample_names = {
+    #    "vjets": [
+    #        "Data",
+    #        "QCD",
+    #    ],
+    #}
 
     files = {}
     # for selection in ["vjets", "ttbar"]:

@@ -431,7 +431,8 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
 def plot_acceptance(hists, outdir, year):
     print("plotting acceptance")
 
-    fs = 18
+    fs = 36
+    plt.rcParams.update({'font.size': fs})
     pt_edges = hists["misses"].axes["ptgen"].edges
 
     acc = hists["acceptance"]
@@ -449,11 +450,12 @@ def plot_acceptance(hists, outdir, year):
             xerr=[msd_centers - msd_edges[:-1], msd_edges[1:] - msd_centers], markersize=6, lw=2, fmt=markers[ipt]
         )
         ax.errorbar(msd_centers, acc[ipt][0], label=pt_tex, **errbar_kwargs)
-    ax.legend(fontsize=fs+2)
-    hep.cms.label("Work in Progress", year=year_alias.get(year, year), fontsize=fs + 1, ax=ax, data=False)
+    ax.legend(fontsize=fs-11)
+    hep.cms.label("Preliminary", year="" #year_alias.get(year, year)
+    , fontsize=fs-8, ax=ax, data=False)
     ax.set_ylim(0, 1.0)
     # ax.set_ylabel(r"$1-\frac{N( \mathrm{pass-gen} \wedge \mathrm{fail-reco})}{N(\mathrm{pass-gen})}$")
-    ax.set_ylabel(r"acceptance")
+    ax.set_ylabel(r"Acceptance")
     ax.set_xlabel(r"$m_{\mathrm{SD,gen}}$ [GeV]")
     ax.set_xlim(0, 270)
     ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 260.0], [30, 50, 100, 150, 200, r"$\infty$"])
@@ -463,7 +465,8 @@ def plot_acceptance(hists, outdir, year):
 def plot_sf_efficiency(hists, outdir, year):
     print("plotting sf efficiency")
 
-    fs = 18
+    fs = 30
+    plt.rcParams.update({'font.size': fs})
     pt_edges = hists["misses"].axes["ptgen"].edges
 
     sf_eff = hists["sf_efficiency"]["pass_gen_pass_reco_pass_dR"]
@@ -482,7 +485,8 @@ def plot_sf_efficiency(hists, outdir, year):
         )
         ax.errorbar(msd_centers, sf_eff[ipt][0], label=pt_tex, **errbar_kwargs)
     ax.legend(fontsize=fs+2)
-    hep.cms.label("Work in Progress", year=year_alias.get(year, year), fontsize=fs + 1, ax=ax, data=False)
+    hep.cms.label("Preliminary", year="" #year_alias.get(year, year)
+    , fontsize=fs + 1, ax=ax, data=False)
     ax.set_ylim(0, 1.1)
     # ax.set_ylabel(r"$1-\frac{N( \mathrm{pass-gen} \wedge \mathrm{fail-reco})}{N(\mathrm{pass-gen})}$")
     ax.set_ylabel(r"$\varepsilon_{\mathrm{scale factors}}$")

@@ -134,3 +134,23 @@ PostFitShapesFromWorkspace  -w /data/dust/user/hinzmann/jetmass/JetMass/rhalph/U
 cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24-UL18/WJetsUL18Unfolding; source build.sh
 cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24-UL18/FullRunII; source wrapper.sh
 PostFitShapesFromWorkspace  -w /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24-UL18/FullRunII//WJetsUL18Unfolding_renamed.root --postfit --sampling --output /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24-UL18/FullRunII//WJetsUL18Unfolding_fit_shapes.root -f /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24-UL18/FullRunII//fitDiagnostics.root:fit_s &
+
+
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL17/WJetsUL17Unfolding; source build.sh
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL17/FullRunII; source wrapper.sh
+PostFitShapesFromWorkspace  -w /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL17/FullRunII//WJetsUL17Unfolding_renamed.root --postfit --sampling --output /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL17/FullRunII//WJetsUL17Unfolding_fit_shapes.root -f /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL17/FullRunII//fitDiagnostics.root:fit_s &
+
+
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL18/WJetsUL18Unfolding; source build.sh
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL18/FullRunII; source wrapper.sh
+PostFitShapesFromWorkspace  -w /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL18/FullRunII//WJetsUL18Unfolding_renamed.root --postfit --sampling --output /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL18/FullRunII//WJetsUL18Unfolding_fit_shapes.root -f /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24Asimov-UL18/FullRunII//fitDiagnostics.root:fit_s &
+
+
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL17/WJetsUL17Unfolding; source build.sh
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL17/FullRunII; source wrapper.sh
+PostFitShapesFromWorkspace  -w /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL17/FullRunII//WJetsUL17Unfolding_renamed.root --postfit --sampling --output /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL17/FullRunII//WJetsUL17Unfolding_fit_shapes.root -f /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL17/FullRunII//fitDiagnostics.root:fit_s &
+
+
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL18/WJetsUL18Unfolding; source build.sh
+cd /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL18/FullRunII; source wrapper.sh
+PostFitShapesFromWorkspace  -w /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL18/FullRunII//WJetsUL18Unfolding_renamed.root --postfit --sampling --output /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL18/FullRunII//WJetsUL18Unfolding_fit_shapes.root -f /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24NoSys-UL18/FullRunII//fitDiagnostics.root:fit_s &

@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 #!/usr/bin/env pythonJMS.sh
 from coffea.util import load, save
 import os
@@ -9,6 +12,7 @@ def flatten_control_plots(hists, samples, jec_applied_on="pt&mJ"):
         "pt": {"jecAppliedOn": jec_applied_on},
         "eta": {},
         "phi": {},
+        "phieta": {},
         "ntrueint": {},
         "npv": {},
         "rho": {"jecAppliedOn": jec_applied_on},

@@ -22,7 +22,7 @@ function submit_templates_parallel {
   fi
   
   for YEAR in UL16preVFP UL16postVFP UL17 UL18
-  #for YEAR in UL18
+  #for YEAR in UL17
   do
     if [ ${VAR} == "nominal" ]; then
       echo "default -> ${YEAR}" 
@@ -70,7 +70,7 @@ function submit_templates {
   fi
   
   for YEAR in UL16preVFP UL16postVFP UL17 UL18
-  #for YEAR in UL18
+  #for YEAR in UL17
   do
     if [ $YEAR == "UL18" ]; then
       LAST=""

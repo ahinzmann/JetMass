@@ -30,7 +30,7 @@ common_plot_kwargs = dict(flow="none")
 
 
 def cms_label(ax, fs=20):
-    hep.cms.label("Work in Progress", year=year_alias.get(year, year), ax=ax, fontsize=fs, data=False)
+    hep.cms.label("Preliminary", year=year_alias.get(year, year), ax=ax, fontsize=fs, data=False)
     # try:
     #     hep.label.exp_label(llabel="Private work (CMS simulation)", year=year, ax=ax, fontsize=fs)
     # except BaseException as e:

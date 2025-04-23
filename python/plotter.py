@@ -466,10 +466,10 @@ lumis = {
 }
 
 year_alias = {
-    "UL16preVFP": "legacy 2016 (early)",
-    "UL16postVFP": "legacy 2016 (late)",
-    "UL17": "legacy 2017",
-    "UL18": "legacy 2018",
+    "UL16preVFP": "2016 (early)",
+    "UL16postVFP": "2016 (late)",
+    "UL17": "2017",
+    "UL18": "2018",
 }
 
 lumis["RunII"] = sum([lumi for year, lumi in lumis.items() if "UL" in year])
@@ -484,10 +484,10 @@ obs_line_color = 1
 obs_marker_style = 8
 obs_marker_size = 0.5
 year = "2017"
-# extra_text = "Preliminary"
-extra_text = "Work_in_progress"
+extra_text = "Preliminary"
+# extra_text = "Work_in_progress"
 lumi_text_padding = 0.4
-additional_text_padding = 0.4
+additional_text_padding = 0.2
 additional_text_size_modifier = 1.4
 draw_extra_text = True
 private_work = False
@@ -592,6 +592,7 @@ def get_hists(
         elif yTitle is not None:
             h_data.GetYaxis().SetTitle(yTitle)
 
+        h_data.GetXaxis().SetTitle(xTitle)
         h_qcd_from_data = h_data.Clone()
 
     # mc_hists = {}
@@ -654,6 +655,7 @@ def get_hists(
         if "QCD" not in sample and not pseudo_data:
             h_qcd_from_data.Add(this_hist, -1.0)
 
+        this_hist.GetXaxis().SetTitle(xTitle)
         mc_hists.update({sample: this_hist})
 
     if pseudo_data:
