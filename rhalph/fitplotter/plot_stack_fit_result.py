@@ -217,6 +217,7 @@ def plot_fit_result(
                 for bb in reversed(range(h_obs.GetNbinsX())):
                    if h_obs.GetBinContent(bb+1)==0:
                       h_obs.GetXaxis().SetRangeUser(h_obs.GetXaxis().GetBinLowEdge(1), h_obs.GetXaxis().GetBinCenter(bb))
+                      plotter.x_range=[h_obs.GetXaxis().GetBinLowEdge(1), h_obs.GetXaxis().GetBinCenter(bb)]
 
                 plotter.logY = logY
 

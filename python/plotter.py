@@ -967,7 +967,10 @@ def plot_data_mc(
 
         ratioXMin = ratio_hist[0].GetXaxis().GetXmin()
         ratioXMax = ratio_hist[0].GetXaxis().GetXmax()
-
+        if x_range!=[None, None]:
+           ratioXMin = x_range[0]
+           ratioXMax = x_range[1]
+           
         zeropercent = ROOT.TLine(ratioXMin, 1, ratioXMax, 1)
         plus10percent = ROOT.TLine(ratioXMin, 1.1, ratioXMax, 1.1)
         minus10percent = ROOT.TLine(ratioXMin, 0.9, ratioXMax, 0.9)

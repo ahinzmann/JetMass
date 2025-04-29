@@ -113,7 +113,7 @@ def draw_lumi(
     lumi_text_size = 0.6 * font_size_modifier * 1.2
     additional_text_size = lumi_text_size * top_margin /1.2
 
-    cms_text_size = (0.6 if private_work else 0.75) * font_size_modifier *1.2
+    cms_text_size = (0.6 if private_work else 0.75) * font_size_modifier * 1.2
 
     extra_text_size = cms_text_size * 0.76
 
@@ -137,7 +137,7 @@ def draw_lumi(
 
     # if(not private_work):
     if out_of_frame:
-        latex.DrawLatex(left_margin, y_pos, cms_text)
+        latex.DrawLatex(left_margin + 0.01, y_pos, cms_text)
     else:
         y_pos -= top_margin + top_margin * text_padding
         latex.SetTextAlign(11)

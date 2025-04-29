@@ -502,7 +502,7 @@ if __name__ == "__main__":
             #)
 
             exec_cmd(
-                "{}/../python/pretty_postfit.py {} --mctruth --year {} {} --coffea_hists {} {}".format(
+                "{}/../python/pretty_postfit.py {} --mctruth --year {} {} --migmat --coffea_hists {} {}".format(
                     sys.path[0], JMS_Combination._combination_dir, args.year, ("--data" if data else "")+(" --nomatching" if "NoMatching" in args.workdir else ""), "/data/dust/user/hinzmann/jetmass/JetMass/python/coffea_hists_withN2" if args.n2gen else "/data/dust/user/hinzmann/jetmass/JetMass/python/coffea_hists_noN2", "--n2gen" if args.n2gen else ""
                 )
             )

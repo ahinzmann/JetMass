@@ -671,6 +671,12 @@ def jet_mass_producer(args, configs):
                             #print("read jec hist",sample_name,source)
                             hist_jec_up = get_hist(hist_dir % (sample_name, ""), ("jec_"+source+"_up").replace("__","_"))
                             hist_jec_down = get_hist(hist_dir % (sample_name, ""), ("jec_"+source+"_down").replace("__","_"))
+                            hist_jec_up.Divide(sample_hist)
+                            hist_jec_up.Smooth()
+                            hist_jec_up.Multiply(sample_hist)
+                            hist_jec_down.Divide(sample_hist)
+                            hist_jec_down.Smooth()
+                            hist_jec_down.Multiply(sample_hist)
                             sample.setParamEffect(jec_var_nuisances[JECsources.index(source)], hist_jec_up, hist_jec_down)
                         else:
                             logger.warn("JEC variation hists not present.")
@@ -704,6 +710,12 @@ def jet_mass_producer(args, configs):
                         if "isr_up" in aux_hist_files and "isr_down" in aux_hist_files:
                             hist_isr_up = get_hist(hist_dir % (sample_name, ""), "isr_up")
                             hist_isr_down = get_hist(hist_dir % (sample_name, ""), "isr_down")
+                            hist_isr_up.Divide(sample_hist)
+                            hist_isr_up.Smooth()
+                            hist_isr_up.Multiply(sample_hist)
+                            hist_isr_down.Divide(sample_hist)
+                            hist_isr_down.Smooth()
+                            hist_isr_down.Multiply(sample_hist)
                             sample.setParamEffect(extra_nuisances["isr"], hist_isr_up, hist_isr_down)
                         else:
                             logger.warn("ISR variation hists not present.")
@@ -713,6 +725,12 @@ def jet_mass_producer(args, configs):
                         if "fsr_up" in aux_hist_files and "fsr_down" in aux_hist_files:
                             hist_fsr_up = get_hist(hist_dir % (sample_name, ""), "fsr_up")
                             hist_fsr_down = get_hist(hist_dir % (sample_name, ""), "fsr_down")
+                            hist_fsr_up.Divide(sample_hist)
+                            hist_fsr_up.Smooth()
+                            hist_fsr_up.Multiply(sample_hist)
+                            hist_fsr_down.Divide(sample_hist)
+                            hist_fsr_down.Smooth()
+                            hist_fsr_down.Multiply(sample_hist)
                             sample.setParamEffect(extra_nuisances["fsr"], hist_fsr_up, hist_fsr_down)
                         else:
                             logger.warn("FSR variation hists not present.")

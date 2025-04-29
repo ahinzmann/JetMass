@@ -19,6 +19,29 @@ ls /data/dust/user/hinzmann/jetmass/JetMass/python/coffea_hists_noN2/acceptance_
 # impacts
 #python plots_april_2024.py
 
+# uncertainty plots
+python plot_systematics_summary.py
+
 # postfit plots
-python plots_april_2024.py
+python plots_april_2024.py # fitplotter/plot_stack_fit_result.py ../python/plotter.py ../python/cms_style.py
 ls /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII//plots/fit_shapes/*.pdf
+
+# berstein plot
+python pretty_qcdbernstein.py ../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII/ --data
+ls /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII//plots/pretty*.pdf
+
+# migration matrix plot
+python pretty_postfit.py --data --tagger particlenetDDT --migmat --n2cut n2_0p2 --skipmunfold --coffea_hists coffea_hists_withN2 --n2gen ../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII/ # ../python/unfolding_plotting.py
+ls /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII/mig*.pdf
+
+# unfolded distributions
+python plots_april_2024.py # ../python/pretty_postfit.py /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII/ --mctruth --year RunII --data --coffea_hists /data/dust/user/hinzmann/jetmass/JetMass/python/coffea_hists_withN2 --n2gen
+ls /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII/plots/pretty_unfold_sigma/m*.pdf
+
+# correlation matrix plot
+python UnfoldingCorrelationMatrix.py
+ls -lh UnfoldingParticleNet_N2Cut_18-09-24/FullRunII/corr*.pdf
+
+# unfolded distributions with Pythia mass samples
+python make_w_fit.py
+ls /afs/desy.de/user/h/hinzmann/wjetmass/w_mass_d02-x01-y01-0Data.pdf

@@ -6,8 +6,8 @@ import json
 hep.style.use("CMS")
 import re
 #fit_dir = "../rhalph/UnfoldingParticleNet_18-09-24/FullRunII"
-fit_dir = "../rhalph/UnfoldingSubstructure_18-09-24/FullRunII"
-#fit_dir = "../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII"
+#fit_dir = "../rhalph/UnfoldingSubstructure_18-09-24/FullRunII"
+fit_dir = "../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII"
 #fit_dir = "../rhalph/UnfoldingSubstructure_N2Cut_18-09-24/FullRunII"
 
 config = json.load(open(f"{fit_dir}/config.json","r"))
@@ -39,7 +39,7 @@ axis_labels = [axis_label(*genbins(poi)) for poi in pois]
 
 np.min(corr)
 
-f,ax = plt.subplots(figsize=(10,9))
+f,ax = plt.subplots(figsize=(10,10))
 
 cmap = ax.pcolormesh(axis_labels, axis_labels, corr)#, cmap="RdGy")
 f.colorbar(cmap,ax=ax)
@@ -54,7 +54,9 @@ def edge(e):
     else:
         return "%i"%e
         
-f,(ax,cax) = plt.subplots(1,2,figsize=(10,9), gridspec_kw={"width_ratios":[0.95,0.05]})
+f,((ax0,ax1),(ax,cax)) = plt.subplots(2,2,figsize=(10,10), gridspec_kw={"width_ratios":[0.95,0.05],"height_ratios":[0.02,0.98]})
+ax0.axis('off')
+ax1.set_visible(False)
 
 edges = np.array(range(len(pois)))-0.5
 m_tick_labels_per_pt = [edge(e) for e in m_edges]
@@ -69,11 +71,9 @@ m_tick_labels[-1] = "$\infty$"
 
 pt_tick_labels = [edge(e) for e in pt_edges]
 pt_tick_loc = m_tick_loc[::len(m_edges)-1]
-cmap = ax.pcolormesh(edges, edges, corr, vmin=-1, vmax=1)#, cmap="RdGy")
-cax.axis('off')
 
 f.colorbar(cmap,ax=cax,fraction=1, pad=0.0)
-fs = 18
+fs = 22
 for i in range(3):
     ax.plot([-1,len(pois)-1],[(1+i)*(len(m_edges)-1)-1]*2,"k--",alpha=0.5)
     ax.plot([(1+i)*(len(m_edges)-1)-1]*2,[-1,len(pois)-1],"k--",alpha=0.5)
@@ -84,10 +84,15 @@ twinx = ax.twinx()
 twiny = ax.twiny()
 twinx.set_yticks(pt_tick_loc, pt_tick_labels,fontsize=fs)
 twiny.set_xticks(pt_tick_loc, pt_tick_labels,fontsize=fs)
-ax.set_ylabel("$m_\mathrm{jet,gen}~\mathrm{[GeV]}$",fontsize=fs,labelpad=0)
-ax.set_xlabel("$m_\mathrm{jet,gen}~\mathrm{[GeV]}$",fontsize=fs,labelpad=0)
-twinx.set_ylabel("$p_{T,\mathrm{gen}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=-20)
-twiny.set_xlabel("$p_{T,\mathrm{gen}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=0)
+ax.set_ylabel("$m_\mathrm{jet,ptcl}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
+ax.set_xlabel("$m_\mathrm{jet,ptcl}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
+twinx.set_ylabel("$p_{T,\mathrm{ptcl}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=-30)
+twiny.set_xlabel("$p_{T,\mathrm{ptcl}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
+
+hep.cms.label("Preliminary", ax=ax0, lumi=137.2, fontsize=25, data=True)
+
+cmap = ax.pcolormesh(edges, edges, corr, vmin=-1, vmax=1)#, cmap="RdGy")
+cax.axis('off')
 
 f.savefig(f"{fit_dir}/corr_matrix.pdf",bbox_inches="tight")
 

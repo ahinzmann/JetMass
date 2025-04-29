@@ -25,12 +25,13 @@ label_tex_dict = {
 
 lumi = 41.47968052876168  # fb^-1
 global year
-year = "UL17"
+year = ""#"UL17"
 common_plot_kwargs = dict(flow="none")
 
 
 def cms_label(ax, fs=20):
-    hep.cms.label("Preliminary", year=year_alias.get(year, year), ax=ax, fontsize=fs, data=False)
+    hep.cms.label("Preliminary", year="" #year_alias.get(year, year)
+    , ax=ax, fontsize=fs, data=False)
     # try:
     #     hep.label.exp_label(llabel="Private work (CMS simulation)", year=year, ax=ax, fontsize=fs)
     # except BaseException as e:
@@ -464,19 +465,20 @@ def plot_migration_matrix(
             reco_positions,
         ),
         content.T,
-        cmap="Blues",#"magma",
+        #cmap="Blues",#"magma",
+        cmap="magma",
         norm=(Normalize(0,1) if "probability" in outname else LogNorm()),
     )
 
-    ax.set_xticks(pt_gen_labels_positions, pt_gen_labels)
+    ax.set_xticks(pt_gen_labels_positions, pt_gen_labels, fontsize=25)
     for iptgen in range(1, nbins_pt_gen):
         ax.plot([pt_gen_labels_positions[iptgen]] * 2, ax.get_ylim(), "k--", alpha=0.6)
-    ax.set_xlabel("generator bin")
+    ax.set_xlabel("generator bin", fontsize=25)
 
-    ax.set_yticks(pt_reco_labels_positions, pt_reco_labels)
+    ax.set_yticks(pt_reco_labels_positions, pt_reco_labels, fontsize=25)
     for iptreco in range(1, nbins_pt_reco):
         ax.plot(ax.get_xlim(), [pt_reco_labels_positions[iptreco]] * 2, "k--", alpha=0.6)
-    ax.set_ylabel("detector bin")
+    ax.set_ylabel("detector bin", fontsize=25)
 
     msd_gen_subax_length = gen_positions[nbins_msd_gen]
     msd_reco_subax_length = reco_positions[nbins_msd_reco]
@@ -508,7 +510,10 @@ def plot_migration_matrix(
     ax.text(0.05 * ax.get_xlim()[1], 0.9 * ax.get_ylim()[1], r"$W(q\bar{q})$+jets")
     ax.text(0.05 * ax.get_xlim()[1], 0.85 * ax.get_ylim()[1], extratext)
 
-    f.colorbar(c, cax=cax, orientation="vertical", label=("Probability" if "probability" in outname else "Events"))
+    cms_label(ax, fs=25)
+    
+    cbar=f.colorbar(c, cax=cax, orientation="vertical", label=("Probability" if "probability" in outname else "Events"))
+    cbar.ax.tick_params(labelsize=25)
     f.savefig(
         outname,
         bbox_inches="tight"

@@ -168,7 +168,8 @@ def plot_templates(
                     labels.append(pt_gen_bin_tex + " " + msd_gen_bin_tex)
             hep.histplot(hists, label=labels, stack=True, histtype="fill", color=colors)
 
-            cms_label(exp_label=exp_label, year=year, fs=fs, ax=ax, data=data and state != "prefit")
+            hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+            #cms_label(exp_label=exp_label, year=year, fs=fs, ax=ax, data=data and state != "prefit")
 
             ax.text(
                 np.diff(ax.get_xlim()) * 0.4,
@@ -368,7 +369,7 @@ def plot_unfolded_mass(
       theory_systs = [theory_uncertainty]
     theory_vars = [f"{syst}_{direc}" for syst in theory_systs for direc in ["up", "down"]]
 
-    data_label = ("data" if data else "unfolded pseudo data") + r"(stat. $\bigoplus$ syst. unc.)"
+    data_label = ("Data" if data else "Unfolded pseudo data") + r" (stat. $\bigoplus$ syst. unc.)"
     out_dir = f"{fit_dir}/plots/pretty_unfold_{yaxis}{n2cut}/"
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
@@ -642,7 +643,7 @@ def plot_unfolded_mass(
                 flat_scale[matching] = 1.0 / lumis[year]
             y_label = r"$\frac{d\sigma}{d m_\mathrm{SD}}~[\frac{fb}{\mathrm{GeV}}]$"
 
-        x_label = r"$m_{\mathrm{SD, ptcl}} [GeV]$"
+        x_label = r"$m_{\mathrm{SD, ptcl}}$ [GeV]"
         msd_max = 250. # or 1000. for Rivet or 250 for Paper
         msd_min = 30.
         msd_edges_ = truth_mc[matchings[0]][ipt].axes[0].edges.copy()
@@ -798,7 +799,7 @@ def plot_unfolded_mass(
                         truth_values[matching],
                         msd_edges_,
                         yerr=np.sqrt(truth_variances[matching]),
-                        label="Simulation{}{}".format(matching_str[matching], ("" if ax_==ax else " ("+pt_bin_tex+")")),
+                        label="W+jets (NLO){}{}".format(matching_str[matching], ("" if ax_==ax else " ("+pt_bin_tex+")")),
                         ax=ax_,
                         ls="-",
                         alpha=alpha,
@@ -857,7 +858,8 @@ def plot_unfolded_mass(
                     markersize=6,
                     **marker_kwargs[matching]
                   )
-        cms_label(exp_label=exp_label, year=year, ax=ax, fs=20, data=data)
+        hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+        #cms_label(exp_label=exp_label, year=year, ax=ax, fs=20, data=data)
 
         ax.text(
         ax.get_xlim()[0]+0.5*np.diff(ax_.get_xlim()),
@@ -870,6 +872,13 @@ def plot_unfolded_mass(
             ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
             ax.get_ylim()[1]*0.5,
             r"$N_{2}^{\beta=1} < 0.2$",
+            fontsize=20
+          )
+        if plot_no_matching:
+          ax.text(
+            ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+            ax.get_ylim()[1]*0.4,
+            "W-match",
             fontsize=20
           )
 
@@ -885,7 +894,14 @@ def plot_unfolded_mass(
         else:
           ax.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
         ax.set_ylim(0, ymaxs[ipt])
-        ax.legend(fontsize=legend_fontsize)
+
+        handles,labels = ax.get_legend_handles_labels()
+        labels=[labels[2],labels[1],labels[0]]
+        handles=[handles[2],handles[1],handles[0]]
+
+        #cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
+        hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+        ax.legend(handles, labels,fontsize=legend_fontsize)
 
         if doRatio:
           axratio.set_xlim(msd_min, msd_max)
@@ -893,7 +909,7 @@ def plot_unfolded_mass(
           axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
           axratio.set_ylim(0., 2)
           axratio.set_xlabel(x_label)
-          axratio.set_ylabel("Data/Sim")
+          axratio.set_ylabel("Ratio")
 
         f.savefig(f"{out_dir}/m_unfold_pt{ipt}{region_str}.pdf", bbox_inches="tight")
         del f, ax, axratio
@@ -916,7 +932,9 @@ def plot_unfolded_mass(
       f, ax = plt.subplots(figsize=(9, 9))
     
     if plot_truth:
+        mc={}
         for matching in matchings:
+            mc[matching]={}
             if False:
              hep.histplot(
                  mc_truth_noreco_sum[matching],
@@ -937,7 +955,7 @@ def plot_unfolded_mass(
                 msd_edges_,
                 yerr=np.sqrt(mc_truth_variance_sum[matching]),
                 ax=ax,
-                label="Simulation {}".format(matching_str[matching]),
+                label="W+jets (NLO) {}".format(matching_str[matching]),
                 alpha=0.8,
                 ls="-",
                 **matching_kwargs[matching]
@@ -951,6 +969,45 @@ def plot_unfolded_mass(
                     label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
+            def is_float_try(str):
+               try:
+                 float(str)
+                 return True
+               except ValueError:
+                 return False
+            for mass,col,ls in [(80,"tab:cyan","--"),(81,"tab:olive","-."),(82,"tab:brown",":")]:
+              samplename="/afs/desy.de/user/h/hinzmann/wjetmass/WJET_Pythia8_CP5"+("_m"+str(mass)).replace("_m80.4","")+"_12Sep2024.yoda"
+              print(samplename)
+              fi=open(samplename)
+              start=False
+              ys=[]
+              for line in fi.readlines():
+                  if "BEGIN" in line and "d02-x01-y01" in line:
+                    start=True
+                    print("found data")
+                  if start:
+                    if "END" in line: break
+                    s=line.split("	")
+                    if len(s)==7 and is_float_try(s[0]):
+                      ys+=[float(s[2])]#,float(s[3]))]
+                    if len(s)==6 and is_float_try(s[0]):
+                      ys+=[float(s[3])]#,float(s[4]))]
+              sum_data=0
+              sum_mc=0
+              for i in [1,2]: # normalize to middle two bins
+                sum_data+=unfolding_sum[matching][i]*(msd_edges_for_binwidth[i+1]-msd_edges_for_binwidth[i])
+                sum_mc+=ys[i]
+              for i in range(len(ys)):
+                ys[i]=ys[i]/(msd_edges_for_binwidth[i+1]-msd_edges_for_binwidth[i])
+              mc[matching][mass]=np.array(ys)*sum_data/sum_mc
+              hep.histplot(
+                mc[matching][mass],
+                msd_edges_,
+                ax=ax,
+                label="W+jets (LO) $m_{W}$="+str(mass)+" GeV",
+                color=col,
+                ls=ls
+              )
             if doRatio:
               for ibin in range(len(msd_edges_)-1):
                 axratio.fill_between(
@@ -961,6 +1018,24 @@ def plot_unfolded_mass(
                     label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
+              for mass,col,ls in [(80,"tab:cyan","--"),(81,"tab:olive","-."),(82,"tab:brown",":")]:
+                hep.histplot(
+                  mc[matching][mass]/mc_truth_sum[matching],
+                  msd_edges_,
+                  ax=axratio,
+                  label="W+jets (LO) $m_{W}$="+str(mass)+" GeV",
+                  color=col,
+                  ls=ls
+                )
+                #axratio.errorbar(
+                #msd_centers,
+                #mc[matching][mass]/mc_truth_sum[matching],
+                #xerr=msd_xerr,
+                #label="",
+                #color=col,
+                #fmt="_",
+                #ls=ls
+                #)
     for matching in matchings:
         output_hists["munfold_{}_sum".format(matching)] = {
             "values": unfolding_sum[matching],
@@ -991,12 +1066,17 @@ def plot_unfolded_mass(
             **marker_kwargs[matching]
           )
 
-    cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
-    ax.legend(fontsize=legend_fontsize)
+    handles,labels = ax.get_legend_handles_labels()
+    labels=[labels[5],labels[4],labels[0],labels[3],labels[2],labels[1]]
+    handles=[handles[5],handles[4],handles[0],handles[3],handles[2],handles[1]]
+
+    #cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
+    hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+    ax.legend(handles, labels,fontsize=legend_fontsize)
     ax.text(
         ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.6,
-        r"$p_{T, \mathrm{ptcl}} > 650~$GeV ",
+        r"$p_{T, \mathrm{ptcl}} > 650$ GeV ",
         fontsize=20
     )
     if n2cut_str == "n2_0p2":
@@ -1036,7 +1116,7 @@ def plot_unfolded_mass(
      axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
      axratio.set_ylim(0., 2)
      axratio.set_xlabel(x_label)
-     axratio.set_ylabel("Data/Sim")
+     axratio.set_ylabel("Ratio")
 
     f.savefig(f"{out_dir}/m_unfold_sum{region_str}.pdf", bbox_inches="tight")
     del f, ax
@@ -1127,7 +1207,7 @@ if __name__ == "__main__":
         storage=hist.storage.Weight(),
     )
     polynomial_msd_correction_set = correctionlib.CorrectionSet.from_file(
-        jms_correction_files["notagger"]
+        "/data/dust/user/hinzmann/jetmass/JetMass/python/"+jms_correction_files["notagger"]
     )
     tagger_str = "n2ddt" if args.tagger == "substructure" else "pNetddt"
     for year in years:
