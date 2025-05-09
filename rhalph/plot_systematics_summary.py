@@ -63,22 +63,24 @@ if __name__=="__main__":
        "jec_AbsoluteMPFBias_down", "jec_AbsoluteMPFBias_up", 
        "jec_Fragmentation_down", "jec_Fragmentation_up", 
        "jec_SinglePionECAL_down", "jec_SinglePionECAL_up", 
-       "jec_SinglePionHCAL_down", "jec_SinglePionHCAL_up", 
+       "jec_SinglePionHCAL_down", "jec_SinglePionHCAL_up"]),
+       ("summary_jec2",["nominal","jec_down", "jec_up",
        "jec_FlavorQCD_down", "jec_FlavorQCD_up", 
        "jec_TimePtEta_down", "jec_TimePtEta_up", 
        "jec_RelativePtBB_down", "jec_RelativePtBB_up", 
        "jec_RelativePtEC1_down", "jec_RelativePtEC1_up", 
        "jec_RelativePtEC2_down", "jec_RelativePtEC2_up", 
-       "jec_RelativePtHF_down", "jec_RelativePtHF_up"]),
-       ("summary_jec2",["nominal","jec_down", "jec_up",
-       "jec_RelativeBal_down", "jec_RelativeBal_up", 
+       "jec_RelativePtHF_down", "jec_RelativePtHF_up",
+       "jec_RelativeBal_down", "jec_RelativeBal_up"]),
+       ("summary_jec3",["nominal","jec_down", "jec_up", 
        "jec_RelativeFSR_down", "jec_RelativeFSR_up", 
        "jec_RelativeSample_down", "jec_RelativeSample_up", 
        "jec_RelativeStatFSR_down", "jec_RelativeStatFSR_up", 
        "jec_RelativeStatEC_down", "jec_RelativeStatEC_up", 
-       "jec_RelativeStatHF_down", "jec_RelativeStatHF_up", 
+       "jec_RelativeStatHF_down", "jec_RelativeStatHF_up",
        "jec_RelativeJEREC1_down", "jec_RelativeJEREC1_up", 
-       "jec_RelativeJEREC2_down", "jec_RelativeJEREC2_up", 
+       "jec_RelativeJEREC2_down", "jec_RelativeJEREC2_up"]),
+       ("summary_jec4",["nominal","jec_down", "jec_up", 
        "jec_RelativeJERHF_down", "jec_RelativeJERHF_up", 
        "jec_PileUpDataMC_down", "jec_PileUpDataMC_up", 
        "jec_PileUpPtRef_down", "jec_PileUpPtRef_up", 
@@ -163,7 +165,7 @@ if __name__=="__main__":
            hist.GetXaxis().SetTitle("Softdrop Mass (GeV)")
            hist.GetYaxis().SetTitle("Ratio to nominal")
            if "jec" in plotname:
-             hist.GetYaxis().SetRangeUser(0.85,1.2)
+             hist.GetYaxis().SetRangeUser(0.9,1.15)
            else:
              hist.GetYaxis().SetRangeUser(0.6,1.5)
            hist.SetTitle("")
