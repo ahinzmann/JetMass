@@ -23,6 +23,8 @@ ls /data/dust/user/hinzmann/jetmass/JetMass/python/coffea_hists_noN2/acceptance_
 python plot_systematics_summary.py
 
 # postfit plots
+condor_submit -i request_memory=8GB
+
 python plots_april_2024.py # fitplotter/plot_stack_fit_result.py ../python/plotter.py ../python/cms_style.py
 ls /data/dust/user/hinzmann/jetmass/JetMass/rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII//plots/fit_shapes/*.pdf
 

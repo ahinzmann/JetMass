@@ -365,8 +365,8 @@ def plot_unfolded_mass(
 
     if theory_uncertainty=="Theory":
       theory_systs = ["v_qcd", "w_ewk"]
-      theory_systs = ["v_qcd", "w_ewk", "isr", "model"] ### Andreas
-#      theory_systs = ["v_qcd", "w_ewk", "isr", "fsr", "model"] ### Andreas
+      theory_systs = ["v_qcd", "w_ewk", "model"] ### Andreas
+      theory_systs = ["v_qcd", "w_ewk", "isr", "fsr", "model"] ### Andreas
     else:
       theory_systs = [theory_uncertainty]
     theory_vars = [f"{syst}_{direc}" for syst in theory_systs for direc in ["up", "down"]]
@@ -519,7 +519,7 @@ def plot_unfolded_mass(
 
     var_files = {
         var: [
-            load(f"{coffea_hist_path}/templates_{year}{tagger}_{var}"+("_mctruth" if "ewk" in var or "qcd" in var else "")+".coffea") ### Andreas
+            load(f"{coffea_hist_path}/templates_{year}{tagger}_"+var.replace("model_down","prefiring")+("_mctruth" if "ewk" in var or "qcd" in var else "")+".coffea") ### Andreas
             for year in years
         ]
         for var in theory_vars
@@ -531,10 +531,18 @@ def plot_unfolded_mass(
             var: [
                 [
                     deepcopy(
-                        f_var["vjets_"+("mjet" if "ewk" in var or "qcd" in var else "mjetgen") +f"_unfolding_{region}"][ ### Andreas
+                        f_var[f"vjets_mjet_unfolding_{region}"][
                             {
                                 "ptgen": iptgen,
                                 "dataset": "vjets_WJetsMatched",# if matching == "matching" else "vjets_WJets",
+                            } if "ewk" in var or "qcd" in var else ### Andreas
+                            {
+                                "ptgen": iptgen,
+                                "dataset": "vjets_WJets",# if matching == "matching" else "vjets_WJets",
+                                "ptreco": sum,
+                                "mJreco": sum,
+                                "jecAppliedOn": "pt&mJ",
+                                "fakes": False,
                             }
                         ]
                     )
@@ -702,15 +710,16 @@ def plot_unfolded_mass(
             for matching in matchings
         }
 
+        print(theory_var_values[matchings[0]])
         theory_lower = {
             matching: {
                 syst: np.abs(
-                    np.min(
+                    (np.min(
                         np.array([theory_var_values[matching][f"{syst}_{direc}"] for direc in ["up", "down"]]), axis=0
                     )
-                    - (truth_values[matching] if "ewk" in var or "qcd" in var else
-#                       theory_var_values[matching]["model_down"])
-                      (theory_var_values[matching][f"isr_up"]+theory_var_values[matching][f"isr_down"])/2.)
+                    - (truth_values[matching] if "ewk" in syst or "qcd" in syst else
+                       theory_var_values[matching]["model_down"])) ### Andreas
+                    * (1.0 if "ewk" in syst or "qcd" in syst else truth_values[matching]/theory_var_values[matching]["model_down"]) ### Andreas
                 )
                 for syst in theory_systs
             }
@@ -719,18 +728,18 @@ def plot_unfolded_mass(
         theory_upper = {
             matching: {
                 syst: np.abs(
-                    np.max(
+                    (np.max(
                         np.array([theory_var_values[matching][f"{syst}_{direc}"] for direc in ["up", "down"]]), axis=0
                     )
-                    - (truth_values[matching] if "ewk" in var or "qcd" in var else
-#                       theory_var_values[matching]["model_down"])
-                      (theory_var_values[matching][f"isr_up"]+theory_var_values[matching][f"isr_down"])/2.)
+                    - (truth_values[matching] if "ewk" in syst or "qcd" in syst else
+                       theory_var_values[matching]["model_down"])) ### Andreas
+                    * (1.0 if "ewk" in syst or "qcd" in syst else truth_values[matching]/theory_var_values[matching]["model_down"]) ### Andreas
                 )
                 for syst in theory_systs
             }
             for matching in matchings
         }
-
+        print(theory_upper[matchings[0]])
         theory_band_low = {
             matching: sum(theory_lower[matching][unc] ** 2 for unc in theory_systs)
             for matching in matchings
@@ -832,7 +841,7 @@ def plot_unfolded_mass(
                             (truth_values[matching]-np.sqrt(theory_band_low[matching]))[ibin],
                             (truth_values[matching]+np.sqrt(theory_band_hi[matching]))[ibin],
                             alpha=0.1,
-                            label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
+                            label="{} uncertainty{}".format("Total theory", matching_str[matching]) if ibin == 0 else None,
                             **matching_kwargs[matching]
                         )
                         ax_.fill_between(
@@ -870,7 +879,7 @@ def plot_unfolded_mass(
                             (1.-np.sqrt(theory_band_low[matching])/truth_values[matching])[ibin],
                             (1.+np.sqrt(theory_band_hi[matching])/truth_values[matching])[ibin],
                             alpha=0.1,
-                            label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
+                            label="{} uncertainty{}".format("Total theory", matching_str[matching]) if ibin == 0 else None,
                             **matching_kwargs[matching]
                         )
                         axratio.fill_between(
@@ -932,8 +941,8 @@ def plot_unfolded_mass(
         ax.set_ylim(0, ymaxs[ipt])
 
         handles,labels = ax.get_legend_handles_labels()
-        labels=[labels[3],labels[2],labels[1],labels[0]]
-        handles=[handles[3],handles[2],handles[1],handles[0]]
+        labels=[labels[3],labels[2],labels[0],labels[1]]
+        handles=[handles[3],handles[2],handles[0],handles[1]]
 
         #cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
         hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
@@ -1002,7 +1011,7 @@ def plot_unfolded_mass(
                     (mc_truth_sum[matching]-np.sqrt(theory_lower_sum[matching]))[ibin],
                     (mc_truth_sum[matching]+np.sqrt(theory_upper_sum[matching]))[ibin],
                     alpha=0.1,
-                    label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
+                    label="{} uncertainty{}".format("Total theory", matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
                 ax.fill_between(
@@ -1059,7 +1068,7 @@ def plot_unfolded_mass(
                     (1.-np.sqrt(theory_lower_sum[matching])/mc_truth_sum[matching])[ibin],
                     (1.+np.sqrt(theory_upper_sum[matching])/mc_truth_sum[matching])[ibin],
                     alpha=0.1,
-                    label="{} uncertainties{}".format(theory_uncertainty, matching_str[matching]) if ibin == 0 else None,
+                    label="{} uncertainty{}".format("Total theory", matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
                 axratio.fill_between(
