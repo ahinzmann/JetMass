@@ -105,6 +105,8 @@ def jet_mass_producer(args, configs):
       ]
       systematics+=[("jec_"+source+"_up").replace("__","_") for source in JECsources]
       systematics+=[("jec_"+source+"_down").replace("__","_") for source in JECsources]
+    if "NoModel" in args.workdir:
+      systematics.remove("model_up")
     for var in systematics:
         fname = configs["histLocation"].replace(".root", "_{}.root".format(var))
         print(fname)

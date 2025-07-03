@@ -470,15 +470,15 @@ def plot_migration_matrix(
         norm=(Normalize(0,1) if "probability" in outname else LogNorm()),
     )
 
-    ax.set_xticks(pt_gen_labels_positions, pt_gen_labels, fontsize=25)
+    ax.set_xticks(pt_gen_labels_positions, pt_gen_labels, fontsize=30)
     for iptgen in range(1, nbins_pt_gen):
         ax.plot([pt_gen_labels_positions[iptgen]] * 2, ax.get_ylim(), "k--", alpha=0.6)
-    ax.set_xlabel("generator bin", fontsize=25)
+    ax.set_xlabel("$p_{T,ptcl}$ and $m_{SD,ptcl}$ bin [GeV]", fontsize=30)
 
-    ax.set_yticks(pt_reco_labels_positions, pt_reco_labels, fontsize=25)
+    ax.set_yticks(pt_reco_labels_positions, pt_reco_labels, fontsize=30)
     for iptreco in range(1, nbins_pt_reco):
         ax.plot(ax.get_xlim(), [pt_reco_labels_positions[iptreco]] * 2, "k--", alpha=0.6)
-    ax.set_ylabel("detector bin", fontsize=25)
+    ax.set_ylabel("$p_{T,reco}$ and $m_{SD,reco}$ bin [GeV]", fontsize=30)
 
     msd_gen_subax_length = gen_positions[nbins_msd_gen]
     msd_reco_subax_length = reco_positions[nbins_msd_reco]
@@ -510,10 +510,10 @@ def plot_migration_matrix(
     ax.text(0.05 * ax.get_xlim()[1], 0.9 * ax.get_ylim()[1], r"$W(q\bar{q})$+jets")
     ax.text(0.05 * ax.get_xlim()[1], 0.85 * ax.get_ylim()[1], extratext)
 
-    cms_label(ax, fs=25)
+    cms_label(ax, fs=28)
     
     cbar=f.colorbar(c, cax=cax, orientation="vertical", label=("Probability" if "probability" in outname else "Events"))
-    cbar.ax.tick_params(labelsize=25)
+    cbar.ax.tick_params(labelsize=30)
     f.savefig(
         outname,
         bbox_inches="tight"

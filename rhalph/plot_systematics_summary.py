@@ -1,4 +1,4 @@
-from ROOT import gROOT,gStyle,TH2F,TLegend,TCanvas,TFile
+from ROOT import gROOT,gStyle,TH2F,TLegend,TCanvas,TFile, TColor
 import array, math, sys
 import os
 import cmsstyle as CMS
@@ -28,6 +28,7 @@ if __name__=="__main__":
  gStyle.SetOptStat(0)
  gStyle.SetOptFit(0)
  gStyle.SetTitleOffset(1.2,"Y")
+ gStyle.SetLegendFont(42)
  gStyle.SetPadLeftMargin(0.15)
  gStyle.SetPadBottomMargin(0.15)
  gStyle.SetPadTopMargin(0.08)
@@ -55,6 +56,13 @@ if __name__=="__main__":
       "jec_down","jec_up",
       "fsr_down","fsr_up","isr_down","isr_up",
       "v_qcd_down","v_qcd_up","w_ewk_down","w_ewk_up","z_ewk_down","z_ewk_up",
+      "toppt_off",
+      "model_up"]),
+       ("summary_short",["nominal",
+      #"pu_down","pu_up","triggersf_down","triggersf_up","prefiring",
+      "fsr_down","fsr_up","isr_down","isr_up",
+      "w_ewk_down","w_ewk_up","z_ewk_down","z_ewk_up","v_qcd_down","v_qcd_up",
+      "jec_down","jec_up",
       "toppt_off",
       "model_up"]),
        ("summary_jec1",["nominal","jec_down", "jec_up",
@@ -92,7 +100,7 @@ if __name__=="__main__":
        files=[]
        hists=[]
 
-       names={"nominal":"Nominal","model":"Model","jec":"Jet energy scale","isr":"Initial state shower","fsr":"Final state shower","w_ewk":"W+jets (NLO) EW","z_ewk":"Z+jets (NLO) EW", "v_qcd":"V+jets (NLO) QCD", "triggersf":"Trigger eff.", "pu":"Pileup", "toppt_off":"t#bar{t} (NLO)","prefiring":"Trigger pref.",
+       names={"nominal":"Nominal","model":"Hadronization model","jec":"Jet energy scale","isr":"Initial state radiation","fsr":"Final state radiation","w_ewk":"W+jets (NLO) EWK","z_ewk":"Z+jets (NLO) EW", "v_qcd":"V+jets (NLO) QCD", "triggersf":"Trigger eff.", "pu":"Pileup", "toppt_off":"t#bar{t} (NLO)","prefiring":"Trigger pref.",
        "jec_AbsoluteStat":"JEC AbsoluteStat", 
        "jec_AbsoluteScale":"JEC AbsoluteScale", 
        "jec_AbsoluteMPFBias":"JEC AbsoluteMPFBias", 
@@ -125,7 +133,23 @@ if __name__=="__main__":
        canvas=TCanvas("systematics"+sample, "systematics"+sample, 0, 0, 300, 300)
        canvas.cd()
        
-       colors=[1,2,3,4,6,7,8,9,12,28,34,38,40,41,42,43,44,45,46,47,48,49]
+       c867=TColor( 0.341, 0.565, 0.988)
+       k867=c867.GetNumber()
+       c419=TColor( 0.894, 0.145, 0.212)
+       k419=c419.GetNumber()
+       c413=TColor( 0.973, 0.612, 0.125)
+       k413=c413.GetNumber()
+       c797=TColor( 0.612, 0.612, 0.631)
+       k797=c797.GetNumber()
+       c810=TColor( 0.478, 0.129, 0.867)
+       k810=c810.GetNumber()
+       c804=TColor( 0.588, 0.29, 0.545)
+       k804=c804.GetNumber()
+ 
+       if plotname=="summary_short":
+         colors=[1,2,k867,k797,k419,k804,k413,k810]
+       else:
+         colors=[1,2,3,4,6,7,8,9,12,28,34,38,40,41,42,43,44,45,46,47,48,49]
        marker_up=[20,21,22,23,29,33,34,45,47,41,43]
        marker_down=[24,25,26,32,30,27,28,44,46,40,42]
        color=0
@@ -136,6 +160,8 @@ if __name__=="__main__":
        if sample=="QCD": samplename="QCD"
  
        l=TLegend(0.52,0.5,0.9,0.9,samplename+", "+str(ptmin)+"<p_{T}<"+str(ptmax)+" GeV, "+year)
+       #l.SetTextFont(42)
+       #l.SetTitle()
        l.SetTextSize(0.035)
        l.SetFillStyle(0)
 
@@ -194,7 +220,7 @@ if __name__=="__main__":
              
        canvas.SaveAs("systematics_"+plotname+year+"_"+sample+"_"+n2+"_"+tagger+"_"+str(ptmin)+".pdf")
 
-       if plotname=="summary":
+       if plotname=="summary" or plotname=="summary_short":
          color=1
          canvas=TCanvas("systematics"+sample, "systematics"+sample, 0, 0, 300, 300)
          canvas.cd()
@@ -205,6 +231,8 @@ if __name__=="__main__":
          if sample=="QCD": samplename="QCD"
  
          l=TLegend(0.52,0.5,0.9,0.9,samplename+", "+str(ptmin)+"<p_{T}<"+str(ptmax)+" GeV")
+         #l.SetTextFont(42)
+         #l.SetTitle()
          l.SetTextSize(0.04)
          l.SetFillStyle(0)
 

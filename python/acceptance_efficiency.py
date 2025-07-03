@@ -1,16 +1,23 @@
 #!/usr/bin/env pythonJMS.sh
+print("import uproot")
 import uproot
+print("import coffea")
 from coffea.util import save, load
+print("import matplotlib")
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+print("start")
 import mplhep as hep
 import numpy as np
 import awkward as ak
 import hist
 from copy import deepcopy
 import glob
+print("import coffea lookup")
 import coffea.lookup_tools
 import os
 from utils import jms_correction_files, year_alias
+print("import corretionlib")
 import correctionlib
 hep.style.use("CMS")
 
@@ -154,9 +161,9 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
     hists = {}
 
     pt_gen_edges = np.array([500, 650.0, 800.0, 1200.0, np.inf])
-    pt_gen_ax = hist.axis.Variable(pt_gen_edges, name="ptgen", label=r"$p_{T,\mathrm{gen}}$ [GeV]")
+    pt_gen_ax = hist.axis.Variable(pt_gen_edges, name="ptgen", label=r"$p_{T,\mathrm{ptcl}}$ [GeV]")
     msd_gen_edges = np.array([30., 70.0, 80.0, 90.0, np.inf])
-    msd_gen_ax = hist.axis.Variable(msd_gen_edges, name="msdgen", label=r"$m_{\mathrm{SD,gen}}$ [GeV]")
+    msd_gen_ax = hist.axis.Variable(msd_gen_edges, name="msdgen", label=r"$m_{\mathrm{SD,ptcl}}$ [GeV]")
 
     hists["misses"] = hist.Hist(
         pt_gen_ax,
@@ -437,12 +444,13 @@ def plot_acceptance(hists, outdir, year):
 
     acc = hists["acceptance"]
     markers = ["o", "v", "^", "s", "x"]
+    plt.rcParams["axes.prop_cycle"]=mpl.cycler(color=["#5790fc", "#f89c20", "#e42536", "#964a8b", "#9c9ca1", "#7a21dd"])
     f, ax = plt.subplots()
     for ipt in range(len(pt_edges)-1):
         if ipt == len(pt_edges)-2 and pt_edges[-1] == np.inf:
-            pt_tex = r"$p_{T,\mathrm{gen}} \geq %i$ GeV" % (pt_edges[ipt])
+            pt_tex = r"$p_{T,\mathrm{ptcl}} \geq %i$ GeV" % (pt_edges[ipt])
         else:
-            pt_tex = r"$%i \leq p_{T,\mathrm{gen}} < %i$ GeV" % (pt_edges[ipt], pt_edges[ipt + 1])
+            pt_tex = r"$%i \leq p_{T,\mathrm{ptcl}} < %i$ GeV" % (pt_edges[ipt], pt_edges[ipt + 1])
         msd_edges = acc[ipt][1]
         msd_edges[-1] = 260
         msd_centers = msd_edges[:-1] + 0.5 * np.diff(msd_edges)
@@ -456,7 +464,7 @@ def plot_acceptance(hists, outdir, year):
     ax.set_ylim(0, 1.0)
     # ax.set_ylabel(r"$1-\frac{N( \mathrm{pass-gen} \wedge \mathrm{fail-reco})}{N(\mathrm{pass-gen})}$")
     ax.set_ylabel(r"Acceptance")
-    ax.set_xlabel(r"$m_{\mathrm{SD,gen}}$ [GeV]")
+    ax.set_xlabel(r"$m_{\mathrm{SD,ptcl}}$ [GeV]")
     ax.set_xlim(0, 270)
     ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 260.0], [30, 50, 100, 150, 200, r"$\infty$"])
     f.savefig(f"{outdir}/acceptance_{year}.pdf", bbox_inches="tight")
@@ -474,9 +482,9 @@ def plot_sf_efficiency(hists, outdir, year):
     f, ax = plt.subplots()
     for ipt in range(len(pt_edges)-1):
         if ipt == len(pt_edges)-2 and pt_edges[-1] == np.inf:
-            pt_tex = r"$p_{T,\mathrm{gen}} \geq %i$ GeV" % (pt_edges[ipt])
+            pt_tex = r"$p_{T,\mathrm{ptcl}} \geq %i$ GeV" % (pt_edges[ipt])
         else:
-            pt_tex = r"$%i \leq p_{T,\mathrm{gen}} < %i$ GeV" % (pt_edges[ipt], pt_edges[ipt + 1])
+            pt_tex = r"$%i \leq p_{T,\mathrm{ptcl}} < %i$ GeV" % (pt_edges[ipt], pt_edges[ipt + 1])
         msd_edges = sf_eff[ipt][1]
         msd_edges[-1] = 260
         msd_centers = msd_edges[:-1] + 0.5 * np.diff(msd_edges)
@@ -490,7 +498,7 @@ def plot_sf_efficiency(hists, outdir, year):
     ax.set_ylim(0, 1.1)
     # ax.set_ylabel(r"$1-\frac{N( \mathrm{pass-gen} \wedge \mathrm{fail-reco})}{N(\mathrm{pass-gen})}$")
     ax.set_ylabel(r"$\varepsilon_{\mathrm{scale factors}}$")
-    ax.set_xlabel(r"$m_{\mathrm{SD,gen}}$ [GeV]")
+    ax.set_xlabel(r"$m_{\mathrm{SD,ptcl}}$ [GeV]")
     ax.set_xlim(0, 270)
     ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 260.0], [30, 50, 100, 150, 200, r"$\infty$"])
     f.savefig(f"{outdir}/sf_efficiency_{year}.pdf", bbox_inches="tight")

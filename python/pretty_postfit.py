@@ -81,7 +81,8 @@ lumis = {
 lumis["RunII"] = sum(lumis[year] for year in ["UL16preVFP", "UL16postVFP", "UL17", "UL18"])
 
 
-mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=diverging_colors)
+#mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=diverging_colors)
+mpl.rcParams['axes.prop_cycle'] = mpl.cycler(color=["#5790fc", "#f89c20", "#e42536", "#964a8b", "#9c9ca1", "#7a21dd"])
 
 
 def cms_label(exp_label, year, fs, ax, data):
@@ -168,7 +169,7 @@ def plot_templates(
                     labels.append(pt_gen_bin_tex + " " + msd_gen_bin_tex)
             hep.histplot(hists, label=labels, stack=True, histtype="fill", color=colors)
 
-            hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+            hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=25, data=True)
             #cms_label(exp_label=exp_label, year=year, fs=fs, ax=ax, data=data and state != "prefit")
 
             ax.text(
@@ -284,12 +285,12 @@ def plot_migration_matrix1(migmat: hist.Hist, outname: str, r_gen=1.0):
     ax.set_xticks(pt_gen_labels_positions, pt_gen_labels)
     for iptgen in range(1, nbins_pt_gen):
         ax.plot([pt_gen_labels_positions[iptgen]] * 2, ax.get_ylim(), "k--", alpha=0.6)
-    ax.set_xlabel("generator bin")
+    ax.set_xlabel("particle-level bin [GeV]")
 
     ax.set_yticks(pt_reco_labels_positions, pt_reco_labels)
     for iptreco in range(1, nbins_pt_reco):
         ax.plot(ax.get_xlim(), [pt_reco_labels_positions[iptreco]] * 2, "k--", alpha=0.6)
-    ax.set_ylabel("detector bin")
+    ax.set_ylabel("detector-level bin [GeV]")
 
     msd_gen_subax_length = gen_positions[nbins_msd_gen]
     msd_reco_subax_length = reco_positions[nbins_msd_reco]
@@ -605,7 +606,7 @@ def plot_unfolded_mass(
     mc_truth_variance_sum = None
     # capsize = 5
     fontsize = 14
-    legend_fontsize = fontsize + 4
+    legend_fontsize = fontsize + 6
     unfolding_sum = None
     unfolding_variance_sum = None
 
@@ -613,11 +614,11 @@ def plot_unfolded_mass(
     f_all, ax_all = plt.subplots(figsize=(10, 10))
     theory_upper_sum = None
     theory_lower_sum = None
-    ymaxs = [100.0, 23.0, 7.0, 0.6]
-    ymax_sum = 36.0  # TODO: for pt>650 GeV plots change to 42.0 .
+    ymaxs = [100.0, 23.0, 8.0, 0.6]
+    ymax_sum = 40.  # TODO: for pt>650 GeV plots change to 42.0 .
     if n2cut_str == "n2_0p2":# and (not plot_no_matching):
-        ymaxs = [50., 10., 4., 0.3]
-        ymax_sum = 16.
+        ymaxs = [50., 12., 4., 0.3]
+        ymax_sum = 18.
 
     # markers = ["o", "v", "^"]
     # linestyle = ["-", "--", ":"]
@@ -637,10 +638,12 @@ def plot_unfolded_mass(
           f, (ax,axratio) = plt.subplots(2,1,gridspec_kw={'height_ratios': [4,1],'hspace' : 0.08},figsize=(9, 12))
         else:
           f, ax = plt.subplots(figsize=(10, 10))
-        pt_bin_tex = r"$%s \leq p_{T, \mathrm{ptcl}} < %s $" % (
+        pt_bin_tex = r"$%s \leq p_{T, \mathrm{ptcl}} < %s $ GeV" % (
             str(configs["unfolding_bins"]["ptgen"][ipt]),
             str(configs["unfolding_bins"]["ptgen"][ipt + 1]),
         )
+        if "Inf" in pt_bin_tex:
+          pt_bin_tex = "$p_{T, \mathrm{ptcl}} > 1200$ GeV"
 
         flat_scale = {match: 1.0 for match in matchings}
         y_label = "Events"
@@ -656,7 +659,7 @@ def plot_unfolded_mass(
             y_label = r"$\frac{d\sigma}{d m_\mathrm{SD}}~[\frac{fb}{\mathrm{GeV}}]$"
 
         x_label = r"$m_{\mathrm{SD, ptcl}}$ [GeV]"
-        msd_max = 250. # or 1000. for Rivet or 250 for Paper
+        msd_max = 150. # or 1000. for Rivet or 250 for Paper
         msd_min = 30.
         msd_edges_ = truth_mc[matchings[0]][ipt].axes[0].edges.copy()
         print("lower edge",msd_edges_[0]," modified to", msd_min)
@@ -849,7 +852,7 @@ def plot_unfolded_mass(
                             (truth_values[matching]-np.sqrt(theory_band2_low[matching]))[ibin],
                             (truth_values[matching]+np.sqrt(theory_band2_hi[matching]))[ibin],
                             alpha=0.2,
-                            label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
+                            label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
                             **matching_kwargs[matching]
                         )
             for matching in matchings:
@@ -887,7 +890,7 @@ def plot_unfolded_mass(
                             (1.-np.sqrt(theory_band2_low[matching])/truth_values[matching])[ibin],
                             (1.+np.sqrt(theory_band2_hi[matching])/truth_values[matching])[ibin],
                             alpha=0.2,
-                            label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
+                            label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
                             **matching_kwargs[matching]
                         )
             for matching in matchings:
@@ -903,28 +906,28 @@ def plot_unfolded_mass(
                     markersize=6,
                     **marker_kwargs[matching]
                   )
-        hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+        hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=30, data=True)
         #cms_label(exp_label=exp_label, year=year, ax=ax, fs=20, data=data)
 
         ax.text(
-        ax.get_xlim()[0]+0.5*np.diff(ax_.get_xlim()),
+        ax.get_xlim()[0]+0.52*np.diff(ax_.get_xlim()),
         ax.get_ylim()[1]*0.6,
         pt_bin_tex,
-        fontsize=20
+        fontsize=22
         )
         if n2cut_str == "n2_0p2":
           ax.text(
-            ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+            ax.get_xlim()[0]+0.52*np.diff(ax.get_xlim()),
             ax.get_ylim()[1]*0.5,
             r"$N_{2}^{\beta=1} < 0.2$",
-            fontsize=20
+            fontsize=22
           )
         if plot_no_matching:
           ax.text(
-            ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+            ax.get_xlim()[0]+0.52*np.diff(ax.get_xlim()),
             ax.get_ylim()[1]*0.4,
             "W-match",
-            fontsize=20
+            fontsize=22
           )
 
         ax.set_ylabel(y_label)
@@ -933,11 +936,20 @@ def plot_unfolded_mass(
         else: 
           ax.set_xlabel(x_label)
         ax.set_xlim(msd_min, msd_max)
-        ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
-        if doRatio:
-          ax.set_xticklabels(["", "", "", "", "", ""])
+        if msd_max>200:
+          ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
         else:
+          ax.set_xticks([40.0, 60.0, 80.0, 100.0, msd_max])
+        if doRatio:
+         if msd_max>200:
+          ax.set_xticklabels(["", "", "", "", "", ""])
+         else:
+          ax.set_xticklabels(["", "", "", "", ""])
+        else:
+         if msd_max>200:
           ax.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+         else:
+          ax.set_xticklabels(["40", "60", "80", "100", "1000"])
         ax.set_ylim(0, ymaxs[ipt])
 
         handles,labels = ax.get_legend_handles_labels()
@@ -945,16 +957,27 @@ def plot_unfolded_mass(
         handles=[handles[3],handles[2],handles[0],handles[1]]
 
         #cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
-        hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+        hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=30, data=True)
         ax.legend(handles, labels,fontsize=legend_fontsize)
 
         if doRatio:
           axratio.set_xlim(msd_min, msd_max)
-          axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
-          axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+          if msd_max>200:
+            axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
+            axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+          else:
+            axratio.set_xticks([40.0, 60.0, 80.0, 100.0, msd_max])
+            axratio.set_xticklabels(["40", "60", "80", "100", "1000"])
           axratio.set_ylim(0., 2)
           axratio.set_xlabel(x_label)
           axratio.set_ylabel("Ratio")
+
+        for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
+          ax.get_xticklabels() + ax.get_yticklabels()):
+          item.set_fontsize(30)
+        for item in ([axratio.title, axratio.xaxis.label, axratio.yaxis.label] +
+          axratio.get_xticklabels() + axratio.get_yticklabels()):
+          item.set_fontsize(30)
 
         f.savefig(f"{out_dir}/m_unfold_pt{ipt}{region_str}.pdf", bbox_inches="tight")
         del f, ax, axratio
@@ -963,8 +986,12 @@ def plot_unfolded_mass(
     ax_all.set_ylabel(y_label)
     ax_all.set_xlabel(x_label)
     ax_all.set_xlim(msd_min, msd_max)
-    ax_all.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
-    ax_all.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+    if msd_max>200:
+      ax_all.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
+      ax_all.set_xticklabels(["40", "50", "100", "150", "200", "1000"])
+    else:
+      ax_all.set_xticks([40.0, 60.0, 80.0, 100.0, msd_max])
+      ax_all.set_xticklabels(["40", "60", "80", "100", "1000"])
     ax_all.legend(fontsize=legend_fontsize)
     cms_label(exp_label=exp_label, year=year, fs=20, ax=ax_all, data=data)
     f_all.savefig(f"{out_dir}/m_unfold_pt_all{region_str}.pdf", bbox_inches="tight")
@@ -979,6 +1006,17 @@ def plot_unfolded_mass(
     if plot_truth:
         mc={}
         for matching in matchings:
+            
+            ### PRINTING CROSS SECTION
+            xsec=0
+            xsec_up=0
+            xsec_down=0
+            for ibin in range(len(msd_edges_)-1):
+               xsec+=mc_truth_sum[matching][ibin]*(msd_edges_for_binwidth[ibin+1]-msd_edges_for_binwidth[ibin])
+               xsec_up+=np.sqrt(theory_upper_sum[matching])[ibin]*(msd_edges_for_binwidth[ibin+1]-msd_edges_for_binwidth[ibin])
+               xsec_down+=np.sqrt(theory_lower_sum[matching])[ibin]*(msd_edges_for_binwidth[ibin+1]-msd_edges_for_binwidth[ibin])
+            print("Theory prediction", xsec, "+", xsec_up, "-", xsec_down)
+        
             mc[matching]={}
             if False:
              hep.histplot(
@@ -1019,7 +1057,7 @@ def plot_unfolded_mass(
                     (mc_truth_sum[matching]-np.sqrt(theory_lower_sum2[matching]))[ibin],
                     (mc_truth_sum[matching]+np.sqrt(theory_upper_sum2[matching]))[ibin],
                     alpha=0.2,
-                    label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
+                    label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
             def is_float_try(str):
@@ -1076,7 +1114,7 @@ def plot_unfolded_mass(
                     (1.-np.sqrt(theory_lower_sum2[matching])/mc_truth_sum[matching])[ibin],
                     (1.+np.sqrt(theory_upper_sum2[matching])/mc_truth_sum[matching])[ibin],
                     alpha=0.2,
-                    label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
+                    label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
               for mass,col,ls in [(80,"tab:cyan","--"),(81,"tab:olive","-."),(82,"tab:brown",":")]:
@@ -1132,35 +1170,44 @@ def plot_unfolded_mass(
     handles=[handles[6],handles[5],handles[0],handles[1],handles[4],handles[3],handles[2]]
 
     #cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
-    hep.cms.label("Preliminary", ax=ax, lumi=137.2, fontsize=25, data=True)
+    hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=30, data=True)
     ax.legend(handles, labels,fontsize=legend_fontsize)
     ax.text(
-        ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+        ax.get_xlim()[0]+0.6*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.6,
         r"$p_{T, \mathrm{ptcl}} > 650$ GeV ",
-        fontsize=20
+        fontsize=22
     )
     if n2cut_str == "n2_0p2":
       ax.text(
-        ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+        ax.get_xlim()[0]+0.6*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.5,
         r"$N_{2}^{\beta=1} < 0.2$",
-        fontsize=20
+        fontsize=22
       )
     if plot_no_matching:
       ax.text(
-        ax.get_xlim()[0]+0.5*np.diff(ax.get_xlim()),
+        ax.get_xlim()[0]+0.6*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.4,
         "W-match",
-        fontsize=20
+        fontsize=22
       )
 
     ax.set_xlim(msd_min, msd_max)
-    ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
-    if doRatio:
-      ax.set_xticklabels(["", "", "", "", "", ""])
+    if msd_max>200:
+      ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
     else:
+      ax.set_xticks([40.0, 60.0, 80.0, 100.0, msd_max])
+    if doRatio:
+     if msd_max>200:
+      ax.set_xticklabels(["", "", "", "", "", ""])
+     else:
+      ax.set_xticklabels(["", "", "", "", ""])
+    else:
+     if msd_max>200:
       ax.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+     else:
+      ax.set_xticklabels(["40", "60", "80", "100", "1000"])
 
     # ax.set_yscale("log")
     # ax.set_ylim(-1, 90.0)
@@ -1173,11 +1220,22 @@ def plot_unfolded_mass(
 
     if doRatio:
      axratio.set_xlim(msd_min, msd_max)
-     axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
-     axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+     if msd_max>200:
+       axratio.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, msd_max])
+       axratio.set_xticklabels(["30", "50", "100", "150", "200", "1000"])
+     else:
+       axratio.set_xticks([40.0, 60.0, 80.0, 100.0, msd_max])
+       axratio.set_xticklabels(["40", "60", "80", "100", "1000"])
      axratio.set_ylim(0., 2)
      axratio.set_xlabel(x_label)
      axratio.set_ylabel("Ratio")
+
+    for item in ([ax.title, ax.xaxis.label, ax.yaxis.label] +
+      ax.get_xticklabels() + ax.get_yticklabels()):
+      item.set_fontsize(30)
+    for item in ([axratio.title, axratio.xaxis.label, axratio.yaxis.label] +
+      axratio.get_xticklabels() + axratio.get_yticklabels()):
+      item.set_fontsize(30)
 
     f.savefig(f"{out_dir}/m_unfold_sum{region_str}.pdf", bbox_inches="tight")
     del f, ax
@@ -1255,7 +1313,7 @@ if __name__ == "__main__":
         exit(0)
     years = ["UL16preVFP", "UL16postVFP", "UL17", "UL18"] if args.year == "RunII" else [args.year]
 
-    pt_reco_edges = np.array([575.0, 650.0, 725.0, 800.0, 1000.0, 1200.0])
+    pt_reco_edges = np.array([575.0, 650.0, 725.0, 800.0, 1000.0, 1200.0, np.inf])
     pt_gen_edges = np.array([500.0, 650.0, 800.0, 1200.0, np.inf])
     msd_reco_edges = np.arange(50.0, 300.0, 5)
     msd_gen_edges = np.array([30.0, 70., 80., 90., np.inf])

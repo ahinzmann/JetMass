@@ -92,7 +92,10 @@ def draw_lumi(
     global cms_text
     global extra_text
     #lumi_text = "%.1f fb^{-1}, %s (13 TeV)" % (float(lumi), str(year))
-    lumi_text = "%.1f fb^{-1} (13 TeV)" % (float(lumi))
+    if lumi==138:
+      lumi_text = "%.0f fb^{-1} (13 TeV)" % (float(lumi))
+    else:
+      lumi_text = "%.1f fb^{-1} (13 TeV)" % (float(lumi))
     if private_work:
         cms_text = "Private work"
         if data:

@@ -7,14 +7,16 @@ hep.style.use("CMS")
 import re
 #fit_dir = "../rhalph/UnfoldingParticleNet_18-09-24/FullRunII"
 #fit_dir = "../rhalph/UnfoldingSubstructure_18-09-24/FullRunII"
-fit_dir = "../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII"
-#fit_dir = "../rhalph/UnfoldingSubstructure_N2Cut_18-09-24/FullRunII"
+#fit_dir = "../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII"
+fit_dir = "../rhalph/UnfoldingSubstructure_N2Cut_18-09-24/FullRunII"
 
 config = json.load(open(f"{fit_dir}/config.json","r"))
 fit_results = json.load(open(f"{fit_dir}/FullRunIIfitResult.json","r"))
 result = np.load(f"{fit_dir}/poi_correlation_matrix.npy", allow_pickle=True, encoding="latin1").item()
-pois = result["pois"]
-corr = result["correlationMatrix"]
+pois = result["pois"][4:]
+print(len(pois))
+corr = result["correlationMatrix"][4:,4:]
+print(corr)
 cov = result["covarianceMatrix"]
 
 for i,poi in enumerate(pois):
@@ -64,12 +66,12 @@ m_tick_labels_per_pt[0] = "10"
 m_tick_labels = m_tick_labels_per_pt
 # m_tick_labels_per_pt[-1] += "|0"
 m_tick_labels_per_pt[-1] = "10"
-m_tick_labels += m_tick_labels_per_pt[1:]*(len(pt_edges)-2)
+m_tick_labels += m_tick_labels_per_pt[1:]*(len(pt_edges)-3)
 m_tick_loc = np.concatenate([edges,[len(edges)-0.5]])-0.5
 m_tick_labels[-1] = "$\infty$"
 
 
-pt_tick_labels = [edge(e) for e in pt_edges]
+pt_tick_labels = [edge(e) for e in pt_edges][1:]
 pt_tick_loc = m_tick_loc[::len(m_edges)-1]
 
 f.colorbar(cmap,ax=cax,fraction=1, pad=0.0)
@@ -89,7 +91,7 @@ ax.set_xlabel("$m_\mathrm{jet,ptcl}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
 twinx.set_ylabel("$p_{T,\mathrm{ptcl}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=-30)
 twiny.set_xlabel("$p_{T,\mathrm{ptcl}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
 
-hep.cms.label("Preliminary", ax=ax0, lumi=137.2, fontsize=25, data=True)
+hep.cms.label("Preliminary", ax=ax0, lumi=138, fontsize=25, data=True)
 
 cmap = ax.pcolormesh(edges, edges, corr, vmin=-1, vmax=1)#, cmap="RdGy")
 cax.axis('off')

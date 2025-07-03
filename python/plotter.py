@@ -53,21 +53,34 @@ binning_dict = {
 
 rebin = True
 
+c867=ROOT.TColor( 0.341, 0.565, 0.988)
+k867=c867.GetNumber()
+c419=ROOT.TColor( 0.894, 0.145, 0.212)
+k419=c419.GetNumber()
+c413=ROOT.TColor( 0.973, 0.612, 0.125)
+k413=c413.GetNumber()
+c797=ROOT.TColor( 0.612, 0.612, 0.631)
+k797=c797.GetNumber()
+c810=ROOT.TColor( 0.478, 0.129, 0.867)
+k810=c810.GetNumber()
+c804=ROOT.TColor( 0.588, 0.29, 0.545)
+k804=c804.GetNumber()
+
 colors = {
-    "QCD": 867,
-    "qcd": 867,
+    "QCD": k867,
+    "qcd": k867,
     "QCD_lowPt": 867,
     "QCD_highPt": 867,
     "WJets": 413,
-    "WUnmatched": 419,
-    "WMatched": 413,
-    "WJetsUnmatched": 419,
-    "WJetsMatched": 413,
+    "WUnmatched": k419,
+    "WMatched": k413,
+    "WJetsUnmatched": k419,
+    "WJetsMatched": k413,
     "WJetsMatched0p4": 413,
     "WJetsMatched0p2": 413,
     "WJetsMatched0p1": 413,
     "WJetsMatched_fakes": 430,
-    "ZJets": 797,
+    "ZJets": k797,
     "DYJets": 797,
     "ZJetsUnmatched": 794,
     "ZJetsMatched": 797,
@@ -91,10 +104,10 @@ colors = {
     "ST_s": 40,
     "ttbar": 810,
     "TTbar": 810,
-    "TTbar_Hadronic": 810,
-    "TTbar_SemiLeptonic": 804,
-    "TTToHadronic": 810,
-    "TTToSemiLeptonic": 804,
+    "TTbar_Hadronic": k810,
+    "TTbar_SemiLeptonic": k804,
+    "TTToHadronic": k810,
+    "TTToSemiLeptonic": k804,
     "TTTo2L2Nu": 803,
     "TTbar_had": 810,
     "TTbar_semilep": 804,
@@ -446,7 +459,7 @@ for selection, workflows in pt_bins_dict.items():
             pt_bins_tex_dict[selection][workflow][pt_bin] = (
                 ""
                 if (pt_bin == "inclusive")
-                else " %s GeV #leq p_{T} < %s GeV" % (pt_bin.split("to")[0], pt_bin.split("to")[1])
+                else " %s #leq p_{T} < %s GeV" % (pt_bin.split("to")[0], pt_bin.split("to")[1])
             )
         min_pt = min(map(lambda x: int(x.split("to")[0]) if "to" in x else 9999, bins))
         pt_bins_tex_dict[selection][workflow]["inclusive"] = " p_{T} #geq %s GeV" % (min_pt)
@@ -472,7 +485,7 @@ year_alias = {
     "UL18": "2018",
 }
 
-lumis["RunII"] = sum([lumi for year, lumi in lumis.items() if "UL" in year])
+lumis["RunII"] = 138 #sum([lumi for year, lumi in lumis.items() if "UL" in year])
 lumis["UL16"] = sum([lumi for year, lumi in lumis.items() if "UL16" in year])
 
 

@@ -91,7 +91,8 @@ def plot_fit_result(
     plotter.draw_extra_text = True
     plotter.year = config.get("year", "2017")
     # plotter.legend_bbox = (0.60, 0.2, 0.9, 0.6)
-    plotter.legend_bbox = (0.53, 0.5, 0.87, 0.9)
+    # plotter.legend_bbox = (0.53, 0.5, 0.87, 0.9)
+    plotter.legend_bbox = (0.45, 0.5, 0.87, 0.9)
     if unfolding and not sum_genbins:
         plotter.legend_bbox = (0.6, 0.25, 0.85, 0.9)
     # plotter.y_range_ratio = [0.8,1.2]
@@ -239,7 +240,7 @@ def plot_fit_result(
                     legend_entries.append((h_obs, "Pseudodata", "pe1x0"))
                 else:
                     legend_entries.append((h_obs, "Data", "pe1x0"))
-                suffix_tex = {"postfit": "#color[34]{postfit}", "prefit": "#color[46]{prefit}"}
+                suffix_tex = {"postfit": "postfit", "prefit": "prefit"}#{"postfit": "#color[34]{postfit}", "prefit": "#color[46]{prefit}"}
                 additional_text = (
                     " "
                     + plotter.selection_tex[channel["selection"]]
