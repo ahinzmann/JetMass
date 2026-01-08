@@ -65,6 +65,7 @@ class JetMassCombination(object):
             model_config = self._config_dicts[model]
             model_config["ModelDir"] = "{}/{}".format(self.workdir, model)
             model_config_json_path = "{}/{}config.json".format(self._combination_dir, model)
+            print(model_config_json_path)
             if os.path.isfile(model_config_json_path):
                 self._config_dicts[model] = import_config(model_config_json_path)
             else:
@@ -125,13 +126,11 @@ class JetMassCombination(object):
         print("building individual models...")
         while len(model_processes) > 0:
             model_processes[-1].wait()
-            if model_processes[-1].returncode == 0:
-                model_processes.pop()
-            else:
-                [p.terminate() for p in model_processes]
+            if model_processes[-1].returncode != 0:
                 print("One of the processes had an issue. Check the logs!")
-                break
+                #[p.terminate() for p in model_processes]
                 #raise RuntimeError("One of the processes had an issue. Check the logs!")
+            model_processes.pop()
             time.sleep(2)
 
     def combine_models(self):
@@ -285,13 +284,12 @@ class JetMassCombination(object):
         print("getting postfit shapes...")
         while len(model_processes) > 0:
             model_processes[-1].wait()
-            if model_processes[-1].returncode == 0:
-                model_processes.pop()
-            else:
-                [p.terminate() for p in model_processes if p.returncode]
+            if model_processes[-1].returncode != 0:
+                #[p.terminate() for p in model_processes if p.returncode]
                 print("One of the processes had an issue. Check the logs!")
-                break
+                #break
                 #raise RuntimeError("One of the processes had an issue. Check the logs!")
+            model_processes.pop()
             time.sleep(2)
 
         for fname in fit_shapes_files:

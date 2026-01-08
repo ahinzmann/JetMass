@@ -273,7 +273,7 @@ if __name__ == "__main__":
             for year in years[tagger]:
                 f, ax = setup_ax(10, 7)
                 iplot = 0
-                legend_alias = {"WJets": r"$W(q\bar{q})$+jets regions", "TTBar": r"$t\bar{t}$ regions"}
+                legend_alias = {"WJets": r"$W(q\bar{q}')$+jets regions", "TTBar": r"$t\bar{t}$ regions"}
                 for sample in ["WJets", "TTBar"]:
                     jet_scales = ["W"]
                     # jet_scales = ["W", "top"] if sample == "TTBar" else ["W"]

@@ -577,7 +577,7 @@ def finalize_ax(
         lumi = round(lumi, 1)
     if exp_label == "":
         # hep.label.exp_label(exp="", llabel=exp_label, ax=ax, fontsize=font_size - 2, year=year, lumi=lumi)
-        hep.cms.label("Preliminary", ax=ax, year=year_alias.get(year, year), lumi=lumi, fontsize=font_size-2, data=True)
+        hep.cms.label("", ax=ax, year=year_alias.get(year, year), lumi=lumi, fontsize=font_size-2, data=True)
     else:
         hep.label.exp_label(
             exp="", llabel=exp_label, ax=ax, fontsize=font_size - 2, year=year_alias.get(year, year), lumi=lumi

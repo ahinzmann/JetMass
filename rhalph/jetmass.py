@@ -107,6 +107,7 @@ def jet_mass_producer(args, configs):
       systematics+=[("jec_"+source+"_down").replace("__","_") for source in JECsources]
     if "NoModel" in args.workdir:
       systematics.remove("model_up")
+      #systematics.remove("model_down")
     for var in systematics:
         fname = configs["histLocation"].replace(".root", "_{}.root".format(var))
         print(fname)
@@ -742,7 +743,16 @@ def jet_mass_producer(args, configs):
                         if "model_up" in aux_hist_files:# and "model_down" in aux_hist_files:
                             hist_model_up = get_hist(hist_dir % (sample_name, ""), "model_up")
                             hist_model_down = get_hist(hist_dir % (sample_name, ""), "triggersf_down")
-                            sample.setParamEffect(extra_nuisances["model"], hist_model_up, hist_model_down)
+                            hist_model_up.Divide(hist_model_down)
+                            for b in range(hist_model_up.GetNbinsX()):
+                               #print("MODEL UP BEFORE",hist_dir % (sample_name, ""), "model_up",b+1,hist_model_up.GetBinContent(b+1))
+                               #print("MODEL DOWN BEFORE",hist_model_down.GetBinContent(b+1))
+                               hist_model_up.SetBinContent(b+1,(hist_model_up.GetBinContent(b+1)-1.)/10.+1.) # Scale down by 10
+                               #print("MODEL UP AFTER",hist_model_up.GetBinContent(b+1))
+                            hist_model_up.Multiply(hist_model_down)
+                            #hist_model_down = get_hist(hist_dir % (sample_name, ""), "model_down")
+                            sample.setParamEffect(extra_nuisances["model"], hist_model_up, hist_model_down,10)
+                            #sample.setParamEffect(extra_nuisances["model"], hist_model_up)
                         else:
                             logger.warn("model variation hists not present.")
 

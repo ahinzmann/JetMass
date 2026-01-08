@@ -435,7 +435,7 @@ def create_hists(events, year, n2_max=-999.0, nomatching=False):
     return hists
 
 
-def plot_acceptance(hists, outdir, year):
+def plot_acceptance(hists, outdir, year, n2cut):
     print("plotting acceptance")
 
     fs = 36
@@ -459,14 +459,18 @@ def plot_acceptance(hists, outdir, year):
         )
         ax.errorbar(msd_centers, acc[ipt][0], label=pt_tex, **errbar_kwargs)
     ax.legend(fontsize=fs-11)
-    hep.cms.label("Preliminary", year="" #year_alias.get(year, year)
+    hep.cms.label("", year="" #year_alias.get(year, year)
     , fontsize=fs-8, ax=ax, data=False)
     ax.set_ylim(0, 1.0)
+    if n2cut>0:
+      ax.text(150, 0.5, r"$N_{2}^{(1)} < 0.2$",fontsize=fs-6)    
     # ax.set_ylabel(r"$1-\frac{N( \mathrm{pass-gen} \wedge \mathrm{fail-reco})}{N(\mathrm{pass-gen})}$")
     ax.set_ylabel(r"Acceptance")
-    ax.set_xlabel(r"$m_{\mathrm{SD,ptcl}}$ [GeV]")
-    ax.set_xlim(0, 270)
-    ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 260.0], [30, 50, 100, 150, 200, r"$\infty$"])
+    ax.set_xlabel(r"$m_{\mathrm{SD}}^{ptcl}$ [GeV]")
+    ax.set_xlim(30, 260)
+    ax.set_xticks([50.0, 100.0, 150.0, 200.0, 260.0], [50, 100, 150, 200, r"$\infty$"])
+    from matplotlib.ticker import MultipleLocator
+    ax.xaxis.set_minor_locator(MultipleLocator(10))
     f.savefig(f"{outdir}/acceptance_{year}.pdf", bbox_inches="tight")
 
 
@@ -493,12 +497,12 @@ def plot_sf_efficiency(hists, outdir, year):
         )
         ax.errorbar(msd_centers, sf_eff[ipt][0], label=pt_tex, **errbar_kwargs)
     ax.legend(fontsize=fs+2)
-    hep.cms.label("Preliminary", year="" #year_alias.get(year, year)
+    hep.cms.label("", year="" #year_alias.get(year, year)
     , fontsize=fs + 1, ax=ax, data=False)
     ax.set_ylim(0, 1.1)
     # ax.set_ylabel(r"$1-\frac{N( \mathrm{pass-gen} \wedge \mathrm{fail-reco})}{N(\mathrm{pass-gen})}$")
     ax.set_ylabel(r"$\varepsilon_{\mathrm{scale factors}}$")
-    ax.set_xlabel(r"$m_{\mathrm{SD,ptcl}}$ [GeV]")
+    ax.set_xlabel(r"$m_{\mathrm{SD}}^{ptcl}$ [GeV]")
     ax.set_xlim(0, 270)
     ax.set_xticks([30.0, 50.0, 100.0, 150.0, 200.0, 260.0], [30, 50, 100, 150, 200, r"$\infty$"])
     f.savefig(f"{outdir}/sf_efficiency_{year}.pdf", bbox_inches="tight")
@@ -536,5 +540,5 @@ if __name__ == "__main__":
         out.update(create_hists(tree, args.year,  args.n2cut, args.nomatching))
         save(out, outfile)
 
-    plot_acceptance(out, outdir, args.year)
+    plot_acceptance(out, outdir, args.year, args.n2cut)
     plot_sf_efficiency(out, outdir, args.year)

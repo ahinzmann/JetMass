@@ -100,7 +100,7 @@ def w_channels(w_pt_edges):
                 "QcdEstimation": "True",
                 "selection": "W",
                 "pt_bin": "{}to{}".format(*w_pt_edges[ipt:ipt + 2]),
-                "samples": ["QCD", "WJetsMatched", "WJetsUnmatched", "ZJets", "TTToHadronic", "TTToSemiLeptonic"],
+                "samples": ["QCD", "TTToSemiLeptonic", "TTToHadronic", "ZJets", "WJetsUnmatched", "WJetsMatched"],
                 "NormUnc": {
                     # "WJets": {"value": 1.2, "decorrelateRegions": True},
                     # "WJets": 1.2,

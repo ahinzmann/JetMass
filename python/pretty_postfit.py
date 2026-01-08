@@ -16,6 +16,14 @@ from coffea.util import load
 import pickle
 hep.style.use("CMS")
 
+def is_float_try(str):
+   try:
+     float(str)
+     return True
+   except ValueError:
+     return False
+
+
 diverging_colors = [
     "#a50026",
     "#d73027",
@@ -169,13 +177,13 @@ def plot_templates(
                     labels.append(pt_gen_bin_tex + " " + msd_gen_bin_tex)
             hep.histplot(hists, label=labels, stack=True, histtype="fill", color=colors)
 
-            hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=25, data=True)
+            hep.cms.label("", ax=ax, lumi=138, fontsize=25, data=True)
             #cms_label(exp_label=exp_label, year=year, fs=fs, ax=ax, data=data and state != "prefit")
 
             ax.text(
                 np.diff(ax.get_xlim()) * 0.4,
                 ax.get_ylim()[1] * 0.2,
-                r"$\it{" + state + r"}~W(qq)\mathrm{+jets}$",
+                r"$\it{" + state + r"}~W\mathrm{+jets}$",
                 fontsize=fs + 2,
             )
             ax.text(
@@ -368,6 +376,7 @@ def plot_unfolded_mass(
       theory_systs = ["v_qcd", "w_ewk"]
       theory_systs = ["v_qcd", "w_ewk", "model"] ### Andreas
       theory_systs = ["v_qcd", "w_ewk", "isr", "fsr", "model"] ### Andreas
+      #theory_systs = ["model"] # TEST
     else:
       theory_systs = [theory_uncertainty]
     theory_vars = [f"{syst}_{direc}" for syst in theory_systs for direc in ["up", "down"]]
@@ -517,22 +526,27 @@ def plot_unfolded_mass(
         ]
 
     del files
+    
+    #print("getting theory files")
 
-    var_files = {
-        var: [
-            load(f"{coffea_hist_path}/templates_{year}{tagger}_"+var.replace("model_down","prefiring")+("_mctruth" if "ewk" in var or "qcd" in var else "")+".coffea") ### Andreas
-            for year in years
-        ]
-        for var in theory_vars
-    }
+    #var_files = {
+    #    var: [
+    #        load(f"{coffea_hist_path}/templates_{year}{tagger}_"+var.replace("model_down","prefiring")+("_mctruth" if "ewk" in var or "qcd" in var else "")+".coffea") ### Andreas
+    #        for year in years
+    #    ]
+    #    for var in theory_vars
+    #}
     #print(var_files["v_qcd_down"][0][f"vjets_mjet_unfolding_{region}"])
     #print(var_files["fsr_down"][0][f"vjets_mjet_unfolding_{region}"])
+    
+    print("getting theory hists")
     theory_vars_hists_years = {
         matching: {
             var: [
                 [
                     deepcopy(
-                        f_var[f"vjets_mjet_unfolding_{region}"][
+                        #f_var[f"vjets_mjet_unfolding_{region}"][
+                        load(f"{coffea_hist_path}/templates_{year}{tagger}_"+var.replace("model_down","prefiring")+("_mctruth" if "ewk" in var or "qcd" in var else "")+".coffea")[f"vjets_mjet_unfolding_{region}"][
                             {
                                 "ptgen": iptgen,
                                 "dataset": "vjets_WJetsMatched",# if matching == "matching" else "vjets_WJets",
@@ -547,7 +561,8 @@ def plot_unfolded_mass(
                             }
                         ]
                     )
-                    for f_var in var_files[var]
+                    for year in years
+                    #for f_var in var_files[var]
                 ]
                 for iptgen in range(len(pt_edges) - 1)
             ]
@@ -556,7 +571,7 @@ def plot_unfolded_mass(
         for matching in matchings
     }
 
-    del var_files
+    #del var_files
 
     print("adding hists")
 
@@ -628,6 +643,7 @@ def plot_unfolded_mass(
     }
 
     output_hists = {}
+    mc2={}
 
     for ipt in range(0, len(pt_edges) - 1):
         # plot_kwargs = {
@@ -831,13 +847,41 @@ def plot_unfolded_mass(
                         truth_values[matching],
                         msd_edges_,
                         yerr=np.sqrt(truth_variances[matching]),
-                        label="W+jets (NLO){}{}".format(matching_str[matching], ("" if ax_==ax else " ("+pt_bin_tex+")")),
+                        label="W+jets (NLO) "+ matching_str[matching]+ ("" if ax_==ax else " ("+pt_bin_tex+")"),
                         ax=ax_,
                         ls="-",
                         alpha=alpha,
                         **matching_kwargs[matching]
                     )
-
+                    samplename="/afs/desy.de/user/h/hinzmann/wjetmass/WJET_MadgraphHerwig_12Sep2024.yoda"
+                    print(samplename)
+                    fi=open(samplename)
+                    start=False
+                    ys=[]
+                    print(pt_bin_tex)
+                    for line in fi.readlines():
+                        if "BEGIN" in line and "d"+("0" if 2*ipt+3+1*(n2cut_str == "n2_0p2")<10 else "")+str(2*ipt+3+1*(n2cut_str == "n2_0p2"))+"-x01-y01" in line:
+                          start=True
+                          print("found data",pt_bin_tex,line)
+                        if start:
+                          if "END" in line: break
+                          s=line.split("	")
+                          if len(s)==7 and is_float_try(s[0]):
+                            ys+=[float(s[2])]#,float(s[3]))]
+                          if len(s)==6 and is_float_try(s[0]):
+                            ys+=[float(s[3])]#,float(s[4]))]
+                    for i in range(len(ys)):
+                      ys[i]=ys[i]/(msd_edges_for_binwidth[i+1]-msd_edges_for_binwidth[i])
+                    mc2[matching+str(ipt)]=np.array(ys)/10.
+                    print(mc2[matching+str(ipt)])
+                    #hep.histplot(
+                    #  mc2[matching+str(ipt)],
+                    #  msd_edges_,
+                    #  ax=ax_,
+                    #  label="W+jets (MG+Herwig)",
+                    #  color="tab:cyan",
+                    #  ls="--"
+                    #)
                     for ibin in range(len(msd_edges_)-1):
                         ax_.fill_between(
                             msd_edges_[ibin:ibin+2],
@@ -852,7 +896,7 @@ def plot_unfolded_mass(
                             (truth_values[matching]-np.sqrt(theory_band2_low[matching]))[ibin],
                             (truth_values[matching]+np.sqrt(theory_band2_hi[matching]))[ibin],
                             alpha=0.2,
-                            label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
+                            label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
                             **matching_kwargs[matching]
                         )
             for matching in matchings:
@@ -876,6 +920,14 @@ def plot_unfolded_mass(
         if doRatio:
             if plot_truth:
                 for matching in matchings:
+                    #hep.histplot(
+                    #  mc2[matching+str(ipt)]/truth_values[matching],
+                    #  msd_edges_,
+                    #  ax=axratio,
+                    #  label="W+jets (MG+Herwig)",
+                    #  color="tab:cyan",
+                    #  ls="--"
+                    #)
                     for ibin in range(len(msd_edges_)-1):
                         axratio.fill_between(
                             msd_edges_[ibin:ibin+2],
@@ -890,7 +942,7 @@ def plot_unfolded_mass(
                             (1.-np.sqrt(theory_band2_low[matching])/truth_values[matching])[ibin],
                             (1.+np.sqrt(theory_band2_hi[matching])/truth_values[matching])[ibin],
                             alpha=0.2,
-                            label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
+                            label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
                             **matching_kwargs[matching]
                         )
             for matching in matchings:
@@ -906,7 +958,7 @@ def plot_unfolded_mass(
                     markersize=6,
                     **marker_kwargs[matching]
                   )
-        hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=30, data=True)
+        hep.cms.label("", ax=ax, lumi=138, fontsize=30, data=True)
         #cms_label(exp_label=exp_label, year=year, ax=ax, fs=20, data=data)
 
         ax.text(
@@ -919,7 +971,7 @@ def plot_unfolded_mass(
           ax.text(
             ax.get_xlim()[0]+0.52*np.diff(ax.get_xlim()),
             ax.get_ylim()[1]*0.5,
-            r"$N_{2}^{\beta=1} < 0.2$",
+            r"$N_{2}^{(1)} < 0.2$",
             fontsize=22
           )
         if plot_no_matching:
@@ -957,7 +1009,7 @@ def plot_unfolded_mass(
         handles=[handles[3],handles[2],handles[0],handles[1]]
 
         #cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
-        hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=30, data=True)
+        hep.cms.label("", ax=ax, lumi=138, fontsize=30, data=True)
         ax.legend(handles, labels,fontsize=legend_fontsize)
 
         if doRatio:
@@ -1038,7 +1090,7 @@ def plot_unfolded_mass(
                 msd_edges_,
                 yerr=np.sqrt(mc_truth_variance_sum[matching]),
                 ax=ax,
-                label="W+jets (NLO) {}".format(matching_str[matching]),
+                label="W+jets (NLO) "+matching_str[matching],
                 alpha=0.8,
                 ls="-",
                 **matching_kwargs[matching]
@@ -1057,17 +1109,11 @@ def plot_unfolded_mass(
                     (mc_truth_sum[matching]-np.sqrt(theory_lower_sum2[matching]))[ibin],
                     (mc_truth_sum[matching]+np.sqrt(theory_upper_sum2[matching]))[ibin],
                     alpha=0.2,
-                    label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
+                    label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
-            def is_float_try(str):
-               try:
-                 float(str)
-                 return True
-               except ValueError:
-                 return False
             for mass,col,ls in [(80,"tab:cyan","--"),(81,"tab:olive","-."),(82,"tab:brown",":")]:
-              samplename="/afs/desy.de/user/h/hinzmann/wjetmass/WJET_Pythia8_CP5"+("_m"+str(mass)).replace("_m80.4","")+"_12Sep2024.yoda"
+              samplename="/afs/desy.de/user/h/hinzmann/wjetmass/WJET_Pythia8_CP5"+("_m"+str(mass)).replace("_m80.4","")+"_12Jun2025.yoda"
               print(samplename)
               fi=open(samplename)
               start=False
@@ -1114,7 +1160,7 @@ def plot_unfolded_mass(
                     (1.-np.sqrt(theory_lower_sum2[matching])/mc_truth_sum[matching])[ibin],
                     (1.+np.sqrt(theory_upper_sum2[matching])/mc_truth_sum[matching])[ibin],
                     alpha=0.2,
-                    label="{} uncertainties{}".format("NLO QCD+EWK", matching_str[matching]) if ibin == 0 else None,
+                    label="{} uncertainties{}".format("NLO QCD+EW", matching_str[matching]) if ibin == 0 else None,
                     **matching_kwargs[matching]
                 )
               for mass,col,ls in [(80,"tab:cyan","--"),(81,"tab:olive","-."),(82,"tab:brown",":")]:
@@ -1170,7 +1216,7 @@ def plot_unfolded_mass(
     handles=[handles[6],handles[5],handles[0],handles[1],handles[4],handles[3],handles[2]]
 
     #cms_label(exp_label=exp_label, year=year, fs=20, ax=ax, data=data)
-    hep.cms.label("Preliminary", ax=ax, lumi=138, fontsize=30, data=True)
+    hep.cms.label("", ax=ax, lumi=138, fontsize=30, data=True)
     ax.legend(handles, labels,fontsize=legend_fontsize)
     ax.text(
         ax.get_xlim()[0]+0.6*np.diff(ax.get_xlim()),
@@ -1182,7 +1228,7 @@ def plot_unfolded_mass(
       ax.text(
         ax.get_xlim()[0]+0.6*np.diff(ax.get_xlim()),
         ax.get_ylim()[1]*0.5,
-        r"$N_{2}^{\beta=1} < 0.2$",
+        r"$N_{2}^{(1)} < 0.2$",
         fontsize=22
       )
     if plot_no_matching:
@@ -1272,7 +1318,7 @@ if __name__ == "__main__":
     parser.add_argument("--theory_uncertainty", default="Theory")
 
     args = parser.parse_args()
-    exp_label = "Preliminary" #"Work in progress"
+    exp_label = "" #"Work in progress"
     if not args.skip_templates:
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data)
         plot_templates(args.fit_dir, year=args.year, exp_label=exp_label, data=args.data, region="fail")

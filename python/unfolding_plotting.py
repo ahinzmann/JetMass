@@ -3,6 +3,7 @@ import hist
 import numpy as np
 import seaborn as sns
 from matplotlib.colors import Normalize,LogNorm
+from matplotlib.patches import Rectangle
 import matplotlib.pyplot as plt
 import awkward as ak
 import mplhep as hep
@@ -29,9 +30,8 @@ year = ""#"UL17"
 common_plot_kwargs = dict(flow="none")
 
 
-def cms_label(ax, fs=20):
-    hep.cms.label("Preliminary", year="" #year_alias.get(year, year)
-    , ax=ax, fontsize=fs, data=False)
+def cms_label(ax, fs=20,loc=0):
+    hep.cms.label("", year="", ax=ax, fontsize=fs, data=False, loc=loc) #year_alias.get(year, year)
     # try:
     #     hep.label.exp_label(llabel="Private work (CMS simulation)", year=year, ax=ax, fontsize=fs)
     # except BaseException as e:
@@ -387,7 +387,7 @@ def plot_migration_matrix_old(
     ax.set_ylabel("$m_{SD,reco}$ [GeV]")
 
     hep.cms.text("Simulation, Work in progress", ax=ax, fontsize=23, pad=0.03)
-    ax.text(0.05 * x_shape, 0.9 * y_shape, r"$W(q\bar{q})$+jets")
+    ax.text(0.05 * x_shape, 0.9 * y_shape, r"$W(q\bar{q}')$+jets")
     ax.text(0.05 * x_shape, 0.85 * y_shape, extratext)
     fig.tight_layout()
     plt.savefig(
@@ -420,10 +420,15 @@ def plot_migration_matrix(
     r_gen=1.0,
     extratext: str = "",
 ):
-    f = plt.figure(figsize=(11, 12))
-    grid = f.add_gridspec(1, 2, width_ratios=[1, 0.02])
-    ax = f.add_subplot(grid[0])
-    cax = f.add_subplot(grid[1])
+    #f = plt.figure(figsize=(11, 12))
+    #f,ax = plt.subplots(figsize=(11,12))
+    #ax.add_patch(Rectangle((3.5,3.5),8,8 , edgecolor = "tab:red", fill=False))
+    f,((ax0,ax1),(ax,cax)) = plt.subplots(2,2,figsize=(11,12), gridspec_kw={"width_ratios":[0.95,0.05],"height_ratios":[0.02,0.98]})
+    ax0.axis('off')
+    ax1.set_visible(False)
+    #grid = f.add_gridspec(1, 2, width_ratios=[1, 0.02])
+    #ax = f.add_subplot(grid[0])
+    #cax = f.add_subplot(grid[1])
 
     pt_reco_edges, pt_reco_labels = finite_edges(migmat.axes["pt_reco"])
     nbins_pt_reco = len(pt_reco_edges) - 1
@@ -465,20 +470,68 @@ def plot_migration_matrix(
             reco_positions,
         ),
         content.T,
-        #cmap="Blues",#"magma",
-        cmap="magma",
-        norm=(Normalize(0,1) if "probability" in outname else LogNorm()),
+        cmap="binary",#"magma",
+        #cmap="YlGnBu",
+        norm=(Normalize(0,0.3) if "probability" in outname else LogNorm()),
     )
 
-    ax.set_xticks(pt_gen_labels_positions, pt_gen_labels, fontsize=30)
+    #ax.axis('off')
+
+    def edge(e):
+      if isinstance(e,str):
+        if e == "Inf":
+            return r"$\infty$"
+        else: return e
+      else:
+        return "%i"%e
+    print(msd_gen_edges)
+    mx_tick_labels_per_pt = [edge(e) for e in msd_gen_edges]
+    mx_tick_labels_per_pt[0] = "30"
+    mx_tick_labels_per_pt[2] = ""
+    mx_tick_labels = mx_tick_labels_per_pt
+    mx_tick_labels_per_pt[-1] = mx_tick_labels_per_pt[0]
+    mx_tick_labels += mx_tick_labels_per_pt[1:]*(len(pt_gen_edges)-2)
+    mx_tick_loc = [gen_positions[ipt * nbins_msd_gen + j] for ipt in range(nbins_pt_gen) for j in range(nbins_msd_gen)]
+    mx_tick_loc += [gen_positions[nbins_pt_gen * nbins_msd_gen]]
+    mx_tick_labels[-1] = "$\infty$"
+
+    my_tick_labels_per_pt = [edge(msd_reco_edges[j*20]) for j in range(3)]
+    my_tick_labels = my_tick_labels_per_pt
+    #last=my_tick_labels_per_pt[-1]
+    #my_tick_labels_per_pt[-1] = my_tick_labels_per_pt[0]
+    my_tick_labels += my_tick_labels_per_pt*(len(pt_reco_edges)-2)
+    my_tick_loc = [reco_positions[ipt * nbins_msd_reco + j*20] for ipt in range(nbins_pt_reco) for j in range(3)]
+    my_tick_loc += [reco_positions[nbins_pt_reco * nbins_msd_reco]]
+    my_tick_labels += ["300"]
+    
+    fs=22
+    print(msd_reco_edges)
+    print(my_tick_loc)
+    print(mx_tick_loc)
+    ax.set_yticks(my_tick_loc, my_tick_labels,fontsize=fs)
+    ax.set_xticks(mx_tick_loc, mx_tick_labels,fontsize=fs)
+    from matplotlib.ticker import MultipleLocator
+    ax.xaxis.set_minor_locator(MultipleLocator(2))
+    ax.yaxis.set_minor_locator(MultipleLocator(25))
+    twinx = ax.twinx() #ax.secondary_xaxis("right")
+    twiny = ax.twiny() #ax.secondary_yaxis("top")
+    twinx.set_yticks(pt_reco_labels_positions, pt_reco_labels,fontsize=fs)
+    twiny.set_xticks(pt_gen_labels_positions, pt_gen_labels,fontsize=fs)
+    ax.set_ylabel("$m_{\mathrm{SD}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
+    ax.set_xlabel("$m_{\mathrm{SD}}^{\mathrm{ptcl}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
+    twinx.set_ylabel("$p_{T}~\mathrm{[GeV]}$",fontsize=fs,labelpad=-30)
+    twiny.set_xlabel("$p_{T}^{\mathrm{ptcl}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=10)
+
+    #ax.set_xticks(pt_gen_labels_positions, pt_gen_labels, fontsize=30)
     for iptgen in range(1, nbins_pt_gen):
         ax.plot([pt_gen_labels_positions[iptgen]] * 2, ax.get_ylim(), "k--", alpha=0.6)
-    ax.set_xlabel("$p_{T,ptcl}$ and $m_{SD,ptcl}$ bin [GeV]", fontsize=30)
+    #ax.set_xlabel("$p_{T,ptcl}$ and $m_{SD,ptcl}$ bin [GeV]", fontsize=30)
 
-    ax.set_yticks(pt_reco_labels_positions, pt_reco_labels, fontsize=30)
+    #ax.set_yticks(pt_reco_labels_positions, pt_reco_labels, fontsize=30)
     for iptreco in range(1, nbins_pt_reco):
         ax.plot(ax.get_xlim(), [pt_reco_labels_positions[iptreco]] * 2, "k--", alpha=0.6)
-    ax.set_ylabel("$p_{T,reco}$ and $m_{SD,reco}$ bin [GeV]", fontsize=30)
+    #ax.set_ylabel("$p_{T,reco}$ and $m_{SD,reco}$ bin [GeV]", fontsize=30)
+
 
     msd_gen_subax_length = gen_positions[nbins_msd_gen]
     msd_reco_subax_length = reco_positions[nbins_msd_reco]
@@ -506,14 +559,14 @@ def plot_migration_matrix(
             (min_ - min_reco) * msd_reco_subax_length / (max_reco - min_reco) + iptreco * msd_reco_subax_length,
             (max_ - min_reco) * msd_reco_subax_length / (max_reco - min_reco) + iptreco * msd_reco_subax_length,
         )
-        ax.plot(gen_pos, reco_pos, "k--", alpha=0.6)
-    ax.text(0.05 * ax.get_xlim()[1], 0.9 * ax.get_ylim()[1], r"$W(q\bar{q})$+jets")
+        #ax.plot(gen_pos, reco_pos, "k--", alpha=0.6)
+    #ax.text(0.05 * ax.get_xlim()[1], 0.9 * ax.get_ylim()[1], r"$W(q\bar{q}')$+jets")
     ax.text(0.05 * ax.get_xlim()[1], 0.85 * ax.get_ylim()[1], extratext)
 
-    cms_label(ax, fs=28)
+    cms_label(ax=ax0, fs=25, loc=0)
     
-    cbar=f.colorbar(c, cax=cax, orientation="vertical", label=("Probability" if "probability" in outname else "Events"))
-    cbar.ax.tick_params(labelsize=30)
+    cbar=f.colorbar(c, cax=cax, orientation="vertical", label=("" if "probability" in outname else "Events"))
+    cbar.ax.tick_params(labelsize=fs)
     f.savefig(
         outname,
         bbox_inches="tight"

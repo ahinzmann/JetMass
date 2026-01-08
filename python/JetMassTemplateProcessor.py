@@ -14,6 +14,7 @@ import glob
 from coffea_util import CoffeaWorkflow
 from utils import jms_correction_files
 from copy import deepcopy
+withN2=False
 
 jetmass_path = "/data/dust/user/hinzmann/jetmass"
 ddtmaps_n2_path = f"{jetmass_path}/ddtmaps/ddtmaps_n2.npy"
@@ -734,25 +735,86 @@ class JMSTemplates(processor.ProcessorABC):
                 variation_weights["isr_down"] = 1.0
                 variation_weights["isr_up"] = 1.0
 
+            # not smoothed
             model_uncertainty_map={'Madgraph+Pythia': [[4248.748046875, 1950.68505859375, 3420.052001953125, 9013.298828125], [1137.9599609375, 566.2576904296875, 814.9030151367188, 2945.991943359375], [526.6923217773438, 263.8905944824219, 357.5408935546875, 1671.18603515625], [52.632930755615234, 26.49795913696289, 25.409000396728516, 212.7095947265625]], 'Madgraph+Herwig': [[4954.89111328125, 2149.37109375, 3797.093994140625, 5445.283203125], [1264.583984375, 499.2561950683594, 939.0938720703125, 1580.64404296875], [586.7092895507812, 273.48370361328125, 377.1571960449219, 829.7686157226562], [64.3490982055664, 30.3870792388916, 23.237180709838867, 82.36943054199219]], 'Pythia': [[1775.532958984375, 2102.533935546875, 4230.81396484375, 2258.155029296875], [387.2319030761719, 529.7987060546875, 978.967529296875, 578.1860961914062], [169.04600524902344, 262.5823974609375, 366.9169921875, 291.5531005859375], [12.388580322265625, 20.840530395507812, 26.876819610595703, 22.360410690307617]], 'Madgraph+Pythia_matched': [[431.5899963378906, 1160.4649658203125, 2545.98193359375, 2715.133056640625], [121.23719787597656, 338.66571044921875, 612.3568725585938, 942.3109130859375], [51.543968200683594, 162.98060607910156, 252.2751007080078, 559.7239990234375], [6.170756816864014, 18.149290084838867, 19.964210510253906, 83.4867172241211]], 'Madgraph+Herwig_matched': [[731.4122924804688, 1557.5, 3367.653076171875, 2267.81689453125], [187.9049072265625, 372.1142883300781, 831.7598876953125, 720.782470703125], [82.22386169433594, 203.77220153808594, 309.2331848144531, 345.2055969238281], [8.93737506866455, 21.44969940185547, 21.44969940185547, 41.25749969482422]], 'Pythia_matched': [[571.126220703125, 1746.572998046875, 3659.6650390625, 889.49560546875], [128.99139404296875, 444.3352966308594, 863.3652954101562, 198.31520080566406], [59.0753288269043, 224.03509521484375, 317.0176086425781, 94.38094329833984], [4.554941177368164, 17.485679626464844, 23.504680633544922, 6.6869049072265625]], 'Madgraph+Pythia_unmatched': [[3817.157958984375, 790.2199096679688, 874.069580078125, 6298.1650390625], [1016.7230224609375, 227.59210205078125, 202.54600524902344, 2003.6810302734375], [475.1482849121094, 100.91000366210938, 105.26589965820312, 1111.4620361328125], [46.4621696472168, 8.348671913146973, 5.444786071777344, 129.222900390625]], 'Madgraph+Herwig_unmatched': [[4223.47900390625, 591.8717041015625, 429.4410095214844, 3177.466064453125], [1076.678955078125, 127.14179992675781, 107.33399963378906, 859.8612060546875], [504.48541259765625, 69.71153259277344, 67.9240493774414, 484.56298828125], [55.4117317199707, 8.937376022338867, 1.7874749898910522, 41.11193084716797]], 'Pythia_unmatched': [[1204.406982421875, 355.96148681640625, 571.14892578125, 1368.6590576171875], [258.2405090332031, 85.46336364746094, 115.60220336914062, 379.87091064453125], [109.970703125, 38.54732894897461, 49.899478912353516, 197.1721954345703], [7.83364200592041, 3.354846954345703, 3.3721439838409424, 15.673500061035156]]}
+            # smoothed 20.Nov 2025
+            #model_uncertainty_map={'Madgraph+Pythia': [[4248.748046875, 1950.68505859375, 3420.052001953125, 9013.298828125], [1137.9599609375, 566.2576904296875, 814.9030151367188, 2945.991943359375], [526.6923217773438, 263.8905944824219, 357.5408935546875, 1671.18603515625], [52.632930755615234, 26.49795913696289, 25.409000396728516, 212.7095947265625]], 'Madgraph+Herwig': [[4954.89111328125, 2149.37109375, 3797.093994140625, 5445.283203125], [1264.583984375, 499.2561950683594, 939.0938720703125, 1580.64404296875], [586.7092895507812, 273.48370361328125, 377.1571960449219, 829.7686157226562], [64.3490982055664, 30.3870792388916, 23.237180709838867, 82.36943054199219]], 'Pythia': [[1775.532958984375, 2102.533935546875, 4230.81396484375, 2258.155029296875], [387.2319030761719, 529.7987060546875, 978.967529296875, 578.1860961914062], [169.04600524902344, 262.5823974609375, 366.9169921875, 291.5531005859375], [12.388580322265625, 20.840530395507812, 26.876819610595703, 22.360410690307617]], 'Madgraph+Pythia_matched': [[431.5899963378906, 1160.4649658203125, 2545.98193359375, 2715.133056640625], [121.23719787597656, 338.66571044921875, 612.3568725585938, 942.3109130859375], [51.543968200683594, 162.98060607910156, 252.2751007080078, 559.7239990234375], [6.170756816864014, 18.149290084838867, 19.964210510253906, 83.4867172241211]], 'Madgraph+Herwig_matched': [[727.716145157318, 1597.6894909720233, 3296.7794962470234, 2268.4859522806887], [182.4821188488741, 426.9495012570425, 731.7932229371237, 721.996877956913], [81.80892376734383, 209.02305326397172, 302.73418903935067, 345.30731240757234], [8.962098292832405, 21.146715534869546, 21.69681026055701, 41.25083708242983]], 'Pythia_matched': [[571.126220703125, 1746.572998046875, 3659.6650390625, 889.49560546875], [128.99139404296875, 444.3352966308594, 863.3652954101562, 198.31520080566406], [59.0753288269043, 224.03509521484375, 317.0176086425781, 94.38094329833984], [4.554941177368164, 17.485679626464844, 23.504680633544922, 6.6869049072265625]], 'Madgraph+Pythia_unmatched': [[3817.157958984375, 790.2199096679688, 874.069580078125, 6298.1650390625], [1016.7230224609375, 227.59210205078125, 202.54600524902344, 2003.6810302734375], [475.1482849121094, 100.91000366210938, 105.26589965820312, 1111.4620361328125], [46.4621696472168, 8.348671913146973, 5.444786071777344, 129.222900390625]], 'Madgraph+Herwig_unmatched': [[4325.077973005094, 519.1696940976591, 472.4635600019097, 3173.003616029336], [1059.8323721832212, 137.29987991046525, 100.33985071479405, 860.6467066867001], [501.21809961948185, 72.01694166208048, 66.0919814589597, 484.74620733368226], [60.0692956756437, 5.10148527401361, 2.413180677341756, 40.910186984796404]], 'Pythia_unmatched': [[1204.406982421875, 355.96148681640625, 571.14892578125, 1368.6590576171875], [258.2405090332031, 85.46336364746094, 115.60220336914062, 379.87091064453125], [109.970703125, 38.54732894897461, 49.899478912353516, 197.1721954345703], [7.83364200592041, 3.354846954345703, 3.3721439838409424, 15.673500061035156]]}
             matched_name=("_matched" if "WJetsMatched" in dataset else "_unmatched" if "WJetsUnmatched" in dataset else "")
             #print(dataset,matched_name)
             model_nominal=np.concatenate(model_uncertainty_map['Madgraph+Pythia'+matched_name])
-            model_up=np.concatenate(model_uncertainty_map['Madgraph+Herwig'+matched_name])/model_nominal
-            model_down=np.concatenate(model_uncertainty_map['Pythia'+matched_name])/model_nominal
+            model_herwig=np.concatenate(model_uncertainty_map['Madgraph+Herwig'+matched_name])/model_nominal
+            model_pythia=np.concatenate(model_uncertainty_map['Pythia'+matched_name])/model_nominal
             #print(model_nominal)
             def herwigWeight(pt,msd):
-              ptmsd_bin =  4*(np.trunc(pt/1200) % 2 + np.trunc(pt/800) % 2 + np.trunc(pt/650) % 2) + np.trunc(msd/90) % 2 + np.trunc(msd/80) % 2 + np.trunc(msd/70) % 2
+              ptmsd_bin =  4*(1*np.greater(pt,1200)  + 1*np.greater(pt,800)  + 1*np.greater(pt,650) ) + 1*np.greater(msd,90)  + 1*np.greater(msd,80)  + 1*np.greater(msd,70) 
+              pt_bin =  1*np.greater(pt,1200)  + 1*np.greater(pt,800)  + 1*np.greater(pt,650)
+              msd_bin =  1*np.greater(msd,90)  + 1*np.greater(msd,80)  + 1*np.greater(msd,70) 
               #print(pt,msd,ptmsd_bin,model_up/model_nominal)
-              weight=np.take(model_up,ptmsd_bin,axis=0)
+              #if matched_name=="_matched":
+                #weight=np.array(1.34802+-0.515421*np.tanh((1+0.880484)*(msd/80-1)))*np.equal(pt_bin,0)+\
+                #(1.24764+-0.485236*np.tanh((1+0.257887)*(msd/80-1)))*np.equal(pt_bin,1)+\
+                #(1.24957+-0.633737*np.tanh((1+0.478717)*(msd/80-1)))*np.equal(pt_bin,2)+\
+                #(1.12929+-0.635186*np.tanh((1+0.459982)*(msd/80-1)))*np.equal(pt_bin,3)
+#                weight=(np.minimum(0.748689+46.8516/np.minimum(msd,500),1.6946923732757568))*np.equal(pt_bin,0)+\
+#(np.minimum(0.695131+41.5053/np.minimum(msd,500),1.5498948097229004))*np.equal(pt_bin,1)+\
+#(np.minimum(0.513513+57.569/np.minimum(msd,500),1.5952179431915283))*np.equal(pt_bin,2)+\
+#(np.minimum(0.385064+59.2418/np.minimum(msd,500),1.4483433961868286))*np.equal(pt_bin,3)
+#                weight=(np.maximum(np.minimum(0.742892+47.2243/msd,1.6946923732757568),0.835250735282898))*np.equal(pt_bin,0)+\
+#(np.maximum(np.minimum(0.69494+41.4956/msd,1.5498948097229004),0.7649093866348267))*np.equal(pt_bin,1)+\
+#(np.maximum(np.minimum(0.513514+57.5534/msd,1.5952179431915283),0.6167425513267517))*np.equal(pt_bin,2)+\
+#(np.maximum(np.minimum(0.271512+68.2576/msd,1.4483433961868286),0.4941803812980652))*np.equal(pt_bin,3)
+                #weight=(1.72561+-0.0795648*pt_bin)*np.equal(msd_bin,0)+\
+#(1.3655+-0.0953625*pt_bin)*np.equal(msd_bin,1)+\
+#(1.34629+-0.0316384*pt_bin)*np.equal(msd_bin,2)+\
+#(0.89504+-0.106615*pt_bin)*np.equal(msd_bin,3)
+                #print(pt_bin,weight)
+              #elif matched_name=="_unmatched":
+                #weight=np.array(0.703326+-0.290031*np.tanh((1+2)*(msd/80-1)))*np.equal(pt_bin,0)+\
+                #(0.635756+-0.265276*np.tanh((1+2)*(msd/80-1)))*np.equal(pt_bin,1)+\
+                #(0.717737+-0.305687*np.tanh((1+1.99995)*(msd/80-1)))*np.equal(pt_bin,2)+\
+                #(0.661489+-0.443594*np.tanh((1+2)*(msd/80-1)))*np.equal(pt_bin,3)
+#                weight=(np.minimum(0.374434+26.111/msd,1.1064460277557373))*np.equal(pt_bin,0)+\
+#(np.minimum(0.318753+25.7529/msd,1.0589697360992432))*np.equal(pt_bin,1)+\
+#(np.minimum(0.34867+30.1493/msd,1.061743140220642))*np.equal(pt_bin,2)+\
+#(np.minimum(0.169805+37.3865/msd,1.1926203966140747))*np.equal(pt_bin,3)
+#                weight=(np.maximum(np.minimum(6.24169e-07+51.2385/msd,1.1064460277557373),0.5045066475868225))*np.equal(pt_bin,0)+\
+#(np.maximum(np.minimum(5.22559e-08+47.1378/msd,1.0589697360992432),0.42914074659347534))*np.equal(pt_bin,1)+\
+#(np.maximum(np.minimum(0.0223374+51.6595/msd,1.061743140220642),0.43596896529197693))*np.equal(pt_bin,2)+\
+#(np.maximum(np.minimum(1.58409e-09+48.8641/msd,1.1926203966140747),0.3181474208831787))*np.equal(pt_bin,3)
+                #weight=(1.11356+-0.0220099*pt_bin)*np.equal(msd_bin,0)+\
+#(0.761545+-0.0688183*pt_bin)*np.equal(msd_bin,1)+\
+#(0.468403+0.0468675*pt_bin)*np.equal(msd_bin,2)+\
+#(0.524641+-0.0479194*pt_bin)*np.equal(msd_bin,3)
+                #print(pt_bin,weight)
+              #else:
+                #weight=np.array(1.09448+-0.490705*np.tanh((1+-0.499977)*(msd/80-1)))*np.equal(pt_bin,0)+\
+                #(1.00364+-0.466779*np.tanh((1+-0.499994)*(msd/80-1)))*np.equal(pt_bin,1)+\
+                #(1.03367+-0.538012*np.tanh((1+-0.49998)*(msd/80-1)))*np.equal(pt_bin,2)+\
+                #(1.0081+-0.620429*np.tanh((1+0.127099)*(msd/80-1)))*np.equal(pt_bin,3)
+#                weight=(np.minimum(0.522507+46.2528/msd,1.1662002801895142))*np.equal(pt_bin,0)+\
+#(np.minimum(0.47507+40.4676/msd,1.1112728118896484))*np.equal(pt_bin,1)+\
+#(np.minimum(0.407146+50.5579/msd,1.1139507293701172))*np.equal(pt_bin,2)+\
+#(np.minimum(0.273042+60.1531/msd,1.2226014137268066))*np.equal(pt_bin,3)
+#                weight=(np.maximum(np.minimum(0.522451+46.2119/msd,1.1662002801895142),0.6041387319564819))*np.equal(pt_bin,0)+\
+#(np.maximum(np.minimum(0.475244+40.446/msd,1.1112728118896484),0.5365405082702637))*np.equal(pt_bin,1)+\
+#(np.maximum(np.minimum(0.411225+49.9662/msd,1.1139507293701172),0.49651479721069336))*np.equal(pt_bin,2)+\
+#(np.maximum(np.minimum(0.338209+50/msd,1.2226014137268066),0.38723891973495483))*np.equal(pt_bin,3)
+                #weight=(1.17565+-0.02724*pt_bin)*np.equal(msd_bin,0)+\
+#(1.11622+-0.0773139*pt_bin)*np.equal(msd_bin,1)+\
+#(1.12419+-0.0148967*pt_bin)*np.equal(msd_bin,2)+\
+#(0.633854+-0.0605269*pt_bin)*np.equal(msd_bin,3)
+              weight=np.take(model_herwig,ptmsd_bin,axis=0)
+              #print("Herwig",weight,matched_name,msd,pt_bin,np.take(model_herwig,ptmsd_bin,axis=0))
               return weight
             def pythiaWeight(pt,msd):
               ptmsd_bin =  4*(np.trunc(pt/1200) % 2 + np.trunc(pt/800) % 2 + np.trunc(pt/650) % 2) + np.trunc(msd/90) % 2 + np.trunc(msd/80) % 2 + np.trunc(msd/70) % 2
-              #print(pt,msd,ptmsd_bin,model_down/model_nominal)
-              weight=np.take(model_down,ptmsd_bin,axis=0)
+              #print(pt,msd,ptmsd_bin,model_pythia/model_nominal)
+              weight=np.take(model_pythia,ptmsd_bin,axis=0)
+              #print("Pythia",weight,matched_name)
               return weight
             variation_weights["model_up"] = herwigWeight(events.pt_gen_ak8,events.msd_gen_ak8)
-            variation_weights["model_down"] = pythiaWeight(events.pt_gen_ak8,events.msd_gen_ak8)
+            #variation_weights["model_down"] = pythiaWeight(events.pt_gen_ak8,events.msd_gen_ak8)
+            variation_weights["model_down"] = 1./((variation_weights["model_up"]-1.)/10.+1.) # inverse of herwig but scaled down by factor 10
             #print(variation_weights["model_up"])
             #print(variation_weights["model_down"])
 
@@ -1008,22 +1070,26 @@ class JMSTemplates(processor.ProcessorABC):
                 ),
             )
             ###### WITHOUT N2 selection
-            #selections.add(
-            #    "gensel_drmatch",
-            #    (events.pass_gen_selection == 1) & (events.dR_reco_gen < 0.4) & (mJgen_ > 30.),
-            #)
+            if not withN2:
+              print("WITHOUT N2 SELECTION AT PARTICLE-LEVEL")
+              selections.add(
+                "gensel_drmatch",
+                (events.pass_gen_selection == 1) & (events.dR_reco_gen < 0.4) & (mJgen_ > 30.),
+              )
 
             if "n2_beta1_gen" not in events.fields:
                 events.n2_beta1_gen = ak.ones_like(events.pt)
 
             ###### WITH N2 selection
-            selections.add(
+            if withN2:
+              print("WITH N2 SELECTION AT PARTICLE-LEVEL")
+              selections.add(
                 "gensel_drmatch",
                 (events.pass_gen_selection == 1)
                 & (events.dR_reco_gen < 0.4)
                 & (mJgen_ > 30.)
                 & (events.n2_beta1_gen < 0.2),
-            )
+              )
             
             selections.add(
                 "recosel",
@@ -1252,6 +1318,11 @@ if __name__ == "__main__":
     workflow.parser.add_argument("--VJetsOnly", action="store_true")
 
     args = workflow.parse_args()
+
+    if "withN2" in args.output:
+      withN2=True
+    else:
+      withN2=False
 
     workflow.processor_instance = JMSTemplates(
         year=args.year,

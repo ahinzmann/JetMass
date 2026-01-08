@@ -65,7 +65,7 @@ xmin = 0.0
 
 cms_text = "CMS"
 isData = True
-extra_text = "Preliminary"
+extra_text = ""
 
 extra_text_rel_X = 0.12
 font_size_modifier = 1.15

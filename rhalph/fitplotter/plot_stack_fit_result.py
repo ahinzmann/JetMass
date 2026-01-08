@@ -97,9 +97,9 @@ def plot_fit_result(
         plotter.legend_bbox = (0.6, 0.25, 0.85, 0.9)
     # plotter.y_range_ratio = [0.8,1.2]
     if pseudo_data or prefit_asimov:
-        plotter.extra_text = "Simulation Preliminary"
+        plotter.extra_text = "Simulation"
     else:
-        plotter.extra_text = "Preliminary"
+        plotter.extra_text = ""
     pseudo_data_info = config.get("Pseudo", [])
     if len(pseudo_data_info) > 0 and "lumiScale" in pseudo_data_info[0]:
         lumiScale = float(pseudo_data_info[0].split(":")[-1])
@@ -133,6 +133,8 @@ def plot_fit_result(
                 backgrounds.remove(signal)
                 backgrounds.append(signal)
         regions = channel["regions"] if "regions" in channel else [""]
+        print(backgrounds)
+        backgrounds=['qcd', 'TTToSemiLeptonic', 'TTToHadronic', 'ZJets', 'WJetsUnmatched', 'WJetsMatched_fakes', 'WJetsMatched_ptgen0_msdgen0', 'WJetsMatched_ptgen0_msdgen1', 'WJetsMatched_ptgen0_msdgen2', 'WJetsMatched_ptgen0_msdgen3', 'WJetsMatched_ptgen1_msdgen0', 'WJetsMatched_ptgen1_msdgen1', 'WJetsMatched_ptgen1_msdgen2', 'WJetsMatched_ptgen1_msdgen3', 'WJetsMatched_ptgen2_msdgen0', 'WJetsMatched_ptgen2_msdgen1', 'WJetsMatched_ptgen2_msdgen2', 'WJetsMatched_ptgen2_msdgen3', 'WJetsMatched_ptgen3_msdgen0', 'WJetsMatched_ptgen3_msdgen1', 'WJetsMatched_ptgen3_msdgen2', 'WJetsMatched_ptgen3_msdgen3']
         for region in regions:
             # backgrounds_ = backgrounds if region == "pass" else backgrounds_fail
             backgrounds_ = backgrounds
@@ -243,13 +245,18 @@ def plot_fit_result(
                 suffix_tex = {"postfit": "postfit", "prefit": "prefit"}#{"postfit": "#color[34]{postfit}", "prefit": "#color[46]{prefit}"}
                 additional_text = (
                     " "
-                    + plotter.selection_tex[channel["selection"]]
+                    #+ plotter.selection_tex[channel["selection"]]
+                    #+ "\\"
+                    # + "\\ %s #bf{%s}" % (plotter.region_tex[channel["selection"]][region], suffix)
+                    + "%s #bf{%s}" % (plotter.region_tex[channel["selection"]][region], suffix_tex[suffix])
                     + "\\"
                     + plotter.pt_bins_tex_dict[channel["selection"]]["unfolding" if unfolding else "jms"][
                         channel["pt_bin"]
                     ]
-                    # + "\\ %s #bf{%s}" % (plotter.region_tex[channel["selection"]][region], suffix)
-                    + "\\ %s #bf{%s}" % (plotter.region_tex[channel["selection"]][region], suffix_tex[suffix])
+                    + "\\"
+                    + "\\ "
+                    + ("N_{2}^{(1),DDT}" if "Substructure" in model_dir else "P_{WvsQCD}^{PN,DDT}")
+                    + (" < 0" if "pass" in plotter.region_tex[channel["selection"]][region] else " > 0")
                 )
 
                 ratio_y_ranges = {

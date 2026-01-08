@@ -399,6 +399,8 @@ class CombineWorkflows(object):
                 ))
                 constr_index += 1
 
+        #command_string += exec_bash('echo "{CONSTR}" >> {DATACARD}\n'.format(CONSTR="constrmodel constr model_variation 0.5",DATACARD=datacard))
+        
         POMAPS = " ".join(
             [
                 "--PO map='.*{GENBIN}.*:r_{GENBIN}{PARCONSTRUCT}'".format(
@@ -426,7 +428,7 @@ class CombineWorkflows(object):
             (
                 "combine -M FitDiagnostics -d {WORKSPACE} --saveShapes -n '' "
                 "--cminDefaultMinimizerStrategy 0 --robustFit 1 "
-                "--robustHesse 1 "
+                "--robustHesse 1 --skipBOnlyFit" #### Only signal+background fit useful for postfit
                 "{FREEZEPARAMS}"# &> /dev/null"
             ).format(
                 # BUILDPREFIX=self._build_prefix,

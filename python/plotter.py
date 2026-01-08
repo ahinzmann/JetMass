@@ -173,11 +173,11 @@ legend_names = {
     "ttbar": "t#bar{t}",
     "TTbar": "t#bar{t}",
     "TTbar_Hadronic": "t#bar{t} (hadronic)",
-    "TTbar_SemiLeptonic": "t#bar{t} (semi-leptonic)",
-    "TTToHadronic": "t#bar{t} (hadronic)",
-    "TTToSemiLeptonic": "t#bar{t} (semi-leptonic)",
-    "TTbar_had": "t#bar{t} (hadronic)",
-    "TTbar_semilep": "t#bar{t} (semi-leptonic)",
+    "TTbar_SemiLeptonic": "t#bar{t} (lepton+jets)",
+    "TTToHadronic": "t#bar{t} (all-jets)",
+    "TTToSemiLeptonic": "t#bar{t} (lepton+jets)",
+    "TTbar_had": "t#bar{t} (all-jets)",
+    "TTbar_semilep": "t#bar{t} (lepton+jets)",
     "TTbar_dilep": "t#bar{t} (di-leptonic)",
     "TTbar_semilep_mergedTop": "t#bar{t} (semi-leptonic) (fully merged)",
     "TTbar_semilep_mergedW": "t#bar{t} (semi-leptonic) (merged W)",
@@ -357,7 +357,7 @@ merged_hists = {
 
 selection_tex = {
     "top": "t#bar{t}#rightarrow #mu + jets",
-    "W": "W(q#bar{q}) + jets",
+    "W": "W(q#bar{q}') + jets",
     "Zbb": "Zbb + jets",
 }
 
@@ -497,7 +497,7 @@ obs_line_color = 1
 obs_marker_style = 8
 obs_marker_size = 0.5
 year = "2017"
-extra_text = "Preliminary"
+extra_text = ""
 # extra_text = "Work_in_progress"
 lumi_text_padding = 0.4
 additional_text_padding = 0.2
@@ -553,6 +553,7 @@ def get_hists(
         new_binning = binning_dict["CMS"].get(selection, None)
 
     h_data = None
+    print(f_hists)
     if not pseudo_data:
         for data_name in ["Data", "data_obs", "data"]:
             h_data = f_hists.Get(str(hist_dir % data_name))

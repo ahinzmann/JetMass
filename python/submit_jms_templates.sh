@@ -2,52 +2,18 @@
 
 source /data/dust/user/hinzmann/jetmass/JetMass/venv/bin/activate
 
-function submit_templates_parallel {
-  SCALEOUT=$1
-  VAR=${2:-nominal}
-  TAGGER=${3:-substructure}
-  OUTDIR="coffea_hists/"
-  if [ ! -d ${OUTDIR} ]; then
-    mkdir -p $OUTDIR
-  fi
-  echo $SCALEOUT $VAR
-  if [ "$TAGGER" == "substructure" ]; then
-    NAMESUFFIX=""
-  elif [ "$TAGGER" == "particlenet" ]; then
-    NAMESUFFIX="_particlenet"
-  elif [ "$TAGGER" == "particlenetDDT" ]; then
-    NAMESUFFIX="_particlenetDDT"
-  else
-    echo "You did not provide a valid tagger"
-  fi
-  
-  for YEAR in UL16preVFP UL16postVFP UL17 UL18
-  #for YEAR in UL17
-  do
-    if [ ${VAR} == "nominal" ]; then
-      echo "default -> ${YEAR}" 
-      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}.coffea --year ${YEAR} --tagger ${TAGGER} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}.stdout 2>&1 &
-    elif [[ ${VAR} == *"jec"* ]]; then
-      echo "jec-variation (${VAR}) -> ${YEAR}" $VAR $YEAR
-      DIRECTION=${VAR#*_}
-      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --JEC ${DIRECTION} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}_${VAR}.stdout 2>&1 &
-    else
-      echo "variation ${VAR} -> ${YEAR}"
-      nohup ./JetMassTemplateProcessor.py -o ${OUTDIR}/templates_${YEAR}${NAMESUFFIX}_${VAR}.coffea --year ${YEAR} --tagger ${TAGGER} --variation ${VAR} --scaleout ${SCALEOUT} > ${YEAR}${NAMESUFFIX}_${VAR}.stdout 2>&1 &
-    fi
-  done
-}
-
 function submit_templates {
   SCALEOUT=$1
   VAR=${2:-nominal}
   TAGGER=${3:-substructure}
-  OUTDIR="coffea_hists/"
+  OUTDIR="coffea_hists_noN2/"
 
   VJETSONLY=${4}
   if [[ ${VAR} == *"qcd"* ]]; then
     VJETSONLY="--VJetsOnly"
   elif [[ ${VAR} == *"ewk"* ]]; then
+    VJETSONLY="--VJetsOnly"
+  elif [[ ${VAR} == *"model"* ]]; then
     VJETSONLY="--VJetsOnly"
   fi
   if [ ${SCALEOUT} -eq "0" ]; then

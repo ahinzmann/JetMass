@@ -86,10 +86,10 @@ def plot_year_bernstein(fit_dir: str, year: str, data: bool = False):
     cmap = ax.pcolormesh(msd_edges, pt_edges, bernstein_map, cmap="RdGy_r", vmin=1 - z_offset, vmax=1 + z_offset)
 
     fs = 23
-    hep.cms.label("Preliminary", year=""# year_alias[year], 
+    hep.cms.label("", lumi=138#, year=""# year_alias[year], 
     , data=data, fontsize=fs+(0 if data else -3), ax=ax, loc=0)
     cb = f.colorbar(cmap)
-    cb.set_label("$R_{p/f}$", loc="center")
+    cb.set_label("$r$", loc="center")
     ax.set_xlabel(r"$m_\mathrm{SD}$ [GeV]")
     ax.set_ylabel(r"$p_T$ [GeV]")
     pt_ticklabels = [600, 700, 800, 900, 1000, 1100, 1200, 1300, r"$\infty$"]

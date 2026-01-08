@@ -2,7 +2,7 @@ from ROOT import gROOT,gStyle,TH2F,TLegend,TCanvas,TFile, TColor
 import array, math, sys
 import os
 import cmsstyle as CMS
-CMS.SetExtraText("Simulation Preliminary")
+CMS.SetExtraText("Simulation")
 
 def rebin(h1,binning):
     for b in range(h1.GetXaxis().GetNbins()):
@@ -50,13 +50,15 @@ if __name__=="__main__":
   for tagger in ["_particlenetDDT",""]:
    for sample in ["WJets","ZJets","TTToHadronic","QCD","WJetsMatched","WJetsMatched_fakes","WJetsUnmatched"]:
     for year in ["UL18","UL17","UL16preVFP","UL16postVFP"]:
-     for ptmin,ptmax in [(650,725),(725,800),(800,1000),(1000,1200)]:
+     for ptmin,ptmax in [(575,650),(650,725),(725,800),(800,1000),(1000,1200),(1200,3000)]:
+ #for n2,tagger,sample,year,ptmin,ptmax in [("withN2","_particlenetDDT","WJets","UL17",650,725),("withN2","_particlenetDDT","WJetsMatched","UL17",650,725),("withN2","_particlenetDDT","WJetsUnmatched","UL17",650,725)]:
       for plotname, plotlist in [("summary",["nominal",
       "pu_down","pu_up","triggersf_down","triggersf_up","prefiring",
       "jec_down","jec_up",
       "fsr_down","fsr_up","isr_down","isr_up",
       "v_qcd_down","v_qcd_up","w_ewk_down","w_ewk_up","z_ewk_down","z_ewk_up",
       "toppt_off",
+      #"model_down",
       "model_up"]),
        ("summary_short",["nominal",
       #"pu_down","pu_up","triggersf_down","triggersf_up","prefiring",
@@ -64,43 +66,45 @@ if __name__=="__main__":
       "w_ewk_down","w_ewk_up","z_ewk_down","z_ewk_up","v_qcd_down","v_qcd_up",
       "jec_down","jec_up",
       "toppt_off",
+      #"model_down",
       "model_up"]),
-       ("summary_jec1",["nominal","jec_down", "jec_up",
-       "jec_AbsoluteStat_down", "jec_AbsoluteStat_up", 
-       "jec_AbsoluteScale_down", "jec_AbsoluteScale_up", 
-       "jec_AbsoluteMPFBias_down", "jec_AbsoluteMPFBias_up", 
-       "jec_Fragmentation_down", "jec_Fragmentation_up", 
-       "jec_SinglePionECAL_down", "jec_SinglePionECAL_up", 
-       "jec_SinglePionHCAL_down", "jec_SinglePionHCAL_up"]),
-       ("summary_jec2",["nominal","jec_down", "jec_up",
-       "jec_FlavorQCD_down", "jec_FlavorQCD_up", 
-       "jec_TimePtEta_down", "jec_TimePtEta_up", 
-       "jec_RelativePtBB_down", "jec_RelativePtBB_up", 
-       "jec_RelativePtEC1_down", "jec_RelativePtEC1_up", 
-       "jec_RelativePtEC2_down", "jec_RelativePtEC2_up", 
-       "jec_RelativePtHF_down", "jec_RelativePtHF_up",
-       "jec_RelativeBal_down", "jec_RelativeBal_up"]),
-       ("summary_jec3",["nominal","jec_down", "jec_up", 
-       "jec_RelativeFSR_down", "jec_RelativeFSR_up", 
-       "jec_RelativeSample_down", "jec_RelativeSample_up", 
-       "jec_RelativeStatFSR_down", "jec_RelativeStatFSR_up", 
-       "jec_RelativeStatEC_down", "jec_RelativeStatEC_up", 
-       "jec_RelativeStatHF_down", "jec_RelativeStatHF_up",
-       "jec_RelativeJEREC1_down", "jec_RelativeJEREC1_up", 
-       "jec_RelativeJEREC2_down", "jec_RelativeJEREC2_up"]),
-       ("summary_jec4",["nominal","jec_down", "jec_up", 
-       "jec_RelativeJERHF_down", "jec_RelativeJERHF_up", 
-       "jec_PileUpDataMC_down", "jec_PileUpDataMC_up", 
-       "jec_PileUpPtRef_down", "jec_PileUpPtRef_up", 
-       "jec_PileUpPtBB_down", "jec_PileUpPtBB_up", 
-       "jec_PileUpPtEC1_down", "jec_PileUpPtEC1_up", 
-       "jec_PileUpPtEC2_down", "jec_PileUpPtEC2_up", 
-       "jec_PileUpPtHF_down", "jec_PileUpPtHF_up"])]:
+       #("summary_jec1",["nominal","jec_down", "jec_up",
+       #"jec_AbsoluteStat_down", "jec_AbsoluteStat_up", 
+       #"jec_AbsoluteScale_down", "jec_AbsoluteScale_up", 
+       #"jec_AbsoluteMPFBias_down", "jec_AbsoluteMPFBias_up", 
+       #"jec_Fragmentation_down", "jec_Fragmentation_up", 
+       #"jec_SinglePionECAL_down", "jec_SinglePionECAL_up", 
+       #"jec_SinglePionHCAL_down", "jec_SinglePionHCAL_up"]),
+       #("summary_jec2",["nominal","jec_down", "jec_up",
+       #"jec_FlavorQCD_down", "jec_FlavorQCD_up", 
+       #"jec_TimePtEta_down", "jec_TimePtEta_up", 
+       #"jec_RelativePtBB_down", "jec_RelativePtBB_up", 
+       #"jec_RelativePtEC1_down", "jec_RelativePtEC1_up", 
+       #"jec_RelativePtEC2_down", "jec_RelativePtEC2_up", 
+       #"jec_RelativePtHF_down", "jec_RelativePtHF_up",
+       #"jec_RelativeBal_down", "jec_RelativeBal_up"]),
+       #("summary_jec3",["nominal","jec_down", "jec_up", 
+       #"jec_RelativeFSR_down", "jec_RelativeFSR_up", 
+       #"jec_RelativeSample_down", "jec_RelativeSample_up", 
+       #"jec_RelativeStatFSR_down", "jec_RelativeStatFSR_up", 
+       #"jec_RelativeStatEC_down", "jec_RelativeStatEC_up", 
+       #"jec_RelativeStatHF_down", "jec_RelativeStatHF_up",
+       #"jec_RelativeJEREC1_down", "jec_RelativeJEREC1_up", 
+       #"jec_RelativeJEREC2_down", "jec_RelativeJEREC2_up"]),
+       #("summary_jec4",["nominal","jec_down", "jec_up", 
+       #"jec_RelativeJERHF_down", "jec_RelativeJERHF_up", 
+       #"jec_PileUpDataMC_down", "jec_PileUpDataMC_up", 
+       #"jec_PileUpPtRef_down", "jec_PileUpPtRef_up", 
+       #"jec_PileUpPtBB_down", "jec_PileUpPtBB_up", 
+       #"jec_PileUpPtEC1_down", "jec_PileUpPtEC1_up", 
+       #"jec_PileUpPtEC2_down", "jec_PileUpPtEC2_up", 
+       #"jec_PileUpPtHF_down", "jec_PileUpPtHF_up"])
+       ]:
        print("making systematics_"+plotname+year+"_"+sample+"_"+n2+"_"+tagger+"_"+str(ptmin)+".pdf")
        files=[]
        hists=[]
 
-       names={"nominal":"Nominal","model":"Hadronization model","jec":"Jet energy scale","isr":"Initial state radiation","fsr":"Final state radiation","w_ewk":"W+jets (NLO) EWK","z_ewk":"Z+jets (NLO) EW", "v_qcd":"V+jets (NLO) QCD", "triggersf":"Trigger eff.", "pu":"Pileup", "toppt_off":"t#bar{t} (NLO)","prefiring":"Trigger pref.",
+       names={"nominal":"Nominal","model":"Hadronization model","jec":"Jet energy scale","isr":"Initial state radiation","fsr":"Final state radiation","w_ewk":"W+jets (NLO) EW","z_ewk":"Z+jets (NLO) EW", "v_qcd":"V+jets (NLO) QCD", "triggersf":"Trigger eff.", "pu":"Pileup", "toppt_off":"t#bar{t} (NLO)","prefiring":"Trigger pref.",
        "jec_AbsoluteStat":"JEC AbsoluteStat", 
        "jec_AbsoluteScale":"JEC AbsoluteScale", 
        "jec_AbsoluteMPFBias":"JEC AbsoluteMPFBias", 
@@ -154,8 +158,8 @@ if __name__=="__main__":
        marker_down=[24,25,26,32,30,27,28,44,46,40,42]
        color=0
  
-       if "WJets" in sample: samplename="W+Jets"
-       if sample=="ZJets": samplename="Z+Jets"
+       if "WJets" in sample: samplename="W+jets"
+       if sample=="ZJets": samplename="Z+jets"
        if sample=="TTToHadronic": samplename="t#bar{t}"
        if sample=="QCD": samplename="QCD"
  
@@ -179,7 +183,7 @@ if __name__=="__main__":
            print("File:",filename)
            files+=[f]
   
-           dataname="W_"+sample+"__mjet_"+str(ptmin)+"to"+str(ptmax)+"_inclusive"
+           dataname="W_"+sample+"__mjet_"+str(ptmin)+"to"+str(ptmax).replace("3000","Inf")+"_inclusive"
            print("Hist Name:",dataname)
            hist=f.Get(dataname).Clone(dataname+n2+tagger+str(ptmin))
            hist=rebin(hist,binning)
@@ -192,8 +196,10 @@ if __name__=="__main__":
            hist.GetYaxis().SetTitle("Ratio to nominal")
            if "jec" in plotname:
              hist.GetYaxis().SetRangeUser(0.9,1.15)
+           if "short" in plotname:
+             hist.GetYaxis().SetRangeUser(0.6,1.8)
            else:
-             hist.GetYaxis().SetRangeUser(0.6,1.5)
+             hist.GetYaxis().SetRangeUser(0,2.5)
            hist.SetTitle("")
            hists+=[hist]
   
@@ -225,12 +231,12 @@ if __name__=="__main__":
          canvas=TCanvas("systematics"+sample, "systematics"+sample, 0, 0, 300, 300)
          canvas.cd()
        
-         if "WJets" in sample: samplename="W+Jets"
-         if sample=="ZJets": samplename="Z+Jets"
+         if "WJets" in sample: samplename="W+jets"
+         if sample=="ZJets": samplename="Z+jets"
          if sample=="TTToHadronic": samplename="t#bar{t}"
          if sample=="QCD": samplename="QCD"
  
-         l=TLegend(0.52,0.5,0.9,0.9,samplename+", "+str(ptmin)+"<p_{T}<"+str(ptmax)+" GeV")
+         l=TLegend(0.52,0.5,0.9,0.9,samplename+", "+str(ptmin)+"<p_{T}<"+str(ptmax).replace("3000","inf")+" GeV")
          #l.SetTextFont(42)
          #l.SetTitle()
          l.SetTextSize(0.04)
@@ -253,7 +259,7 @@ if __name__=="__main__":
            print("File:",filename)
            files+=[f]
   
-           dataname="W_"+sample+"__mjet_"+str(ptmin)+"to"+str(ptmax)+"_inclusive"
+           dataname="W_"+sample+"__mjet_"+str(ptmin)+"to"+str(ptmax).replace("3000","Inf")+"_inclusive"
            print("Hist Name:",dataname)
            hist=f.Get(dataname).Clone(dataname+n2+tagger+str(ptmin))
            hist=rebin(hist,binning)
@@ -270,7 +276,7 @@ if __name__=="__main__":
                stack.SetBinContent(b+1,math.sqrt(pow(stack.GetBinContent(b+1),2)+pow(hist.GetBinContent(b+1),2)))
            hist.GetXaxis().SetTitle("m_{SD} [GeV]")
            hist.GetYaxis().SetTitle("Uncertainty in %")
-           hist.GetYaxis().SetRangeUser(0,50)
+           hist.GetYaxis().SetRangeUser(0,100)
            hist.SetTitle("")
            hists+=[hist]
   

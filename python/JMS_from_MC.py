@@ -48,7 +48,7 @@ def cms_label(ax, fs=20, year=2017):
         if year_substr:
             year = "20" + year_substr.group()
     # hep.cms.label(label=", Work in Progress", year=year, ax=ax, fontsize=fs)
-    hep.cms.label("Preliminary", year=year_prefix+year, ax=ax, fontsize=fs, data=False)
+    hep.cms.label("", year=year_prefix+year, ax=ax, fontsize=fs, data=False)
 
 
 def fax(w=9, h=9):
