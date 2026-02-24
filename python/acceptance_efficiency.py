@@ -455,7 +455,7 @@ def plot_acceptance(hists, outdir, year, n2cut):
         msd_edges[-1] = 260
         msd_centers = msd_edges[:-1] + 0.5 * np.diff(msd_edges)
         errbar_kwargs = dict(
-            xerr=[msd_centers - msd_edges[:-1], msd_edges[1:] - msd_centers], markersize=6, lw=2, fmt=markers[ipt]
+            xerr=[msd_centers - msd_edges[:-1], msd_edges[1:] - msd_centers], markersize=10, lw=3, fmt=markers[ipt]
         )
         ax.errorbar(msd_centers, acc[ipt][0], label=pt_tex, **errbar_kwargs)
     ax.legend(fontsize=fs-11)

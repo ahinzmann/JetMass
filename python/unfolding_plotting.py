@@ -12,6 +12,10 @@ from typing import Union
 from copy import deepcopy
 import itertools
 from utils import year_alias
+import matplotlib as mpl
+from matplotlib.colors import LinearSegmentedColormap
+cmap1 = LinearSegmentedColormap.from_list("cmap1", ["white", "#e42536", "#5790fc"],N=60)
+mpl.colormaps.register(cmap=cmap1)
 
 hep.style.use("CMS")
 
@@ -463,14 +467,15 @@ def plot_migration_matrix(
         )
         * r_gen
     )
-
+    
     c = ax.pcolormesh(
         *np.meshgrid(
             gen_positions,
             reco_positions,
         ),
         content.T,
-        cmap="binary",#"magma",
+        cmap="cmap1",
+        #cmap="binary",#"magma",
         #cmap="YlGnBu",
         norm=(Normalize(0,0.3) if "probability" in outname else LogNorm()),
     )

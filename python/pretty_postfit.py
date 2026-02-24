@@ -842,6 +842,10 @@ def plot_unfolded_mass(
                         "values": truth_values[matching],
                         "edges": msd_edges_,
                         "variances": truth_variances[matching],
+                        "total_theory_lower": theory_band_low[matching],
+                        "total_theory_upper": theory_band_hi[matching],
+                        "nlo_theory_lower": theory_band2_low[matching],
+                        "nlo_theory_upper": theory_band2_hi[matching]
                     }
                     hep.histplot(
                         truth_values[matching],
@@ -850,6 +854,7 @@ def plot_unfolded_mass(
                         label="W+jets (NLO) "+ matching_str[matching]+ ("" if ax_==ax else " ("+pt_bin_tex+")"),
                         ax=ax_,
                         ls="-",
+                        lw=2,
                         alpha=alpha,
                         **matching_kwargs[matching]
                     )
@@ -914,7 +919,8 @@ def plot_unfolded_mass(
                     color="k",
                     alpha=alpha,
                     fmt="o",
-                    markersize=6,
+                    markersize=10,
+                    lw=2,
                     **marker_kwargs[matching]
                 )
         if doRatio:
@@ -955,7 +961,8 @@ def plot_unfolded_mass(
                     color="k",
                     alpha=1.0,
                     fmt="o",
-                    markersize=6,
+                    markersize=10,
+                    lw=2,
                     **marker_kwargs[matching]
                   )
         hep.cms.label("", ax=ax, lumi=138, fontsize=30, data=True)
@@ -1084,6 +1091,10 @@ def plot_unfolded_mass(
                 "values": mc_truth_sum[matching],
                 "edges": msd_edges_,
                 "variances": mc_truth_variance_sum[matching],
+                "total_theory_lower": theory_lower_sum[matching],
+                "total_theory_upper": theory_upper_sum[matching],
+                "nlo_theory_lower": theory_lower_sum2[matching],
+                "nlo_theory_upper": theory_upper_sum2[matching]
             }
             hep.histplot(
                 mc_truth_sum[matching],
@@ -1093,6 +1104,7 @@ def plot_unfolded_mass(
                 label="W+jets (NLO) "+matching_str[matching],
                 alpha=0.8,
                 ls="-",
+                lw=2,
                 **matching_kwargs[matching]
             )
             for ibin in range(len(msd_edges_)-1):
@@ -1143,7 +1155,8 @@ def plot_unfolded_mass(
                 ax=ax,
                 label="W+jets (LO) $m_{W}$="+str(mass)+" GeV",
                 color=col,
-                ls=ls
+                ls=ls,
+                lw=2,
               )
             if doRatio:
               for ibin in range(len(msd_edges_)-1):
@@ -1170,7 +1183,8 @@ def plot_unfolded_mass(
                   ax=axratio,
                   label="W+jets (LO) $m_{W}$="+str(mass)+" GeV",
                   color=col,
-                  ls=ls
+                  ls=ls,
+                  lw=2,
                 )
                 #axratio.errorbar(
                 #msd_centers,
@@ -1195,7 +1209,8 @@ def plot_unfolded_mass(
             label=data_label,
             color="k",
             fmt="o",
-            markersize=6,
+            markersize=10,
+            lw=2,
             **marker_kwargs[matching]
         )
         if doRatio:
@@ -1207,7 +1222,8 @@ def plot_unfolded_mass(
             label=data_label,
             color="k",
             fmt="o",
-            markersize=6,
+            markersize=10,
+            lw=2,
             **marker_kwargs[matching]
           )
 

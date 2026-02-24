@@ -5,6 +5,12 @@ import mplhep as hep
 import json
 hep.style.use("CMS")
 import re
+
+import matplotlib as mpl
+from matplotlib.colors import LinearSegmentedColormap
+cmap2 = LinearSegmentedColormap.from_list("cmap2", ["#e42536", "white", "#5790fc"],N=60)
+mpl.colormaps.register(cmap=cmap2)
+
 #fit_dir = "../rhalph/UnfoldingParticleNet_18-09-24/FullRunII"
 #fit_dir = "../rhalph/UnfoldingSubstructure_18-09-24/FullRunII"
 fit_dir = "../rhalph/UnfoldingParticleNet_N2Cut_18-09-24/FullRunII"
@@ -43,7 +49,7 @@ np.min(corr)
 
 f,ax = plt.subplots(figsize=(10,10))
 
-cmap = ax.pcolormesh(axis_labels, axis_labels, corr)#, cmap="RdGy")
+cmap = ax.pcolormesh(axis_labels, axis_labels, corr,vmin=-1, vmax=1,cmap="cmap2")#, cmap="RdGy")
 f.colorbar(cmap,ax=ax)
 plt.xticks(rotation = 90)
 ax.add_patch(Rectangle((3.5,3.5),8,8 , edgecolor = "tab:red", fill=False))
@@ -93,7 +99,7 @@ twiny.set_xlabel("$p_{T}^{\mathrm{ptcl}}~\mathrm{[GeV]}$",fontsize=fs,labelpad=1
 
 hep.cms.label("", ax=ax0, lumi=138, fontsize=25, data=True)
 
-cmap = ax.pcolormesh(edges, edges, corr, vmin=-1, vmax=1)#, cmap="RdGy")
+cmap = ax.pcolormesh(edges, edges, corr, vmin=-1, vmax=1,cmap="cmap2")#, cmap="RdGy")
 cax.axis('off')
 
 f.savefig(f"{fit_dir}/corr_matrix.pdf",bbox_inches="tight")

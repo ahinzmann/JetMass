@@ -46,12 +46,12 @@ if __name__=="__main__":
  binning=array.array('d')
  for n in range(21):
      binning.append(50+n*9)
- for n2 in ["withN2","noN2"]:
-  for tagger in ["_particlenetDDT",""]:
-   for sample in ["WJets","ZJets","TTToHadronic","QCD","WJetsMatched","WJetsMatched_fakes","WJetsUnmatched"]:
-    for year in ["UL18","UL17","UL16preVFP","UL16postVFP"]:
-     for ptmin,ptmax in [(575,650),(650,725),(725,800),(800,1000),(1000,1200),(1200,3000)]:
- #for n2,tagger,sample,year,ptmin,ptmax in [("withN2","_particlenetDDT","WJets","UL17",650,725),("withN2","_particlenetDDT","WJetsMatched","UL17",650,725),("withN2","_particlenetDDT","WJetsUnmatched","UL17",650,725)]:
+ #for n2 in ["withN2","noN2"]:
+ # for tagger in ["_particlenetDDT",""]:
+ #  for sample in ["WJets","ZJets","TTToHadronic","QCD","WJetsMatched","WJetsMatched_fakes","WJetsUnmatched"]:
+ #   for year in ["UL18","UL17","UL16preVFP","UL16postVFP"]:
+ #    for ptmin,ptmax in [(575,650),(650,725),(725,800),(800,1000),(1000,1200),(1200,3000)]:
+ for n2,tagger,sample,year,ptmin,ptmax in [("withN2","_particlenetDDT","WJets","UL17",650,725),("withN2","_particlenetDDT","WJetsMatched","UL17",650,725),("withN2","_particlenetDDT","WJetsUnmatched","UL17",650,725)]:
       for plotname, plotlist in [("summary",["nominal",
       "pu_down","pu_up","triggersf_down","triggersf_up","prefiring",
       "jec_down","jec_up",
@@ -163,7 +163,7 @@ if __name__=="__main__":
        if sample=="TTToHadronic": samplename="t#bar{t}"
        if sample=="QCD": samplename="QCD"
  
-       l=TLegend(0.52,0.5,0.9,0.9,samplename+", "+str(ptmin)+"<p_{T}<"+str(ptmax)+" GeV, "+year)
+       l=TLegend(0.52,0.5,0.9,0.9,samplename+", "+str(ptmin)+" < p_{T} < "+str(ptmax)+" GeV, "+year)
        #l.SetTextFont(42)
        #l.SetTitle()
        l.SetTextSize(0.035)
@@ -236,11 +236,17 @@ if __name__=="__main__":
          if sample=="TTToHadronic": samplename="t#bar{t}"
          if sample=="QCD": samplename="QCD"
  
-         l=TLegend(0.52,0.5,0.9,0.9,samplename+", "+str(ptmin)+"<p_{T}<"+str(ptmax).replace("3000","inf")+" GeV")
+         l=TLegend(0.50,0.35,0.9,0.80,samplename+", "+str(ptmin)+" < p_{T} < "+str(ptmax).replace("3000","inf")+" GeV")
          #l.SetTextFont(42)
          #l.SetTitle()
          l.SetTextSize(0.04)
          l.SetFillStyle(0)
+
+         l2=TLegend(0.50,0.3,0.9,0.65,"")
+         #l2.SetTextFont(42)
+         #l2.SetTitle()
+         l2.SetTextSize(0.04)
+         l2.SetFillStyle(0)
 
          stack=None
          histlist={}
@@ -275,8 +281,8 @@ if __name__=="__main__":
              else:
                stack.SetBinContent(b+1,math.sqrt(pow(stack.GetBinContent(b+1),2)+pow(hist.GetBinContent(b+1),2)))
            hist.GetXaxis().SetTitle("m_{SD} [GeV]")
-           hist.GetYaxis().SetTitle("Uncertainty in %")
-           hist.GetYaxis().SetRangeUser(0,100)
+           hist.GetYaxis().SetTitle("Uncertainty [%]")
+           hist.GetYaxis().SetRangeUser(0,38)
            hist.SetTitle("")
            hists+=[hist]
   
@@ -301,12 +307,18 @@ if __name__=="__main__":
          stack.SetMarkerSize(0)
          stack.Draw("lsame")
          l.AddEntry(stack,"Total","l")
-
+          
+         c=0
          for sys in reversed(plotlist):
+           c+=1
            if "down" in sys or sys=="nominal" or not sys in histlist.keys(): continue
+           #if c<10:
            l.AddEntry(histlist[sys],names[sys.replace("_up","")],"pl")
-         
+           #else:
+           #  l2.AddEntry(histlist[sys],names[sys.replace("_up","")],"pl")
+        
          l.Draw("same")
+         #l2.Draw("same")
                
          CMS.CMS_lumi(canvas, 0)
          canvas.Modified()

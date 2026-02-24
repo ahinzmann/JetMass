@@ -5,6 +5,10 @@ import numpy as np
 from scipy.special import binom
 from utils import year_alias
 import json
+import matplotlib as mpl
+from matplotlib.colors import LinearSegmentedColormap
+cmap1 = LinearSegmentedColormap.from_list("cmap1", ["white", "#e42536", "#5790fc"],N=60)
+mpl.colormaps.register(cmap=cmap1)
 
 hep.style.use("CMS")
 
@@ -83,7 +87,8 @@ def plot_year_bernstein(fit_dir: str, year: str, data: bool = False):
     z_max = np.ceil(precision*np.max(bernstein_map[valid_rho_bins]))/precision + 3/(precision*10)
     z_offset = np.max([abs(z_max-1.), abs(z_min-1.)])
 
-    cmap = ax.pcolormesh(msd_edges, pt_edges, bernstein_map, cmap="RdGy_r", vmin=1 - z_offset, vmax=1 + z_offset)
+    #cmap = ax.pcolormesh(msd_edges, pt_edges, bernstein_map, cmap="RdGy_r", vmin=1 - z_offset, vmax=1 + z_offset)
+    cmap = ax.pcolormesh(msd_edges, pt_edges, bernstein_map, cmap="cmap1", vmin=1.0, vmax=1.25)
 
     fs = 23
     hep.cms.label("", lumi=138#, year=""# year_alias[year], 
